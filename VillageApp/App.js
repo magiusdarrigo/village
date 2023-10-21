@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, createContext, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import React, { useState, createContext, useContext, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { View, ActivityIndicator } from "react-native";
 import { onAuthStateChanged } from "firebase/auth";
-
-import Chat from "./screens/Chat";
+import { auth } from "./config/firebase";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
-import Home from "./screens/Home.1";
+import Chat from "./screens/Chat";
+import Home from "./screens/Home";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -32,7 +32,7 @@ function ChatStack() {
 
 function AuthStack() {
   return (
-    <Stack.Navigator defaultScreenOptions={Login}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
     </Stack.Navigator>
@@ -41,26 +41,20 @@ function AuthStack() {
 
 function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
-  const [loading, setLoading] = useState(true);
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
-      try {
-        if (user) {
-          setUser(user);
-          setLoading(false);
-        } else {
-          setUser(null);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
+    // onAuthStateChanged returns an unsubscriber
+    const unsubscribeAuth = onAuthStateChanged(
+      auth,
+      async (authenticatedUser) => {
+        authenticatedUser ? setUser(authenticatedUser) : setUser(null);
+        setIsLoading(false);
       }
-    });
-    return () => unsubscribeAuth();
+    );
+    // unsubscribe auth listener on unmount
+    return unsubscribeAuth;
   }, [user]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
@@ -71,7 +65,6 @@ function RootNavigator() {
   return (
     <NavigationContainer>
       {user ? <ChatStack /> : <AuthStack />}
-      <ChatStack />
     </NavigationContainer>
   );
 }

@@ -11,7 +11,7 @@ import {
   StatusBar,
   Alert,
 } from "react-native";
-import { SignInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
 const backImage = require("../assets/backImage.png");
 
