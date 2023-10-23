@@ -71,7 +71,8 @@ model Post {
 
   comments       Comment[]
 
-  @@index([createdAt, neighborhoodID], name: "idx_post_createdat_neighborhood")
+  @@index([neighborhoodID, createdAt], name: "idx_post_neighborhood_createdat")
+  @@index([userID, createdAt], name: "idx_post_user_createdat")
 }
 
 model Comment {
