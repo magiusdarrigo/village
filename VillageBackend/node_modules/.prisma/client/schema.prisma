@@ -70,6 +70,8 @@ model Post {
   tags           Json?
 
   comments       Comment[]
+
+  @@index([createdAt, neighborhoodID], name: "idx_post_createdat_neighborhood")
 }
 
 model Comment {
@@ -81,6 +83,8 @@ model Comment {
   textContent    String
   createdAt      DateTime       @default(now())
   tags           Json?
+
+  @@index([postID], name: "idx_comment_post")
 }
 
 model ChatMessage {
@@ -102,4 +106,6 @@ model UserFollowing {
   followingUserID    Int
   createdAt          DateTime @default(now())
   tags               Json?
+
+  @@index([followerUserID, followingUserID], name: "idx_userfollowing_relationship")
 }
