@@ -25,16 +25,51 @@ router.post("/", async (req, res) => {
   }
 });
 
-// // list post
-// router.get("/:id", (req, res) => {
-//   const { id } = req.params;
-//   res.status(501).json({ error: `get tweet ${id} not implemented` });
-// });
+/**
+ * get posts by neighborhood id
+ * order by createdAt descending
+ * paginate by 20 for infinite scroll on the frontend
+ */
+router.get("/neighborhood/:neighborhoodID", async (req, res) => {
+  const { neighborhoodID } = req.params;
+  const { cursor } = req.query;
+  try {
+    const posts = await prisma.post.findMany({
+      where: {
+        neighborhoodID: Number(neighborhoodID),
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 20,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: Number(cursor) } : undefined,
+    });
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching posts",
+    });
+  }
+});
 
-// // delete post
-// router.delete("/:id", (req, res) => {
-//   const { id } = req.params;
-//   res.status(501).json({ error: `delete tweet ${id} not implemented` });
-// });
+// delete post
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedPost = await prisma.post.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.json(deletedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error deleting post: ${id}`,
+    });
+  }
+});
 
 export default router;
