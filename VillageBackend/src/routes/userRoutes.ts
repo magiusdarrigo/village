@@ -52,7 +52,7 @@ router.put("/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error updating user with id ${id}`,
+      error: `error updating user: ${id}`,
     });
   }
 });
@@ -83,7 +83,7 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error getting user with id ${id}`,
+      error: `error getting user: ${id}`,
     });
   }
 });
@@ -101,7 +101,7 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error deleting user with id ${id}`,
+      error: `error deleting user: ${id}`,
     });
   }
 });
