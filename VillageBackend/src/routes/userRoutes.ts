@@ -16,7 +16,8 @@ router.post("/", async (req, res) => {
     });
     res.json(newUser);
   } catch (error) {
-    res.status(400).json({
+    console.error(error);
+    res.status(500).json({
       error: `error creating user with username ${username} and email ${email}`,
     });
   }
@@ -33,48 +34,76 @@ router.put("/:id", async (req, res) => {
     followersCount,
     followingCount,
   } = req.body;
-  const updatedUser = await prisma.user.update({
-    where: {
-      id: Number(id),
-    },
-    data: {
-      image,
-      isVerified,
-      neighborhoodID,
-      buildingID,
-      followersCount,
-      followingCount,
-    },
-  });
-  res.json(updatedUser);
+  try {
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        image,
+        isVerified,
+        neighborhoodID,
+        buildingID,
+        followersCount,
+        followingCount,
+      },
+    });
+    res.json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error updating user with id ${id}`,
+    });
+  }
 });
 
 // list users
 router.get("/", async (req, res) => {
-  const allUsers = await prisma.user.findMany();
-  res.json(allUsers);
+  try {
+    const allUsers = await prisma.user.findMany();
+    res.json(allUsers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error listing users`,
+    });
+  }
 });
 
 // get one user
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: Number(id),
-    },
-  });
-  res.json(user);
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error getting user with id ${id}`,
+    });
+  }
 });
 
 // delete user
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  const deletedUser = await prisma.user.delete({
-    where: {
-      id: Number(id),
-    },
-  });
-  res.json(deletedUser);
+  try {
+    const deletedUser = await prisma.user.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.json(deletedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error deleting user with id ${id}`,
+    });
+  }
 });
 
 export default router;
