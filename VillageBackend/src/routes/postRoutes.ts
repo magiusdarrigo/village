@@ -49,7 +49,36 @@ router.get("/neighborhood/:neighborhoodID", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: "error fetching posts",
+      error: "error fetching posts for timeline",
+    });
+  }
+});
+
+/**
+ * get posts by user id
+ * order by createdAt descending
+ * paginate by 10 for infinite scroll on the frontend
+ */
+router.get("/user/:userID", async (req, res) => {
+  const { userID } = req.params;
+  const { cursor } = req.query;
+  try {
+    const posts = await prisma.post.findMany({
+      where: {
+        userID: Number(userID),
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 10,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: Number(cursor) } : undefined,
+    });
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching posts for profile",
     });
   }
 });
