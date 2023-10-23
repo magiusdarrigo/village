@@ -1,11 +1,15 @@
 import express from "express";
 import userRoutes from "./routes/userRoutes";
 import postRoutes from "./routes/postRoutes";
+import neighborhoodRoutes from "./routes/neighborhoodRoutes";
+import buildingRoutes from "./routes/buildingRoutes";
 
 const app = express();
 app.use(express.json());
 app.use("/user", userRoutes);
 app.use("/post", postRoutes);
+app.use("/neighborhood", neighborhoodRoutes);
+app.use("/building", buildingRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

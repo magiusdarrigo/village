@@ -4,104 +4,91 @@ import { PrismaClient } from "@prisma/client";
 const router = Router();
 const prisma = new PrismaClient();
 
-// create user
+// create neighborhood
 router.post("/", async (req, res) => {
-  const { username, email } = req.body;
+  const { name } = req.body;
   try {
-    const newUser = await prisma.user.create({
+    const newNeighborhood = await prisma.neighborhood.create({
       data: {
-        username,
-        email,
+        name,
       },
     });
-    res.json(newUser);
+    res.json(newNeighborhood);
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error creating user with username ${username} and email ${email}`,
+      error: `error creating neighborhood with name ${name}`,
     });
   }
 });
 
-// update user
+// update neighborhood
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const {
-    image,
-    isVerified,
-    neighborhoodID,
-    buildingID,
-    followersCount,
-    followingCount,
-  } = req.body;
+  const { name } = req.body;
   try {
-    const updatedUser = await prisma.user.update({
+    const updatedNeighborhood = await prisma.neighborhood.update({
       where: {
         id: Number(id),
       },
       data: {
-        image,
-        isVerified,
-        neighborhoodID,
-        buildingID,
-        followersCount,
-        followingCount,
+        name,
       },
     });
-    res.json(updatedUser);
+    res.json(updatedNeighborhood);
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error updating user: ${id}`,
+      error: `error updating neighborhood: ${id}`,
     });
   }
 });
 
-// list users
+// list neighborhoods
 router.get("/", async (_, res) => {
   try {
-    const allUsers = await prisma.user.findMany();
-    res.json(allUsers);
+    const neighborhoods = await prisma.neighborhood.findMany();
+    res.json(neighborhoods);
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error listing users`,
+      error: "error fetching neighborhoods",
     });
   }
 });
 
-// get one user
+// get one neighborhood
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await prisma.user.findUnique({
+    const neighborhood = await prisma.neighborhood.findUnique({
       where: {
         id: Number(id),
       },
     });
-    res.json(user);
+    res.json(neighborhood);
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error getting user: ${id}`,
+      error: `error fetching neighborhood: ${id}`,
     });
   }
 });
 
-// delete user
+// delete neighborhood
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedUser = await prisma.user.delete({
+    const deletedNeighborhood = await prisma.neighborhood.delete({
       where: {
         id: Number(id),
       },
     });
-    res.json(deletedUser);
+    res.json(deletedNeighborhood);
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error deleting user: ${id}`,
+      error: `error deleting neighborhood: ${id}`,
     });
   }
 });
