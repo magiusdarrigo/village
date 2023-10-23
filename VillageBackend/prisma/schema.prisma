@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int            @id @default(autoincrement())
+  username       String         @unique
+  email          String         @unique
+  image          String?
+  isVerified     Boolean        @default(false)
+  neighborhood   Neighborhood?  @relation(fields: [neighborhoodID], references: [id])
+  neighborhoodID Int?
+  building       Building?      @relation(fields: [buildingID], references: [id])
+  buildingID     Int?
+  followersCount Int            @default(0)
+  followingCount Int            @default(0)
+  createdAt      DateTime       @default(now())
+  tags           Json?
+  
+  Posts          Post[]
+  comments       Comment[]
+  chatMessages   ChatMessage[]
+  followedBy     UserFollowing[] @relation("followerUserID")
+  following      UserFollowing[] @relation("followingUserID")
+}
+
+model Neighborhood {
+  id             Int            @id @default(autoincrement())
+  name           String         @unique
+  createdAt      DateTime       @default(now())
+  tags           Json?
+
+  users          User[]
+  buildings      Building[]
+  Posts          Post[]
+}
+
+
+model Building {
+  id             Int            @id @default(autoincrement())
+  address        String
+  neighborhood   Neighborhood   @relation(fields: [neighborhoodID], references: [id])
+  neighborhoodID Int
+  createdAt      DateTime       @default(now())
+  tags           Json?
+  
+  users          User[]
+  chatMessages   ChatMessage[]
+}
+
+model Post {
+  id             Int            @id @default(autoincrement())
+  user           User           @relation(fields: [userID], references: [id])
+  userID         Int
+  neighborhood   Neighborhood   @relation(fields: [neighborhoodID], references: [id])
+  neighborhoodID Int
+  textContent    String?
+  imageURL       String         @default("")
+  likesCount     Int            @default(0)
+  createdAt      DateTime       @default(now())
+  tags           Json?
+
+  comments       Comment[]
+}
+
+model Comment {
+  id             Int            @id @default(autoincrement())
+  post           Post           @relation(fields: [postID], references: [id])
+  postID         Int
+  user           User           @relation(fields: [userID], references: [id])
+  userID         Int
+  textContent    String
+  createdAt      DateTime       @default(now())
+  tags           Json?
+}
+
+model ChatMessage {
+  id             Int            @id @default(autoincrement())
+  user           User           @relation(fields: [userID], references: [id])
+  userID         Int
+  building       Building       @relation(fields: [buildingID], references: [id])
+  buildingID     Int
+  textContent    String
+  createdAt      DateTime       @default(now())
+  tags           Json?
+}
+
+model UserFollowing {
+  id                 Int      @id @default(autoincrement())
+  followerUser       User     @relation("followerUserID", fields: [followerUserID], references: [id])
+  followerUserID     Int
+  followingUser      User     @relation("followingUserID", fields: [followingUserID], references: [id])
+  followingUserID    Int
+  createdAt          DateTime @default(now())
+  tags               Json?
+}
