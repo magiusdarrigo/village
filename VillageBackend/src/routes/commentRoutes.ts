@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import prisma from "../prismaClient";
 import { getTop10CommentsFromPostQuery } from "../sql_queries/comments";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // create comment
 router.post("/", async (req, res) => {
