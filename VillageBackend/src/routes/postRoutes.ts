@@ -94,16 +94,27 @@ router.get("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { textContent, imageURL, likesCount } = req.body;
+
+  let updateData: any = {
+    textContent,
+    imageURL,
+  };
+
+  if (likesCount === 1 || likesCount === -1) {
+    updateData.likesCount = {
+      increment: likesCount,
+    };
+  } else if (likesCount && likesCount !== 1 && likesCount !== -1) {
+    // If likesCount is provided but is not +1 or -1, set it directly
+    updateData.likesCount = likesCount;
+  }
+
   try {
     const updatedPost = await prisma.post.update({
       where: {
         id: Number(id),
       },
-      data: {
-        textContent,
-        imageURL,
-        likesCount,
-      },
+      data: updateData,
     });
     res.json(updatedPost);
   } catch (error) {

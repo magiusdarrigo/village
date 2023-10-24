@@ -30,15 +30,26 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { textContent, likesCount } = req.body;
+
+  let updateData: any = {
+    textContent,
+  };
+
+  if (likesCount === 1 || likesCount === -1) {
+    updateData.likesCount = {
+      increment: likesCount,
+    };
+  } else if (likesCount && likesCount !== 1 && likesCount !== -1) {
+    // If likesCount is provided but is not +1 or -1, set it directly
+    updateData.likesCount = likesCount;
+  }
+
   try {
     const updatedComment = await prisma.comment.update({
       where: {
         id: Number(id),
       },
-      data: {
-        textContent,
-        likesCount,
-      },
+      data: updateData,
     });
     res.json(updatedComment);
   } catch (error) {
@@ -74,6 +85,24 @@ router.get("/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: "error fetching comments for post",
+    });
+  }
+});
+
+// get comment by id
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error fetching comment: ${id}`,
     });
   }
 });
