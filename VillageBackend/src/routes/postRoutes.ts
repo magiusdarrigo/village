@@ -29,9 +29,13 @@ router.post("/", async (req, res) => {
  * order by createdAt descending
  * paginate by 20 for infinite scroll on the frontend
  */
-router.get("/neighborhood/:neighborhoodID", async (req, res) => {
-  const { neighborhoodID } = req.params;
-  const { cursor } = req.query;
+router.get("/", async (req, res) => {
+  const { neighborhoodID, cursor } = req.query;
+
+  if (!neighborhoodID) {
+    return res.status(400).json({ error: "neighborhoodID is required" });
+  }
+
   try {
     const posts = await prisma.post.findMany({
       where: {
@@ -58,9 +62,13 @@ router.get("/neighborhood/:neighborhoodID", async (req, res) => {
  * order by createdAt descending
  * paginate by 10 for infinite scroll on the frontend
  */
-router.get("/user/:userID", async (req, res) => {
-  const { userID } = req.params;
-  const { cursor } = req.query;
+router.get("/", async (req, res) => {
+  const { userID, cursor } = req.query;
+
+  if (!userID) {
+    return res.status(400).json({ error: "userID is required" });
+  }
+
   try {
     const posts = await prisma.post.findMany({
       where: {

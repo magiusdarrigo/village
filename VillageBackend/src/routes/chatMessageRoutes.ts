@@ -30,8 +30,13 @@ router.post("/", async (req, res) => {
 });
 
 // get chat messages by building id
-router.get("/building/:buildingID", async (req, res) => {
-  const { buildingID } = req.params;
+router.get("/", async (req, res) => {
+  const { buildingID } = req.query;
+
+  if (!buildingID) {
+    return res.status(400).json({ error: "buildingID is required" });
+  }
+
   try {
     const messages = await prisma.chatMessage.findMany({
       where: {
