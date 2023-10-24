@@ -82,10 +82,15 @@ model Comment {
   user           User           @relation(fields: [userID], references: [id])
   userID         Int
   textContent    String
+  likesCount     Int            @default(0)
   createdAt      DateTime       @default(now())
   tags           Json?
+  parentComment  Comment?       @relation("Replies", fields: [parentCommentID], references: [id])
+  parentCommentID Int?
+  replies        Comment[]      @relation("Replies")
 
-  @@index([postID], name: "idx_comment_post")
+  @@index([postID, likesCount], name: "idx_comment_post_likes")
+  @@index([parentCommentID], name: "idx_comment_parent_comment")
 }
 
 model ChatMessage {
