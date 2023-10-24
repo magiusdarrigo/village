@@ -83,6 +83,30 @@ router.get("/user/:userID", async (req, res) => {
   }
 });
 
+// update post
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { textContent, imageURL, likesCount } = req.body;
+  try {
+    const updatedPost = await prisma.post.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        textContent,
+        imageURL,
+        likesCount,
+      },
+    });
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error updating post: ${id}`,
+    });
+  }
+});
+
 // delete post
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
