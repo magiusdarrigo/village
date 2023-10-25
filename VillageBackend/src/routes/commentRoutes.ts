@@ -65,20 +65,29 @@ router.put("/:id", async (req, res) => {
  * order comments by likesCount descending
  * paginate by 10 for infinite scroll on the frontend
  * all replies to a comment will be returned
+ * determine if each comment has been liked by a user
  */
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  const { lastLikesCount, lastCommentID } = req.query;
+  const { lastLikesCount, lastCommentID, userID } = req.query;
+
+  if (!userID) {
+    return res
+      .status(400)
+      .json({ error: "userID is required to determine comment likes." });
+  }
 
   // If we have a lastLikesCount and lastCommentID, we'll use them for pagination.
   const likesCount = lastLikesCount ? Number(lastLikesCount) : Infinity;
   const commentID = lastCommentID ? Number(lastCommentID) : Infinity;
+
   try {
     const comments = await prisma.$queryRaw(
       Prisma.sql`${getTop10CommentsFromPostQuery}`,
       id,
       likesCount,
-      commentID
+      commentID,
+      userID
     );
     res.json(comments);
   } catch (error) {
