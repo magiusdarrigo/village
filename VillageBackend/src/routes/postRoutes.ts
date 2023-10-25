@@ -133,4 +133,71 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// like a post
+router.post("/posts/:id/likes", async (req, res) => {
+  const { id } = req.params;
+  const userID = req.body.userID; // assuming the user ID is sent in the request body
+
+  try {
+    const createLike = prisma.userLike.create({
+      data: {
+        userID,
+        postID: Number(id),
+      },
+    });
+
+    const incrementLikes = prisma.post.update({
+      where: { id: Number(id) },
+      data: {
+        likesCount: {
+          increment: 1,
+        },
+      },
+    });
+
+    const [newLike, updatedPost] = await prisma.$transaction([
+      createLike,
+      incrementLikes,
+    ]);
+
+    res.status(201).json({ newLike, updatedPost });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error liking the post." });
+  }
+});
+
+// unlike a post
+router.delete("/posts/:id/likes", async (req, res) => {
+  const { id } = req.params;
+  const userID = req.body.userID; // assuming the user ID is sent in the request body
+
+  try {
+    const deleteLike = prisma.userLike.delete({
+      where: {
+        userID_postID: {
+          userID,
+          postID: Number(id),
+        },
+      },
+    });
+
+    const decrementLikes = prisma.post.update({
+      where: { id: Number(id) },
+      data: {
+        likesCount: {
+          decrement: 1,
+        },
+      },
+    });
+
+    await prisma.$transaction([deleteLike, decrementLikes]);
+
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error unliking the post." });
+  }
+});
+
 export default router;
