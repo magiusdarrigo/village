@@ -126,5 +126,55 @@ router.delete("/:id", async (req, res) => {
 });
 
 // like a comment
+router.post("/:id/likes", async (req, res) => {
+  // the comment id
+  const { id } = req.params;
+  const { userID } = req.body;
+  try {
+    await prisma.$transaction([
+      prisma.comment.update({
+        where: { id: Number(id) },
+        data: { likesCount: { increment: 1 } },
+      }),
+      prisma.commentLike.create({
+        data: {
+          userID,
+          commentID: Number(id),
+        },
+      }),
+    ]);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error liking comment" });
+  }
+});
+
+// unlike a comment
+router.delete("/:id/likes", async (req, res) => {
+  // the comment id
+  const { id } = req.params;
+  const { userID } = req.body;
+  try {
+    await prisma.$transaction([
+      prisma.comment.update({
+        where: { id: Number(id) },
+        data: { likesCount: { decrement: 1 } },
+      }),
+      prisma.commentLike.deleteMany({
+        where: {
+          userID,
+          commentID: Number(id),
+        },
+      }),
+    ]);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error unliking comment" });
+  }
+});
 
 export default router;

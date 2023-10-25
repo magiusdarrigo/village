@@ -139,7 +139,7 @@ router.post("/:id/likes", async (req, res) => {
   const userID = req.body.userID; // assuming the user ID is sent in the request body
 
   try {
-    const createLike = prisma.userLike.create({
+    const createLike = prisma.postLike.create({
       data: {
         userID,
         postID: Number(id),
@@ -173,7 +173,7 @@ router.delete("/:id/likes", async (req, res) => {
   const userID = req.body.userID; // assuming the user ID is sent in the request body
 
   try {
-    const deleteLike = prisma.userLike.delete({
+    const deleteLike = prisma.postLike.delete({
       where: {
         userID_postID: {
           userID,
