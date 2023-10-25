@@ -48,8 +48,8 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const posts = await prisma.$queryRaw(
-      Prisma.sql`${get20NewestPostsForTimelineQuery}`,
+    const posts = await prisma.$queryRawUnsafe(
+      get20NewestPostsForTimelineQuery,
       userID,
       neighborhoodID,
       cursor
