@@ -105,4 +105,78 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// follow a user
+router.post("/:id/follow", async (req, res) => {
+  const { id } = req.params;
+  // the id of the user who is following
+  const followerID = req.body.followerID;
+
+  try {
+    const createFollowing = prisma.userFollowing.create({
+      data: {
+        followerUserID: followerID,
+        followingUserID: Number(id),
+      },
+    });
+
+    const incrementFollowingCount = prisma.user.update({
+      where: { id: followerID },
+      data: { followingCount: { increment: 1 } },
+    });
+
+    const incrementFollowersCount = prisma.user.update({
+      where: { id: Number(id) },
+      data: { followersCount: { increment: 1 } },
+    });
+
+    await prisma.$transaction([
+      createFollowing,
+      incrementFollowingCount,
+      incrementFollowersCount,
+    ]);
+
+    res.status(200).json({ message: "Successfully followed the user." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error following the user." });
+  }
+});
+
+// unfollow a user
+router.delete("/:id/follow", async (req, res) => {
+  const { id } = req.params;
+  // the id of the user who is following
+  const followerID = req.body.followerID;
+
+  try {
+    const deleteFollowing = prisma.userFollowing.deleteMany({
+      where: {
+        followerUserID: followerID,
+        followingUserID: Number(id),
+      },
+    });
+
+    const decrementFollowingCount = prisma.user.update({
+      where: { id: followerID },
+      data: { followingCount: { decrement: 1 } },
+    });
+
+    const decrementFollowersCount = prisma.user.update({
+      where: { id: Number(id) },
+      data: { followersCount: { decrement: 1 } },
+    });
+
+    await prisma.$transaction([
+      deleteFollowing,
+      decrementFollowingCount,
+      decrementFollowersCount,
+    ]);
+
+    res.status(200).json({ message: "Successfully unfollowed the user." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error unfollowing the user." });
+  }
+});
+
 export default router;

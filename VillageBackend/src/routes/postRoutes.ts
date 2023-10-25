@@ -134,7 +134,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // like a post
-router.post("/posts/:id/likes", async (req, res) => {
+router.post("/:id/likes", async (req, res) => {
   const { id } = req.params;
   const userID = req.body.userID; // assuming the user ID is sent in the request body
 
@@ -168,7 +168,7 @@ router.post("/posts/:id/likes", async (req, res) => {
 });
 
 // unlike a post
-router.delete("/posts/:id/likes", async (req, res) => {
+router.delete("/:id/likes", async (req, res) => {
   const { id } = req.params;
   const userID = req.body.userID; // assuming the user ID is sent in the request body
 
