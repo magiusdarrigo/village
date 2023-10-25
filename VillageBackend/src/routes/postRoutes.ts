@@ -1,5 +1,10 @@
 import { Router } from "express";
+import { Prisma } from "@prisma/client";
 import prisma from "../prismaClient";
+import {
+  get20NewestPostsForTimelineQuery,
+  getPostsByUserQuery,
+} from "../sql_queries/posts";
 
 const router = Router();
 
@@ -30,24 +35,26 @@ router.post("/", async (req, res) => {
  * paginate by 20 for infinite scroll on the frontend
  */
 router.get("/", async (req, res) => {
-  const { neighborhoodID, cursor } = req.query;
+  const { neighborhoodID, userID, cursor } = req.query;
 
   if (!neighborhoodID) {
     return res.status(400).json({ error: "neighborhoodID is required" });
   }
 
+  if (!userID) {
+    return res
+      .status(400)
+      .json({ error: "userId is required to determine post likes." });
+  }
+
   try {
-    const posts = await prisma.post.findMany({
-      where: {
-        neighborhoodID: Number(neighborhoodID),
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 20,
-      skip: cursor ? 1 : 0,
-      cursor: cursor ? { id: Number(cursor) } : undefined,
-    });
+    const posts = await prisma.$queryRaw(
+      Prisma.sql`${get20NewestPostsForTimelineQuery}`,
+      userID,
+      neighborhoodID,
+      cursor
+    );
+
     res.json(posts);
   } catch (error) {
     console.error(error);
@@ -70,17 +77,12 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const posts = await prisma.post.findMany({
-      where: {
-        userID: Number(userID),
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 10,
-      skip: cursor ? 1 : 0,
-      cursor: cursor ? { id: Number(cursor) } : undefined,
-    });
+    const posts = await prisma.$queryRaw(
+      Prisma.sql`${getPostsByUserQuery}`,
+      userID,
+      cursor ? 1 : 0
+    );
+
     res.json(posts);
   } catch (error) {
     console.error(error);
