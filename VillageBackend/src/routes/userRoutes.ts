@@ -7,7 +7,7 @@ const router = Router();
 router.post("/", async (req, res) => {
   const { username, email } = req.body;
   try {
-    const newUser = await prisma.user.create({
+    const newUser = await prisma.users.create({
       data: {
         username,
         email,
@@ -34,7 +34,7 @@ router.put("/:id", async (req, res) => {
     followingCount,
   } = req.body;
   try {
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.users.update({
       where: {
         id: Number(id),
       },
@@ -59,7 +59,7 @@ router.put("/:id", async (req, res) => {
 // list users
 router.get("/", async (_, res) => {
   try {
-    const allUsers = await prisma.user.findMany();
+    const allUsers = await prisma.users.findMany();
     res.json(allUsers);
   } catch (error) {
     console.error(error);
@@ -73,7 +73,7 @@ router.get("/", async (_, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: {
         id: Number(id),
       },
@@ -91,7 +91,7 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedUser = await prisma.user.delete({
+    const deletedUser = await prisma.users.delete({
       where: {
         id: Number(id),
       },
@@ -112,19 +112,19 @@ router.post("/:id/follow", async (req, res) => {
   const followerID = req.body.followerID;
 
   try {
-    const createFollowing = prisma.userFollowing.create({
+    const createFollowing = prisma.user_following.create({
       data: {
         followerUserID: followerID,
         followingUserID: Number(id),
       },
     });
 
-    const incrementFollowingCount = prisma.user.update({
+    const incrementFollowingCount = prisma.users.update({
       where: { id: followerID },
       data: { followingCount: { increment: 1 } },
     });
 
-    const incrementFollowersCount = prisma.user.update({
+    const incrementFollowersCount = prisma.users.update({
       where: { id: Number(id) },
       data: { followersCount: { increment: 1 } },
     });
@@ -149,19 +149,19 @@ router.delete("/:id/follow", async (req, res) => {
   const followerID = req.body.followerID;
 
   try {
-    const deleteFollowing = prisma.userFollowing.deleteMany({
+    const deleteFollowing = prisma.user_following.deleteMany({
       where: {
         followerUserID: followerID,
         followingUserID: Number(id),
       },
     });
 
-    const decrementFollowingCount = prisma.user.update({
+    const decrementFollowingCount = prisma.users.update({
       where: { id: followerID },
       data: { followingCount: { decrement: 1 } },
     });
 
-    const decrementFollowersCount = prisma.user.update({
+    const decrementFollowersCount = prisma.users.update({
       where: { id: Number(id) },
       data: { followersCount: { decrement: 1 } },
     });

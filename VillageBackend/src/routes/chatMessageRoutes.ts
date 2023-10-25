@@ -12,7 +12,7 @@ const router = Router();
 router.post("/", async (req, res) => {
   const { userID, buildingID, textContent, tags } = req.body;
   try {
-    const newMessage = await prisma.chatMessage.create({
+    const newMessage = await prisma.chat_messages.create({
       data: {
         userID,
         buildingID,
@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const messages = await prisma.chatMessage.findMany({
+    const messages = await prisma.chat_messages.findMany({
       where: {
         buildingID: Number(buildingID),
       },
@@ -60,7 +60,7 @@ router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { textContent, tags } = req.body;
   try {
-    const updatedMessage = await prisma.chatMessage.update({
+    const updatedMessage = await prisma.chat_messages.update({
       where: {
         id: Number(id),
       },
@@ -82,7 +82,7 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedMessage = await prisma.chatMessage.delete({
+    const deletedMessage = await prisma.chat_messages.delete({
       where: {
         id: Number(id),
       },

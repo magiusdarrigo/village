@@ -12,7 +12,7 @@ const router = Router();
 router.post("/", async (req, res) => {
   const { userID, neighborhoodID, textContent, imageURL } = req.body;
   try {
-    const newPost = await prisma.post.create({
+    const newPost = await prisma.posts.create({
       data: {
         userID,
         neighborhoodID,
@@ -98,7 +98,7 @@ router.put("/:id", async (req, res) => {
   const { textContent, imageURL, likesCount } = req.body;
 
   try {
-    const updatedPost = await prisma.post.update({
+    const updatedPost = await prisma.posts.update({
       where: {
         id: Number(id),
       },
@@ -121,7 +121,7 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedPost = await prisma.post.delete({
+    const deletedPost = await prisma.posts.delete({
       where: {
         id: Number(id),
       },
@@ -141,14 +141,14 @@ router.post("/:id/likes", async (req, res) => {
   const userID = req.body.userID; // assuming the user ID is sent in the request body
 
   try {
-    const createLike = prisma.postLike.create({
+    const createLike = prisma.post_likes.create({
       data: {
         userID,
         postID: Number(id),
       },
     });
 
-    const incrementLikes = prisma.post.update({
+    const incrementLikes = prisma.posts.update({
       where: { id: Number(id) },
       data: {
         likesCount: {
@@ -175,7 +175,7 @@ router.delete("/:id/likes", async (req, res) => {
   const userID = req.body.userID; // assuming the user ID is sent in the request body
 
   try {
-    const deleteLike = prisma.postLike.delete({
+    const deleteLike = prisma.post_likes.delete({
       where: {
         userID_postID: {
           userID,
@@ -184,7 +184,7 @@ router.delete("/:id/likes", async (req, res) => {
       },
     });
 
-    const decrementLikes = prisma.post.update({
+    const decrementLikes = prisma.posts.update({
       where: { id: Number(id) },
       data: {
         likesCount: {

@@ -7,7 +7,7 @@ const router = Router();
 router.post("/", async (req, res) => {
   const { name } = req.body;
   try {
-    const newNeighborhood = await prisma.neighborhood.create({
+    const newNeighborhood = await prisma.neighborhoods.create({
       data: {
         name,
       },
@@ -26,7 +26,7 @@ router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
   try {
-    const updatedNeighborhood = await prisma.neighborhood.update({
+    const updatedNeighborhood = await prisma.neighborhoods.update({
       where: {
         id: Number(id),
       },
@@ -46,7 +46,7 @@ router.put("/:id", async (req, res) => {
 // list neighborhoods
 router.get("/", async (_, res) => {
   try {
-    const neighborhoods = await prisma.neighborhood.findMany();
+    const neighborhoods = await prisma.neighborhoods.findMany();
     res.json(neighborhoods);
   } catch (error) {
     console.error(error);
@@ -60,7 +60,7 @@ router.get("/", async (_, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const neighborhood = await prisma.neighborhood.findUnique({
+    const neighborhood = await prisma.neighborhoods.findUnique({
       where: {
         id: Number(id),
       },
@@ -78,7 +78,7 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedNeighborhood = await prisma.neighborhood.delete({
+    const deletedNeighborhood = await prisma.neighborhoods.delete({
       where: {
         id: Number(id),
       },

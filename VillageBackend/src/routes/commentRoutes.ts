@@ -9,7 +9,7 @@ const router = Router();
 router.post("/", async (req, res) => {
   const { userID, postID, textContent, parentCommentID } = req.body;
   try {
-    const newComment = await prisma.comment.create({
+    const newComment = await prisma.comments.create({
       data: {
         userID,
         postID,
@@ -45,7 +45,7 @@ router.put("/:id", async (req, res) => {
   }
 
   try {
-    const updatedComment = await prisma.comment.update({
+    const updatedComment = await prisma.comments.update({
       where: {
         id: Number(id),
       },
@@ -102,7 +102,7 @@ router.get("/:id", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const comment = await prisma.comment.findUnique({
+    const comment = await prisma.comments.findUnique({
       where: {
         id: Number(id),
       },
@@ -120,7 +120,7 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedComment = await prisma.comment.delete({
+    const deletedComment = await prisma.comments.delete({
       where: {
         id: Number(id),
       },
@@ -141,11 +141,11 @@ router.post("/:id/likes", async (req, res) => {
   const { userID } = req.body;
   try {
     await prisma.$transaction([
-      prisma.comment.update({
+      prisma.comments.update({
         where: { id: Number(id) },
         data: { likesCount: { increment: 1 } },
       }),
-      prisma.commentLike.create({
+      prisma.comment_likes.create({
         data: {
           userID,
           commentID: Number(id),
@@ -167,11 +167,11 @@ router.delete("/:id/likes", async (req, res) => {
   const { userID } = req.body;
   try {
     await prisma.$transaction([
-      prisma.comment.update({
+      prisma.comments.update({
         where: { id: Number(id) },
         data: { likesCount: { decrement: 1 } },
       }),
-      prisma.commentLike.deleteMany({
+      prisma.comment_likes.deleteMany({
         where: {
           userID,
           commentID: Number(id),

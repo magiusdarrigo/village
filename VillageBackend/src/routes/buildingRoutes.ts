@@ -11,7 +11,7 @@ router.post("/", async (req, res) => {
     // below is a temporary solution
     const neighborhoodID = 1; // connecting to UES neighborhood ID
 
-    const newBuilding = await prisma.building.create({
+    const newBuilding = await prisma.buildings.create({
       data: {
         address,
         neighborhoodID,
@@ -35,7 +35,7 @@ router.put("/:id", async (req, res) => {
     // below is a temporary solution
     const neighborhoodID = 1; // connecting to UES neighborhood ID
 
-    const updatedBuilding = await prisma.building.update({
+    const updatedBuilding = await prisma.buildings.update({
       where: {
         id: Number(id),
       },
@@ -56,7 +56,7 @@ router.put("/:id", async (req, res) => {
 // list buildings
 router.get("/", async (_, res) => {
   try {
-    const buildings = await prisma.building.findMany();
+    const buildings = await prisma.buildings.findMany();
     res.json(buildings);
   } catch (error) {
     console.error(error);
@@ -70,7 +70,7 @@ router.get("/", async (_, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const building = await prisma.building.findUnique({
+    const building = await prisma.buildings.findUnique({
       where: {
         id: Number(id),
       },
@@ -88,7 +88,7 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedBuilding = await prisma.building.delete({
+    const deletedBuilding = await prisma.buildings.delete({
       where: {
         id: Number(id),
       },
