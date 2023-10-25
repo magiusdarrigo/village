@@ -31,7 +31,8 @@ model User {
   chatMessages   ChatMessage[]
   followedBy     UserFollowing[] @relation("followerUserID")
   following      UserFollowing[] @relation("followingUserID")
-  likes          UserLike[]
+  likes          PostLike[]
+  likedComments  CommentLike[]
 }
 
 model Neighborhood {
@@ -71,10 +72,20 @@ model Post {
   tags           Json?
 
   comments       Comment[]
-  likes          UserLike[]
+  likes          PostLike[]
 
   @@index([neighborhoodID, createdAt], name: "idx_post_neighborhood_createdat")
   @@index([userID, createdAt], name: "idx_post_user_createdat")
+}
+
+model PostLike {
+  id       Int    @id @default(autoincrement())
+  userID   Int
+  postID   Int
+  user     User   @relation(fields: [userID], references: [id])
+  post     Post   @relation(fields: [postID], references: [id])
+
+  @@unique([userID, postID])
 }
 
 model Comment {
@@ -90,9 +101,20 @@ model Comment {
   parentComment  Comment?       @relation("Replies", fields: [parentCommentID], references: [id])
   parentCommentID Int?
   replies        Comment[]      @relation("Replies")
+  likedBy        CommentLike[]
 
   @@index([postID, likesCount], name: "idx_comment_post_likes")
   @@index([parentCommentID], name: "idx_comment_parent_comment")
+}
+
+model CommentLike {
+  id          Int      @id @default(autoincrement())
+  userID      Int
+  commentID   Int
+  user        User     @relation(fields: [userID], references: [id])
+  comment     Comment  @relation(fields: [commentID], references: [id])
+
+  @@unique([userID, commentID])
 }
 
 model ChatMessage {
@@ -116,13 +138,4 @@ model UserFollowing {
   tags               Json?
 
   @@index([followerUserID, followingUserID], name: "idx_userfollowing_relationship")
-}
-
-model UserLike {
-  id       Int    @id @default(autoincrement())
-  userID   Int
-  postID   Int
-  user     User   @relation(fields: [userID], references: [id])
-  post     Post   @relation(fields: [postID], references: [id])
-  @@unique([userID, postID])
 }
