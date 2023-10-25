@@ -4,11 +4,11 @@ export const getTop10CommentsFromPostQuery = `
         r.*,
         CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS likedByUser
     FROM 
-        Comment c
+        comments c
     LEFT JOIN 
-        Comment r ON c.id = r.parentCommentID
+        comments r ON c.id = r.parentCommentID
     LEFT JOIN
-        CommentLike cl ON (c.id = cl.commentID OR r.id = cl.commentID) AND cl.userID = $4
+        comment_likes cl ON (c.id = cl.commentID OR r.id = cl.commentID) AND cl.userID = $4
     WHERE 
         c.postID = $1 AND 
         c.parentCommentID IS NULL AND 

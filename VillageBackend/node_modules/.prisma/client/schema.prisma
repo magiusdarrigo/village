@@ -26,7 +26,7 @@ model users {
   createdAt      DateTime        @default(now())
   tags           Json?
   
-  Posts          posts[]
+  posts          posts[]
   comments       comments[]
   chatMessages   chat_messages[]
   followedBy     user_following[]  @relation("followerUserID")
@@ -43,7 +43,7 @@ model neighborhoods {
 
   users          users[]
   buildings      buildings[]
-  Posts          posts[]
+  posts          posts[]
 }
 
 
@@ -89,19 +89,19 @@ model post_likes {
 }
 
 model comments {
-  id             Int             @id @default(autoincrement())
-  post           posts           @relation(fields: [postID], references: [id])
-  postID         Int
-  user           users           @relation(fields: [userID], references: [id])
-  userID         Int
-  textContent    String
-  likesCount     Int             @default(0)
-  createdAt      DateTime        @default(now())
-  tags           Json?
-  parentComment  comments?       @relation("Replies", fields: [parentCommentID], references: [id])
+  id              Int             @id @default(autoincrement())
+  post            posts           @relation(fields: [postID], references: [id])
+  postID          Int
+  user            users           @relation(fields: [userID], references: [id])
+  userID          Int
+  textContent     String
+  likesCount      Int             @default(0)
+  createdAt       DateTime        @default(now())
+  tags            Json?
+  parentComment   comments?       @relation("Replies", fields: [parentCommentID], references: [id])
   parentCommentID Int?
-  replies        comments[]      @relation("Replies")
-  likedBy        comment_likes[]
+  replies         comments[]      @relation("Replies")
+  likedBy         comment_likes[]
 
   @@index([postID, likesCount], name: "idx_comment_post_likes")
   @@index([parentCommentID], name: "idx_comment_parent_comment")
