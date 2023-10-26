@@ -5,6 +5,7 @@ import {
   get20NewestPostsForTimelineQuery,
   getPostsByUserQuery,
 } from "../sql_queries/posts";
+import { getNumberFromQuery } from "../utils/casting";
 
 const router = Router();
 
@@ -35,7 +36,9 @@ router.post("/", async (req, res) => {
  * paginate by 20 for infinite scroll on the frontend
  */
 router.get("/", async (req, res) => {
-  const { neighborhoodID, userID, cursor } = req.query;
+  const neighborhoodID = getNumberFromQuery(req.query.neighborhoodID);
+  const userID = getNumberFromQuery(req.query.userID);
+  const cursor = getNumberFromQuery(req.query.cursor) || 0;
 
   if (!neighborhoodID) {
     return res.status(400).json({ error: "neighborhoodID is required" });
@@ -48,12 +51,20 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const posts = await prisma.$queryRawUnsafe(
-      get20NewestPostsForTimelineQuery,
-      userID,
-      neighborhoodID,
-      cursor
-    );
+    const posts = await prisma.$queryRaw`
+    SELECT 
+        posts.*, 
+        CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
+    FROM 
+        posts
+    LEFT JOIN 
+        post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
+    WHERE 
+        posts.neighborhood_id = ${neighborhoodID}
+    ORDER BY 
+        posts.created_at DESC 
+    LIMIT 20 OFFSET ${cursor};
+    `;
 
     res.json(posts);
   } catch (error) {
