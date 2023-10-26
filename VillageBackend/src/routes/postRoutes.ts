@@ -14,10 +14,10 @@ router.post("/", async (req, res) => {
   try {
     const newPost = await prisma.posts.create({
       data: {
-        userID,
-        neighborhoodID,
-        textContent,
-        imageURL,
+        user_id: userID,
+        neighborhood_id: neighborhoodID,
+        text_content: textContent,
+        image_url: imageURL,
       },
     });
     res.json(newPost);
@@ -103,9 +103,9 @@ router.put("/:id", async (req, res) => {
         id: Number(id),
       },
       data: {
-        textContent,
-        imageURL,
-        likesCount,
+        text_content: textContent,
+        image_url: imageURL,
+        likes_count: likesCount,
       },
     });
     res.json(updatedPost);
@@ -143,15 +143,15 @@ router.post("/:id/likes", async (req, res) => {
   try {
     const createLike = prisma.post_likes.create({
       data: {
-        userID,
-        postID: Number(id),
+        user_id: userID,
+        post_id: Number(id),
       },
     });
 
     const incrementLikes = prisma.posts.update({
       where: { id: Number(id) },
       data: {
-        likesCount: {
+        likes_count: {
           increment: 1,
         },
       },
@@ -177,9 +177,9 @@ router.delete("/:id/likes", async (req, res) => {
   try {
     const deleteLike = prisma.post_likes.delete({
       where: {
-        userID_postID: {
-          userID,
-          postID: Number(id),
+        user_id_post_id: {
+          user_id: userID,
+          post_id: Number(id),
         },
       },
     });
@@ -187,7 +187,7 @@ router.delete("/:id/likes", async (req, res) => {
     const decrementLikes = prisma.posts.update({
       where: { id: Number(id) },
       data: {
-        likesCount: {
+        likes_count: {
           decrement: 1,
         },
       },

@@ -7,8 +7,8 @@ async function main() {
       data: {
         username: `user${index}`,
         email: `user${index}@example.com`,
-        neighborhoodID: 1,
-        buildingID: 1,
+        neighborhood_id: 1,
+        building_id: 1,
       },
     });
   });
@@ -19,9 +19,9 @@ async function main() {
   const randomPosts = Array.from({ length: 1000 }).map((_, index) => {
     return prisma.posts.create({
       data: {
-        userID: (index % 20) + 1,
-        neighborhoodID: 1,
-        textContent: `post ${index}`,
+        user_id: (index % 20) + 1,
+        neighborhood_id: 1,
+        text_content: `post ${index}`,
       },
     });
   });
@@ -32,9 +32,9 @@ async function main() {
   const randomComments = Array.from({ length: 1000 }).map((_, index) => {
     return prisma.comments.create({
       data: {
-        userID: (index % 20) + 1,
-        postID: (index % 100) + 1,
-        textContent: `comment ${index}`,
+        user_id: (index % 20) + 1,
+        post_id: (index % 100) + 1,
+        text_content: `comment ${index}`,
       },
     });
   });

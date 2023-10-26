@@ -14,7 +14,7 @@ router.post("/", async (req, res) => {
     const newBuilding = await prisma.buildings.create({
       data: {
         address,
-        neighborhoodID,
+        neighborhood_id: neighborhoodID,
       },
     });
     res.json(newBuilding);
@@ -41,7 +41,7 @@ router.put("/:id", async (req, res) => {
       },
       data: {
         address,
-        neighborhoodID,
+        neighborhood_id: neighborhoodID,
       },
     });
     res.json(updatedBuilding);

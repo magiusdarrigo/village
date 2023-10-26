@@ -14,9 +14,9 @@ router.post("/", async (req, res) => {
   try {
     const newMessage = await prisma.chat_messages.create({
       data: {
-        userID,
-        buildingID,
-        textContent,
+        user_id: userID,
+        building_id: buildingID,
+        text_content: textContent,
         tags,
       },
     });
@@ -40,10 +40,10 @@ router.get("/", async (req, res) => {
   try {
     const messages = await prisma.chat_messages.findMany({
       where: {
-        buildingID: Number(buildingID),
+        building_id: Number(buildingID),
       },
       orderBy: {
-        createdAt: "desc",
+        created_at: "desc",
       },
     });
     res.json(messages);
@@ -65,7 +65,7 @@ router.put("/:id", async (req, res) => {
         id: Number(id),
       },
       data: {
-        textContent,
+        text_content: textContent,
         tags,
       },
     });

@@ -11,10 +11,10 @@ router.post("/", async (req, res) => {
   try {
     const newComment = await prisma.comments.create({
       data: {
-        userID,
-        postID,
-        textContent,
-        parentCommentID,
+        user_id: userID,
+        post_id: postID,
+        text_content: textContent,
+        parent_comment_id: parentCommentID,
       },
     });
     res.json(newComment);
@@ -143,12 +143,12 @@ router.post("/:id/likes", async (req, res) => {
     await prisma.$transaction([
       prisma.comments.update({
         where: { id: Number(id) },
-        data: { likesCount: { increment: 1 } },
+        data: { likes_count: { increment: 1 } },
       }),
       prisma.comment_likes.create({
         data: {
-          userID,
-          commentID: Number(id),
+          user_id: userID,
+          comment_id: Number(id),
         },
       }),
     ]);
@@ -169,12 +169,12 @@ router.delete("/:id/likes", async (req, res) => {
     await prisma.$transaction([
       prisma.comments.update({
         where: { id: Number(id) },
-        data: { likesCount: { decrement: 1 } },
+        data: { likes_count: { decrement: 1 } },
       }),
       prisma.comment_likes.deleteMany({
         where: {
-          userID,
-          commentID: Number(id),
+          user_id: userID,
+          comment_id: Number(id),
         },
       }),
     ]);

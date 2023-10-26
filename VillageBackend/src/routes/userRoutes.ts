@@ -40,11 +40,11 @@ router.put("/:id", async (req, res) => {
       },
       data: {
         image,
-        isVerified,
-        neighborhoodID,
-        buildingID,
-        followersCount,
-        followingCount,
+        is_verified: isVerified,
+        neighborhood_id: neighborhoodID,
+        building_id: buildingID,
+        followers_count: followersCount,
+        following_count: followingCount,
       },
     });
     res.json(updatedUser);
@@ -114,19 +114,19 @@ router.post("/:id/follow", async (req, res) => {
   try {
     const createFollowing = prisma.user_following.create({
       data: {
-        followerUserID: followerID,
-        followingUserID: Number(id),
+        follower_user_id: followerID,
+        following_user_id: Number(id),
       },
     });
 
     const incrementFollowingCount = prisma.users.update({
       where: { id: followerID },
-      data: { followingCount: { increment: 1 } },
+      data: { following_count: { increment: 1 } },
     });
 
     const incrementFollowersCount = prisma.users.update({
       where: { id: Number(id) },
-      data: { followersCount: { increment: 1 } },
+      data: { followers_count: { increment: 1 } },
     });
 
     await prisma.$transaction([
@@ -151,19 +151,19 @@ router.delete("/:id/follow", async (req, res) => {
   try {
     const deleteFollowing = prisma.user_following.deleteMany({
       where: {
-        followerUserID: followerID,
-        followingUserID: Number(id),
+        follower_user_id: followerID,
+        following_user_id: Number(id),
       },
     });
 
     const decrementFollowingCount = prisma.users.update({
       where: { id: followerID },
-      data: { followingCount: { decrement: 1 } },
+      data: { following_count: { decrement: 1 } },
     });
 
     const decrementFollowersCount = prisma.users.update({
       where: { id: Number(id) },
-      data: { followersCount: { decrement: 1 } },
+      data: { followers_count: { decrement: 1 } },
     });
 
     await prisma.$transaction([
