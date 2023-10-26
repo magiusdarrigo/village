@@ -1,7 +1,5 @@
 import { Router } from "express";
-import { Prisma } from "@prisma/client";
 import prisma from "../prismaClient";
-import { getTop10CommentsFromPostQuery } from "../sql_queries/comments";
 
 const router = Router();
 
@@ -56,44 +54,6 @@ router.put("/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: `error updating comment: ${id}`,
-    });
-  }
-});
-
-/**
- * get comments by post id
- * order comments by likesCount descending
- * paginate by 10 for infinite scroll on the frontend
- * all replies to a comment will be returned
- * determine if each comment has been liked by a user
- */
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const { lastLikesCount, lastCommentID, userID } = req.query;
-
-  if (!userID) {
-    return res
-      .status(400)
-      .json({ error: "userID is required to determine comment likes." });
-  }
-
-  // If we have a lastLikesCount and lastCommentID, we'll use them for pagination.
-  const likesCount = lastLikesCount ? Number(lastLikesCount) : Infinity;
-  const commentID = lastCommentID ? Number(lastCommentID) : Infinity;
-
-  try {
-    const comments = await prisma.$queryRaw(
-      Prisma.sql`${getTop10CommentsFromPostQuery}`,
-      id,
-      likesCount,
-      commentID,
-      userID
-    );
-    res.json(comments);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "error fetching comments for post",
     });
   }
 });

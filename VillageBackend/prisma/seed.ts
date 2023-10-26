@@ -61,6 +61,7 @@ async function main() {
   }
 
   // seed the comments table with 50 comments (first 20 users comment on the first 5 posts)
+  // so post id 1 will have 10 comments.
   const randomComments = Array.from({ length: 50 }).map((_, index) => {
     return async () => {
       await sleep(1); // Sleep for 1 ms

@@ -1,5 +1,8 @@
 import { Router } from "express";
 import prisma from "../prismaClient";
+import { Prisma } from "@prisma/client";
+import { getTop10CommentsFromPostQuery } from "../sql_queries/comments";
+import { getNumberFromQuery } from "../utils/casting";
 
 const router = Router();
 
@@ -63,6 +66,52 @@ router.delete("/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: `error deleting post: ${id}`,
+    });
+  }
+});
+
+/**
+ * get comments by post id
+ * order comments by likesCount descending
+ * paginate by 10 for infinite scroll on the frontend
+ * all replies to a comment will be returned
+ * determine if each comment has been liked by a user
+ */
+router.get("/:id/comments", async (req, res) => {
+  const { id } = req.params;
+  let lastLikesCount = getNumberFromQuery(req.query.lastLikesCount);
+  let lastCommentID = getNumberFromQuery(req.query.lastCommentID);
+  const userID = getNumberFromQuery(req.query.userID);
+  const postID = getNumberFromQuery(id);
+
+  if (!postID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
+  if (!userID) {
+    return res
+      .status(400)
+      .json({ error: "userID is required to determine comment likes." });
+  }
+
+  // If we have a lastLikesCount and lastCommentID, we'll use them for pagination.
+  lastLikesCount = lastLikesCount ? Number(lastLikesCount) : Infinity;
+  lastCommentID = lastCommentID ? Number(lastCommentID) : Infinity;
+
+  try {
+    const getCommentsQuery = getTop10CommentsFromPostQuery(
+      postID,
+      userID,
+      lastLikesCount,
+      lastCommentID
+    );
+    const comments = await prisma.$queryRaw(getCommentsQuery);
+
+    res.json(comments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching comments for post",
     });
   }
 });
