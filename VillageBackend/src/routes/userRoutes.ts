@@ -196,7 +196,7 @@ router.get("/:id/posts", async (req, res) => {
   }
 
   try {
-    const getPostsSqlQuery = getPostsByUserQuery(userID, cursor ? 1 : 0);
+    const getPostsSqlQuery = getPostsByUserQuery(userID, cursor);
     const posts = await prisma.$queryRaw(getPostsSqlQuery);
 
     res.json(posts);
