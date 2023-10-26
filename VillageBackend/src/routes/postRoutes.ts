@@ -6,6 +6,8 @@ import { getNumberFromQuery } from "../utils/casting";
 
 const router = Router();
 
+const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
+
 // create post
 router.post("/", async (req, res) => {
   const { userID, neighborhoodID, textContent, imageURL } = req.body;
@@ -95,8 +97,12 @@ router.get("/:id/comments", async (req, res) => {
   }
 
   // If we have a lastLikesCount and lastCommentID, we'll use them for pagination.
-  lastLikesCount = lastLikesCount ? Number(lastLikesCount) : Infinity;
-  lastCommentID = lastCommentID ? Number(lastCommentID) : Infinity;
+  lastLikesCount = lastLikesCount
+    ? Number(lastLikesCount)
+    : MAX_SIGNED_FOUR_BYTE_INT;
+  lastCommentID = lastCommentID
+    ? Number(lastCommentID)
+    : MAX_SIGNED_FOUR_BYTE_INT;
 
   try {
     const getCommentsQuery = getTop10CommentsFromPostQuery(
