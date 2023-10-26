@@ -16,29 +16,29 @@ model users {
   username       String          @unique
   email          String          @unique
   image          String?
-  isVerified     Boolean         @default(false)
-  neighborhood   neighborhoods?  @relation(fields: [neighborhoodID], references: [id])
-  neighborhoodID Int?
-  building       buildings?      @relation(fields: [buildingID], references: [id])
-  buildingID     Int?
-  followersCount Int             @default(0)
-  followingCount Int             @default(0)
-  createdAt      DateTime        @default(now())
+  is_verified     Boolean         @default(false)
+  neighborhood   neighborhoods?  @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id Int?
+  building       buildings?      @relation(fields: [building_id], references: [id])
+  building_id     Int?
+  followers_count Int             @default(0)
+  following_count Int             @default(0)
+  created_at      DateTime        @default(now())
   tags           Json?
   
   posts          posts[]
   comments       comments[]
-  chatMessages   chat_messages[]
-  followedBy     user_following[]  @relation("followerUserID")
-  following      user_following[]  @relation("followingUserID")
+  chat_messages   chat_messages[]
+  followed_by     user_following[]  @relation("follower_user_id")
+  following      user_following[]  @relation("following_user_id")
   likes          post_likes[]
-  likedComments  comment_likes[]
+  liked_comments  comment_likes[]
 }
 
 model neighborhoods {
   id             Int            @id @default(autoincrement())
   name           String         @unique
-  createdAt      DateTime       @default(now())
+  created_at      DateTime       @default(now())
   tags           Json?
 
   users          users[]
@@ -50,92 +50,92 @@ model neighborhoods {
 model buildings {
   id             Int            @id @default(autoincrement())
   address        String
-  neighborhood   neighborhoods  @relation(fields: [neighborhoodID], references: [id])
-  neighborhoodID Int
-  createdAt      DateTime       @default(now())
+  neighborhood   neighborhoods  @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id Int
+  created_at      DateTime       @default(now())
   tags           Json?
   
   users          users[]
-  chatMessages   chat_messages[]
+  chat_messages   chat_messages[]
 }
 
 model posts {
   id             Int             @id @default(autoincrement())
-  user           users           @relation(fields: [userID], references: [id])
-  userID         Int
-  neighborhood   neighborhoods   @relation(fields: [neighborhoodID], references: [id])
-  neighborhoodID Int
-  textContent    String?
-  imageURL       String          @default("")
-  likesCount     Int             @default(0)
-  createdAt      DateTime        @default(now())
+  user           users           @relation(fields: [user_id], references: [id])
+  user_id         Int
+  neighborhood   neighborhoods   @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id Int
+  text_content    String?
+  image_url       String          @default("")
+  likes_count     Int             @default(0)
+  created_at      DateTime        @default(now())
   tags           Json?
 
   comments       comments[]
   likes          post_likes[]
 
-  @@index([neighborhoodID, createdAt], name: "idx_post_neighborhood_createdat")
-  @@index([userID, createdAt], name: "idx_post_user_createdat")
+  @@index([neighborhood_id, created_at], name: "idx_post_neighborhood_created_at")
+  @@index([user_id, created_at], name: "idx_post_user_created_at")
 }
 
 model post_likes {
   id       Int     @id @default(autoincrement())
-  userID   Int
-  postID   Int
-  user     users   @relation(fields: [userID], references: [id])
-  post     posts   @relation(fields: [postID], references: [id])
+  user_id   Int
+  post_id   Int
+  user     users   @relation(fields: [user_id], references: [id])
+  post     posts   @relation(fields: [post_id], references: [id])
 
-  @@unique([userID, postID])
+  @@unique([user_id, post_id])
 }
 
 model comments {
   id              Int             @id @default(autoincrement())
-  post            posts           @relation(fields: [postID], references: [id])
-  postID          Int
-  user            users           @relation(fields: [userID], references: [id])
-  userID          Int
-  textContent     String
-  likesCount      Int             @default(0)
-  createdAt       DateTime        @default(now())
+  post            posts           @relation(fields: [post_id], references: [id])
+  post_id          Int
+  user            users           @relation(fields: [user_id], references: [id])
+  user_id          Int
+  text_content     String
+  likes_count      Int             @default(0)
+  created_at       DateTime        @default(now())
   tags            Json?
-  parentComment   comments?       @relation("Replies", fields: [parentCommentID], references: [id])
-  parentCommentID Int?
-  replies         comments[]      @relation("Replies")
+  parent_comment   comments?       @relation("replies", fields: [parent_comment_id], references: [id])
+  parent_comment_id Int?
+  replies         comments[]      @relation("replies")
   likedBy         comment_likes[]
 
-  @@index([postID, likesCount], name: "idx_comment_post_likes")
-  @@index([parentCommentID], name: "idx_comment_parent_comment")
+  @@index([post_id, likes_count], name: "idx_comment_post_likes")
+  @@index([parent_comment_id], name: "idx_comment_parent_comment")
 }
 
 model comment_likes {
   id          Int       @id @default(autoincrement())
-  userID      Int
-  commentID   Int
-  user        users     @relation(fields: [userID], references: [id])
-  comment     comments  @relation(fields: [commentID], references: [id])
+  user_id      Int
+  comment_id   Int
+  user        users     @relation(fields: [user_id], references: [id])
+  comment     comments  @relation(fields: [comment_id], references: [id])
 
-  @@unique([userID, commentID])
+  @@unique([user_id, comment_id])
 }
 
 model chat_messages {
   id             Int             @id @default(autoincrement())
-  user           users           @relation(fields: [userID], references: [id])
-  userID         Int
-  building       buildings       @relation(fields: [buildingID], references: [id])
-  buildingID     Int
-  textContent    String
-  createdAt      DateTime        @default(now())
+  user           users           @relation(fields: [user_id], references: [id])
+  user_id         Int
+  building       buildings       @relation(fields: [building_id], references: [id])
+  building_id     Int
+  text_content    String
+  created_at      DateTime        @default(now())
   tags           Json?
 }
 
 model user_following {
   id                 Int       @id @default(autoincrement())
-  followerUser       users     @relation("followerUserID", fields: [followerUserID], references: [id])
-  followerUserID     Int
-  followingUser      users     @relation("followingUserID", fields: [followingUserID], references: [id])
-  followingUserID    Int
-  createdAt          DateTime  @default(now())
+  follower_user       users     @relation("follower_user_id", fields: [follower_user_id], references: [id])
+  follower_user_id     Int
+  following_user      users     @relation("following_user_id", fields: [following_user_id], references: [id])
+  following_user_id    Int
+  created_at          DateTime  @default(now())
   tags               Json?
 
-  @@index([followerUserID, followingUserID], name: "idx_userfollowing_relationship")
+  @@index([follower_user_id, following_user_id], name: "idx_userfollowing_relationship")
 }
