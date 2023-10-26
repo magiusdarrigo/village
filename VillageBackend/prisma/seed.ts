@@ -1,45 +1,82 @@
 import prisma from "../src/prismaClient";
 
 async function main() {
-  // seeding User table
+  const sleep = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  // seed the neighborhoods table with 5 neighborhoods
+  const randomNeighborhoods = Array.from({ length: 5 }).map((_, index) => {
+    return prisma.neighborhoods.create({
+      data: {
+        name: `neighborhood-${index}`,
+      },
+    });
+  });
+
+  await Promise.all(randomNeighborhoods);
+
+  // seed the buildings table with 25 buildings (5 buildings per neighborhood)
+  const randomBuildings = Array.from({ length: 25 }).map((_, index) => {
+    return prisma.buildings.create({
+      data: {
+        address: `address #${index}`,
+        neighborhood_id: (index % 5) + 1,
+      },
+    });
+  });
+
+  await Promise.all(randomBuildings);
+
+  // seed the users table with 100 users (20 users per building)
   const randomUsers = Array.from({ length: 100 }).map((_, index) => {
     return prisma.users.create({
       data: {
         username: `user${index}`,
         email: `user${index}@example.com`,
-        neighborhood_id: 1,
-        building_id: 1,
+        neighborhood_id: (index % 5) + 1,
+        building_id: (index % 25) + 1,
       },
     });
   });
 
   await Promise.all(randomUsers);
 
-  // seeding Post table
-  const randomPosts = Array.from({ length: 1000 }).map((_, index) => {
-    return prisma.posts.create({
-      data: {
-        user_id: (index % 20) + 1,
-        neighborhood_id: 1,
-        text_content: `post ${index}`,
-      },
-    });
+  // seed the posts table with 500 posts (first 20 users will have 25 posts each)
+  const randomPosts = Array.from({ length: 500 }).map((_, index) => {
+    return async () => {
+      await sleep(1); // Sleep for 1 ms
+      await prisma.posts.create({
+        data: {
+          user_id: (index % 20) + 1,
+          neighborhood_id: (index % 5) + 1,
+          text_content: `post ${index}`,
+        },
+      });
+    };
   });
 
-  await Promise.all(randomPosts);
+  for (const createPost of randomPosts) {
+    await createPost();
+  }
 
-  // seeding Comment table
-  const randomComments = Array.from({ length: 1000 }).map((_, index) => {
-    return prisma.comments.create({
-      data: {
-        user_id: (index % 20) + 1,
-        post_id: (index % 100) + 1,
-        text_content: `comment ${index}`,
-      },
-    });
+  // seed the comments table with 50 comments (first 20 users comment on the first 5 posts)
+  const randomComments = Array.from({ length: 50 }).map((_, index) => {
+    return async () => {
+      await sleep(1); // Sleep for 1 ms
+      await prisma.comments.create({
+        data: {
+          user_id: (index % 20) + 1,
+          post_id: (index % 5) + 1,
+          text_content: `comment ${index}`,
+        },
+      });
+    };
   });
 
-  await Promise.all(randomComments);
+  for (const createComment of randomComments) {
+    await createComment();
+  }
 }
 
 main()
