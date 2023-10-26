@@ -1,5 +1,7 @@
 import { Router } from "express";
 import prisma from "../prismaClient";
+import { getPostsByUserAndNeighborhoodQuery } from "../sql_queries/posts";
+import { getNumberFromQuery } from "../utils/casting";
 
 const router = Router();
 
@@ -88,6 +90,44 @@ router.delete("/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: `error deleting neighborhood: ${id}`,
+    });
+  }
+});
+
+/**
+ * get posts by neighborhood id
+ * order by createdAt descending
+ * paginate by 20 for infinite scroll on the frontend
+ */
+router.get("/:id/posts", async (req, res) => {
+  const { id } = req.params;
+  const neighborhoodID = getNumberFromQuery(id);
+  const userID = getNumberFromQuery(req.query.userID);
+  const cursor = getNumberFromQuery(req.query.cursor) || 0;
+
+  if (!neighborhoodID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
+  if (!userID) {
+    return res
+      .status(400)
+      .json({ error: "userId is required to determine post likes." });
+  }
+
+  try {
+    const getPostsSqlQuery = getPostsByUserAndNeighborhoodQuery(
+      userID,
+      neighborhoodID,
+      cursor
+    );
+    const posts = await prisma.$queryRaw(getPostsSqlQuery);
+
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching posts for timeline",
     });
   }
 });

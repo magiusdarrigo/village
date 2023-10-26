@@ -8,12 +8,12 @@ import chatMessageRoutes from "./routes/chatMessageRoutes";
 
 const app = express();
 app.use(express.json());
-app.use("/user", userRoutes);
-app.use("/post", postRoutes);
-app.use("/neighborhood", neighborhoodRoutes);
-app.use("/building", buildingRoutes);
-app.use("/comment", commentRoutes);
-app.use("/chatMessage", chatMessageRoutes);
+app.use("/users", userRoutes);
+app.use("/posts", postRoutes);
+app.use("/neighborhoods", neighborhoodRoutes);
+app.use("/buildings", buildingRoutes);
+app.use("/comments", commentRoutes);
+app.use("/chatMessages", chatMessageRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

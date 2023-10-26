@@ -1,5 +1,7 @@
 import { Router } from "express";
 import prisma from "../prismaClient";
+import { getPostsByUserQuery } from "../sql_queries/posts";
+import { getNumberFromQuery } from "../utils/casting";
 
 const router = Router();
 
@@ -176,6 +178,33 @@ router.delete("/:id/follow", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error unfollowing the user." });
+  }
+});
+
+/**
+ * get posts by user id
+ * order by createdAt descending
+ * paginate by 10 for infinite scroll on the frontend
+ */
+router.get("/:id/posts", async (req, res) => {
+  const { id } = req.params;
+  const userID = getNumberFromQuery(id);
+  const cursor = getNumberFromQuery(req.query.cursor) || 0;
+
+  if (!userID) {
+    return res.status(400).json({ error: "userID is required" });
+  }
+
+  try {
+    const getPostsSqlQuery = getPostsByUserQuery(userID, cursor ? 1 : 0);
+    const posts = await prisma.$queryRaw(getPostsSqlQuery);
+
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching posts for profile",
+    });
   }
 });
 

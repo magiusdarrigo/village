@@ -1,29 +1,39 @@
-export const get20NewestPostsForTimelineQuery = `
-SELECT 
-    posts.*, 
-    CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
-FROM 
-    posts
-LEFT JOIN 
-    post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = $1 
-WHERE 
-    posts.neighborhood_id = $2 
-ORDER BY 
-    posts.created_at DESC 
-LIMIT 20 OFFSET $3;
-`;
+import { Prisma } from "@prisma/client";
 
-export const getPostsByUserQuery = `
-SELECT 
-    posts.*, 
-    CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
-FROM 
-    posts 
-LEFT JOIN 
-    post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = $1 
-WHERE 
-    posts.user_id = $1 
-ORDER BY 
-    posts.created_at DESC 
-LIMIT 10 OFFSET $2;
-`;
+export const getPostsByUserAndNeighborhoodQuery = (
+  userID: number,
+  neighborhoodID: number,
+  cursor: number
+) => {
+  return Prisma.sql`
+            SELECT 
+                posts.*, 
+                CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
+            FROM 
+                posts
+            LEFT JOIN 
+                post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
+            WHERE 
+                posts.neighborhood_id = ${neighborhoodID}
+            ORDER BY 
+                posts.created_at DESC 
+            LIMIT 20 OFFSET ${cursor};
+        `;
+};
+
+export const getPostsByUserQuery = (userID: number, cursor: number) => {
+  return Prisma.sql`
+            SELECT 
+                posts.*, 
+                CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
+            FROM 
+                posts 
+            LEFT JOIN 
+                post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID} 
+            WHERE 
+                posts.user_id = ${userID} 
+            ORDER BY 
+                posts.created_at DESC 
+            LIMIT 10 OFFSET ${cursor};
+        `;
+};

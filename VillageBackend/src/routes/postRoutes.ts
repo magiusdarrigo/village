@@ -1,11 +1,5 @@
 import { Router } from "express";
-import { Prisma } from "@prisma/client";
 import prisma from "../prismaClient";
-import {
-  get20NewestPostsForTimelineQuery,
-  getPostsByUserQuery,
-} from "../sql_queries/posts";
-import { getNumberFromQuery } from "../utils/casting";
 
 const router = Router();
 
@@ -26,79 +20,6 @@ router.post("/", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: `error creating post from user: ${userID}`,
-    });
-  }
-});
-
-/**
- * get posts by neighborhood id
- * order by createdAt descending
- * paginate by 20 for infinite scroll on the frontend
- */
-router.get("/", async (req, res) => {
-  const neighborhoodID = getNumberFromQuery(req.query.neighborhoodID);
-  const userID = getNumberFromQuery(req.query.userID);
-  const cursor = getNumberFromQuery(req.query.cursor) || 0;
-
-  if (!neighborhoodID) {
-    return res.status(400).json({ error: "neighborhoodID is required" });
-  }
-
-  if (!userID) {
-    return res
-      .status(400)
-      .json({ error: "userId is required to determine post likes." });
-  }
-
-  try {
-    const posts = await prisma.$queryRaw`
-    SELECT 
-        posts.*, 
-        CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
-    FROM 
-        posts
-    LEFT JOIN 
-        post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
-    WHERE 
-        posts.neighborhood_id = ${neighborhoodID}
-    ORDER BY 
-        posts.created_at DESC 
-    LIMIT 20 OFFSET ${cursor};
-    `;
-
-    res.json(posts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "error fetching posts for timeline",
-    });
-  }
-});
-
-/**
- * get posts by user id
- * order by createdAt descending
- * paginate by 10 for infinite scroll on the frontend
- */
-router.get("/", async (req, res) => {
-  const { userID, cursor } = req.query;
-
-  if (!userID) {
-    return res.status(400).json({ error: "userID is required" });
-  }
-
-  try {
-    const posts = await prisma.$queryRaw(
-      Prisma.sql`${getPostsByUserQuery}`,
-      userID,
-      cursor ? 1 : 0
-    );
-
-    res.json(posts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "error fetching posts for profile",
     });
   }
 });
