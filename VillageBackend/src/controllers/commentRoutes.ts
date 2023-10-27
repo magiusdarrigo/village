@@ -58,7 +58,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// get comment by id
+// get comment
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {

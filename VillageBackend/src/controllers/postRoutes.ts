@@ -28,6 +28,24 @@ router.post("/", async (req, res) => {
   }
 });
 
+// get post
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await prisma.posts.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.json(post);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error fetching post: ${id}`,
+    });
+  }
+});
+
 // update post
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
@@ -181,7 +199,7 @@ router.delete("/:id/likes", async (req, res) => {
 
     await prisma.$transaction([deleteLike, decrementLikes]);
 
-    res.status(204).send();
+    res.status(204).send({ success: true });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error unliking the post." });
