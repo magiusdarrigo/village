@@ -1,0 +1,25 @@
+put data access logic (define repository models here)
+
+EXAMPLE:
+
+import { PrismaClient } from "@prisma/client";
+
+class UserRepository {
+  private prisma: PrismaClient;
+
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
+
+  async findById(userId: number) {
+    return await this.prisma.user.findUnique({ where: { id: userId } });
+  }
+
+  async createUser(data: any) {
+    return await this.prisma.user.create({ data });
+  }
+
+  // ... other methods related to User operations ...
+}
+
+export default UserRepository;
