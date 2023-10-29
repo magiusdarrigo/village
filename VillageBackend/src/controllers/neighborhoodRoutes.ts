@@ -1,5 +1,5 @@
 import { Router } from "express";
-import prisma from "../prismaClient";
+import prisma from "../clients/prismaClient";
 import { getPostsByUserAndNeighborhoodQuery } from "../sql_queries/posts";
 import { getNumberFromQuery } from "../utils/casting";
 

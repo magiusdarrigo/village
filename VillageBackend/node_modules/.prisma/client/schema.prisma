@@ -14,7 +14,8 @@ datasource db {
 model users {
   id             Int             @id @default(autoincrement())
   username       String          @unique
-  email          String          @unique
+  phone_number   String          @unique
+  otp            String?
   image          String?
   is_verified     Boolean         @default(false)
   neighborhood   neighborhoods?  @relation(fields: [neighborhood_id], references: [id])

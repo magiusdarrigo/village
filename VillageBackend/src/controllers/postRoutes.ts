@@ -1,5 +1,5 @@
 import { Router } from "express";
-import prisma from "../prismaClient";
+import prisma from "../clients/prismaClient";
 import { getTop10CommentsFromPostQuery } from "../sql_queries/comments";
 import { getNumberFromQuery } from "../utils/casting";
 

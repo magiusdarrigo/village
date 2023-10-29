@@ -1,4 +1,4 @@
-import prisma from "../src/prismaClient";
+import prisma from "../src/clients/prismaClient";
 
 async function main() {
   const sleep = (ms: number) => {
@@ -33,7 +33,7 @@ async function main() {
     return prisma.users.create({
       data: {
         username: `user${index}`,
-        email: `user${index}@example.com`,
+        phone_number: `+1-000-${index}`,
         neighborhood_id: (index % 5) + 1,
         building_id: (index % 25) + 1,
       },

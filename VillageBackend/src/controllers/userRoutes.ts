@@ -1,5 +1,5 @@
 import { Router } from "express";
-import prisma from "../prismaClient";
+import prisma from "../clients/prismaClient";
 import { getPostsByUserQuery } from "../sql_queries/posts";
 import { getNumberFromQuery } from "../utils/casting";
 
@@ -7,19 +7,19 @@ const router = Router();
 
 // create user
 router.post("/", async (req, res) => {
-  const { username, email } = req.body;
+  const { username, phoneNumber } = req.body;
   try {
     const newUser = await prisma.users.create({
       data: {
         username,
-        email,
+        phone_number: phoneNumber,
       },
     });
     res.json(newUser);
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error creating user with username ${username} and email ${email}`,
+      error: `error creating user with username ${username} and phone number ${phoneNumber}`,
     });
   }
 });
