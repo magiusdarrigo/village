@@ -1,6 +1,6 @@
 import { Router } from "express";
-import prisma from "../clients/prismaClient";
-import twilioClient from "../clients/twilioClient";
+import prisma from "../../clients/prismaClient";
+import twilioClient from "../../clients/twilioClient";
 
 const router = Router();
 const jwt = require("jsonwebtoken");

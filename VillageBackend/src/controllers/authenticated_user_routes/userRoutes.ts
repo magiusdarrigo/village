@@ -1,7 +1,7 @@
 import { Router } from "express";
-import prisma from "../clients/prismaClient";
-import { getPostsByUserQuery } from "../sql_queries/posts";
-import { getNumberFromQuery } from "../utils/casting";
+import prisma from "../../clients/prismaClient";
+import { getPostsByUserQuery } from "../../sql_queries/posts";
+import { getNumberFromQuery } from "../../utils/casting";
 
 const router = Router();
 
