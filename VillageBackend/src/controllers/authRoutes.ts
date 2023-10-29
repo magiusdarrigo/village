@@ -3,6 +3,7 @@ import prisma from "../clients/prismaClient";
 import twilioClient from "../clients/twilioClient";
 
 const router = Router();
+const jwt = require("jsonwebtoken");
 
 // new phone number not seen before -> create new user
 router.post("/login", async (req, res) => {
@@ -58,6 +59,60 @@ router.post("/login", async (req, res) => {
     res.send("OTP sent successfully.");
   } catch (error) {
     console.error("Error in login handler:", error);
+    res.status(500).send("Internal Server Error.");
+  }
+});
+
+router.post("/validate", async (req, res) => {
+  const phoneNumber = req.body.phone_number;
+  const userOTP = req.body.otp;
+
+  if (!phoneNumber || !userOTP) {
+    return res.status(400).send("Phone number and OTP are required.");
+  }
+
+  try {
+    // Fetch the OTP from the database for the given phone number
+    const result = await prisma.users.findUnique({
+      where: {
+        phone_number: phoneNumber,
+      },
+      select: {
+        otp: true,
+        id: true,
+      },
+    });
+
+    const storedOTP = result?.otp;
+    const userID = result?.id;
+
+    if (!storedOTP) {
+      return res.status(404).send("User not found.");
+    }
+
+    if (storedOTP !== userOTP) {
+      return res.status(400).send("Invalid OTP.");
+    }
+
+    // If the OTP is valid, generate a JWT and send it back
+    const token = jwt.sign(
+      { role: "user", phone: phoneNumber, userID },
+      process.env.JWT_SECRET
+    );
+
+    // invalidate/delete the OTP from the database after successful verification
+    await prisma.users.update({
+      where: {
+        phone_number: phoneNumber,
+      },
+      data: {
+        otp: null,
+      },
+    });
+
+    res.json({ token }); // Send the JWT to the client
+  } catch (error) {
+    console.error("Error in validate handler:", error);
     res.status(500).send("Internal Server Error.");
   }
 });
