@@ -26,65 +26,16 @@ router.post("/", async (req, res) => {
   }
 });
 
-// update comment
-router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const { textContent, likesCount } = req.body;
-
-  let updateData: any = {
-    textContent,
-  };
-
-  if (likesCount === 1 || likesCount === -1) {
-    updateData.likesCount = {
-      increment: likesCount,
-    };
-  } else if (likesCount && likesCount !== 1 && likesCount !== -1) {
-    // If likesCount is provided but is not +1 or -1, set it directly
-    updateData.likesCount = likesCount;
-  }
-
-  try {
-    const updatedComment = await prisma.comments.update({
-      where: {
-        id: Number(id),
-      },
-      data: updateData,
-    });
-    res.json(updatedComment);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: `error updating comment: ${id}`,
-    });
-  }
-});
-
-// get comment
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const comment = await prisma.comments.findUnique({
-      where: {
-        id: Number(id),
-      },
-    });
-    res.json(comment);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: `error fetching comment: ${id}`,
-    });
-  }
-});
-
-// delete comment
+// delete comment (if the user is the owner of the comment)
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+
   try {
     const deletedComment = await prisma.comments.delete({
       where: {
         id: Number(id),
+        user_id: currentUser.id,
       },
     });
     res.json(deletedComment);
@@ -100,7 +51,7 @@ router.delete("/:id", async (req, res) => {
 router.post("/:id/likes", async (req, res) => {
   // the comment id
   const { id } = req.params;
-  const { userID } = req.body;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
     await prisma.$transaction([
       prisma.comments.update({
@@ -109,7 +60,7 @@ router.post("/:id/likes", async (req, res) => {
       }),
       prisma.comment_likes.create({
         data: {
-          user_id: userID,
+          user_id: currentUser.id,
           comment_id: Number(id),
         },
       }),
