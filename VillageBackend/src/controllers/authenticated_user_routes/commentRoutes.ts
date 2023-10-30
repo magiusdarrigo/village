@@ -1,15 +1,17 @@
 import { Router } from "express";
 import prisma from "../../clients/prismaClient";
+import { AuthenticatedRequest } from "../../middleware/auth";
 
 const router = Router();
 
 // create comment
 router.post("/", async (req, res) => {
-  const { userID, postID, textContent, parentCommentID } = req.body;
+  const { postID, textContent, parentCommentID } = req.body;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
     const newComment = await prisma.comments.create({
       data: {
-        user_id: userID,
+        user_id: currentUser.id,
         post_id: postID,
         text_content: textContent,
         parent_comment_id: parentCommentID,
@@ -19,7 +21,7 @@ router.post("/", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error creating comment from user: ${userID}`,
+      error: `error creating comment from user.`,
     });
   }
 });
@@ -124,7 +126,7 @@ router.post("/:id/likes", async (req, res) => {
 router.delete("/:id/likes", async (req, res) => {
   // the comment id
   const { id } = req.params;
-  const { userID } = req.body;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
     await prisma.$transaction([
       prisma.comments.update({
@@ -133,7 +135,7 @@ router.delete("/:id/likes", async (req, res) => {
       }),
       prisma.comment_likes.deleteMany({
         where: {
-          user_id: userID,
+          user_id: currentUser.id,
           comment_id: Number(id),
         },
       }),

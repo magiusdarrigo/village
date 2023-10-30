@@ -5,11 +5,14 @@ import jwt, {
 } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
-interface UserData {
+export interface AuthenticatedRequest extends Request {
+  user: UserData;
+}
+
+export interface UserData {
   role: string;
   phone: string;
-  userID: number;
-  // ... any other fields you expect in the JWT payload
+  id: number;
 }
 
 function isUserData(obj: any): obj is UserData {
@@ -17,15 +20,11 @@ function isUserData(obj: any): obj is UserData {
     obj &&
     typeof obj.role === "string" &&
     typeof obj.phone === "string" &&
-    typeof obj.userID === "number"
+    typeof obj.id === "number"
   );
 }
 
-const authenticateToken = (
-  req: Request & { user?: UserData },
-  res: Response,
-  next: NextFunction
-) => {
+const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   // Get the token from the Authorization header
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -38,7 +37,7 @@ const authenticateToken = (
 
     if (isUserData(payload)) {
       // Add user data to the request
-      req.user = payload;
+      (req as any).user = payload;
       next();
     } else {
       res.status(403).send("Access Denied: Invalid Token Structure!");

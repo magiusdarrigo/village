@@ -2,6 +2,7 @@ import { Router } from "express";
 import prisma from "../../clients/prismaClient";
 import { getPostsByUserAndNeighborhoodQuery } from "../../sql_queries/posts";
 import { getNumberFromQuery } from "../../utils/casting";
+import { AuthenticatedRequest } from "../../middleware/auth";
 
 const router = Router();
 
@@ -101,23 +102,17 @@ router.delete("/:id", async (req, res) => {
  */
 router.get("/:id/posts", async (req, res) => {
   const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   const neighborhoodID = getNumberFromQuery(id);
-  const userID = getNumberFromQuery(req.query.userID);
   const cursor = getNumberFromQuery(req.query.cursor) || 0;
 
   if (!neighborhoodID) {
     return res.status(400).json({ error: "id is required" });
   }
 
-  if (!userID) {
-    return res
-      .status(400)
-      .json({ error: "userId is required to determine post likes." });
-  }
-
   try {
     const getPostsSqlQuery = getPostsByUserAndNeighborhoodQuery(
-      userID,
+      currentUser.id,
       neighborhoodID,
       cursor
     );

@@ -2,6 +2,7 @@ import { Router } from "express";
 import prisma from "../../clients/prismaClient";
 import { getPostsByUserQuery } from "../../sql_queries/posts";
 import { getNumberFromQuery } from "../../utils/casting";
+import { AuthenticatedRequest } from "../../middleware/auth";
 
 const router = Router();
 
@@ -111,18 +112,18 @@ router.delete("/:id", async (req, res) => {
 router.post("/:id/follow", async (req, res) => {
   const { id } = req.params;
   // the id of the user who is following
-  const followerID = req.body.followerID;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
 
   try {
     const createFollowing = prisma.user_following.create({
       data: {
-        follower_user_id: followerID,
+        follower_user_id: currentUser.id,
         following_user_id: Number(id),
       },
     });
 
     const incrementFollowingCount = prisma.users.update({
-      where: { id: followerID },
+      where: { id: currentUser.id },
       data: { following_count: { increment: 1 } },
     });
 
@@ -147,19 +148,19 @@ router.post("/:id/follow", async (req, res) => {
 // unfollow a user
 router.delete("/:id/follow", async (req, res) => {
   const { id } = req.params;
-  // the id of the user who is following
-  const followerID = req.body.followerID;
+  // the id of the user who is unfollowing
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
 
   try {
     const deleteFollowing = prisma.user_following.deleteMany({
       where: {
-        follower_user_id: followerID,
+        follower_user_id: currentUser.id,
         following_user_id: Number(id),
       },
     });
 
     const decrementFollowingCount = prisma.users.update({
-      where: { id: followerID },
+      where: { id: currentUser.id },
       data: { following_count: { decrement: 1 } },
     });
 
@@ -187,16 +188,11 @@ router.delete("/:id/follow", async (req, res) => {
  * paginate by 10 for infinite scroll on the frontend
  */
 router.get("/:id/posts", async (req, res) => {
-  const { id } = req.params;
-  const userID = getNumberFromQuery(id);
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   const cursor = getNumberFromQuery(req.query.cursor) || 0;
 
-  if (!userID) {
-    return res.status(400).json({ error: "userID is required" });
-  }
-
   try {
-    const getPostsSqlQuery = getPostsByUserQuery(userID, cursor);
+    const getPostsSqlQuery = getPostsByUserQuery(currentUser.id, cursor);
     const posts = await prisma.$queryRaw(getPostsSqlQuery);
 
     res.json(posts);
