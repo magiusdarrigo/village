@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider  = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model users {
+  id             Int             @id @default(autoincrement())
+  username       String          @unique
+  phone_number   String          @unique
+  otp            String?
+  image          String?
+  is_verified     Boolean         @default(false)
+  neighborhood   neighborhoods?  @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id Int?
+  building       buildings?      @relation(fields: [building_id], references: [id])
+  building_id     Int?
+  followers_count Int             @default(0)
+  following_count Int             @default(0)
+  created_at      DateTime        @default(now())
+  tags           Json?
+  
+  posts          posts[]
+  comments       comments[]
+  chat_messages   chat_messages[]
+  followed_by     user_following[]  @relation("follower_user_id")
+  following      user_following[]  @relation("following_user_id")
+  likes          post_likes[]
+  liked_comments  comment_likes[]
+}
+
+model neighborhoods {
+  id             Int            @id @default(autoincrement())
+  name           String         @unique
+  created_at      DateTime       @default(now())
+  tags           Json?
+
+  users          users[]
+  buildings      buildings[]
+  posts          posts[]
+}
+
+
+model buildings {
+  id             Int            @id @default(autoincrement())
+  address        String
+  neighborhood   neighborhoods  @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id Int
+  created_at      DateTime       @default(now())
+  tags           Json?
+  
+  users          users[]
+  chat_messages   chat_messages[]
+}
+
+model posts {
+  id             Int             @id @default(autoincrement())
+  user           users           @relation(fields: [user_id], references: [id])
+  user_id         Int
+  neighborhood   neighborhoods   @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id Int
+  text_content    String?
+  image_url       String          @default("")
+  likes_count     Int             @default(0)
+  created_at      DateTime        @default(now())
+  tags           Json?
+
+  comments       comments[]
+  likes          post_likes[]
+
+  @@index([neighborhood_id, created_at], name: "idx_post_neighborhood_created_at")
+  @@index([user_id, created_at], name: "idx_post_user_created_at")
+}
+
+model post_likes {
+  id       Int     @id @default(autoincrement())
+  user_id   Int
+  post_id   Int
+  user     users   @relation(fields: [user_id], references: [id])
+  post     posts   @relation(fields: [post_id], references: [id])
+
+  @@unique([user_id, post_id])
+}
+
+model comments {
+  id              Int             @id @default(autoincrement())
+  post            posts           @relation(fields: [post_id], references: [id])
+  post_id          Int
+  user            users           @relation(fields: [user_id], references: [id])
+  user_id          Int
+  text_content     String
+  likes_count      Int             @default(0)
+  created_at       DateTime        @default(now())
+  tags            Json?
+  parent_comment   comments?       @relation("replies", fields: [parent_comment_id], references: [id])
+  parent_comment_id Int?
+  replies         comments[]      @relation("replies")
+  likedBy         comment_likes[]
+
+  @@index([post_id, likes_count], name: "idx_comment_post_likes")
+  @@index([parent_comment_id], name: "idx_comment_parent_comment")
+}
+
+model comment_likes {
+  id          Int       @id @default(autoincrement())
+  user_id      Int
+  comment_id   Int
+  user        users     @relation(fields: [user_id], references: [id])
+  comment     comments  @relation(fields: [comment_id], references: [id])
+
+  @@unique([user_id, comment_id])
+}
+
+model chat_messages {
+  id             Int             @id @default(autoincrement())
+  user           users           @relation(fields: [user_id], references: [id])
+  user_id         Int
+  building       buildings       @relation(fields: [building_id], references: [id])
+  building_id     Int
+  text_content    String
+  created_at      DateTime        @default(now())
+  tags           Json?
+}
+
+model user_following {
+  id                 Int       @id @default(autoincrement())
+  follower_user       users     @relation("follower_user_id", fields: [follower_user_id], references: [id])
+  follower_user_id     Int
+  following_user      users     @relation("following_user_id", fields: [following_user_id], references: [id])
+  following_user_id    Int
+  created_at          DateTime  @default(now())
+  tags               Json?
+
+  @@index([follower_user_id, following_user_id], name: "idx_userfollowing_relationship")
+}
