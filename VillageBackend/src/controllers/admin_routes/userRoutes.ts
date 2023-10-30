@@ -69,24 +69,6 @@ router.get("/", async (_, res) => {
   }
 });
 
-// get one user
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const user = await prisma.users.findUnique({
-      where: {
-        id: Number(id),
-      },
-    });
-    res.json(user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: `error getting user: ${id}`,
-    });
-  }
-});
-
 // delete user
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;

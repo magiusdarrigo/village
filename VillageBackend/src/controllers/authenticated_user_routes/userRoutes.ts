@@ -80,6 +80,33 @@ router.delete("/:id/follow", async (req, res) => {
   }
 });
 
+// get one user
+// only select the fields we need: id, username, image, is_verified, followers_count, following_count
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        id: true,
+        username: true,
+        image: true,
+        is_verified: true,
+        followers_count: true,
+        following_count: true,
+      },
+    });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error getting user: ${id}`,
+    });
+  }
+});
+
 /**
  * get posts by user id
  * order by createdAt descending
