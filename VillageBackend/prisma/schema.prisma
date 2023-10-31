@@ -34,6 +34,26 @@ model users {
   following      user_following[]  @relation("following_user_id")
   likes          post_likes[]
   liked_comments  comment_likes[]
+  tokens          tokens[]
+}
+
+model tokens {
+  id           Int       @id @default(autoincrement())
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  type         TokenType
+  phoneToken   String?   @unique
+  valid        Boolean   @default(true)
+  expiration   DateTime
+  tags         Json?
+
+  user_id      Int
+  user         users     @relation(fields: [user_id], references: [id])
+}
+
+enum TokenType {
+  PHONE
+  API
 }
 
 model neighborhoods {
