@@ -105,7 +105,7 @@ router.post("/authenticate", async (req, res) => {
       {
         role: "user",
         phone: phoneNumber,
-        userID: invalidToken.user_id,
+        id: invalidToken.user_id,
       },
       process.env.JWT_SECRET,
       {

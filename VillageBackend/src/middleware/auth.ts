@@ -12,8 +12,7 @@ export interface AuthenticatedRequest extends Request {
 export interface UserData {
   role: string;
   phone: string;
-  userID: number;
-  apiToken: number;
+  id: number;
 }
 
 function isUserData(obj: any): obj is UserData {
@@ -21,8 +20,7 @@ function isUserData(obj: any): obj is UserData {
     obj &&
     typeof obj.role === "string" &&
     typeof obj.phone === "string" &&
-    typeof obj.userID === "number" &&
-    typeof obj.apiToken === "number"
+    typeof obj.id === "number"
   );
 }
 

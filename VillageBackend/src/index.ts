@@ -10,9 +10,14 @@ import {
 const app = express();
 app.use(express.json());
 
-app.use("/v1", authenticateUserToken, v1AuthUserRoutes);
+// routes that don't require authentication first.
 app.use("/v1", v1UnAuthUserRoutes);
-app.use("/v1", authenticateAdminToken, v1AdminRoutes);
+
+// routes that require admin authentication
+app.use("/v1/admin", authenticateAdminToken, v1AdminRoutes);
+
+// routes that require user authentication
+app.use("/v1", authenticateUserToken, v1AuthUserRoutes);
 
 app.listen(3000, () => {
   console.log("server ready at localhost:3000");
