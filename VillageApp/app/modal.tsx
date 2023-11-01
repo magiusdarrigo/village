@@ -22,7 +22,7 @@ export default function ModalScreen() {
           source={{ uri: userProfile.photo }}
           style={styles.profilePhoto}
         />
-        <Text style={styles.username}>{userProfile.username}</Text>
+        <Text style={styles.username}>@{userProfile.username}</Text>
         <View style={styles.countContainer}>
           <Text style={styles.countText}>
             Following: {userProfile.following}
@@ -46,18 +46,19 @@ export default function ModalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   profileHeader: {
     alignItems: "center",
     marginVertical: 20,
   },
   profilePhoto: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
   },
   username: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
     marginVertical: 8,
   },
