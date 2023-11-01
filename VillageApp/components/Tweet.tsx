@@ -34,57 +34,87 @@ const calculateHoursAgo = (time: string) => {
 
 const Tweet = ({ tweet }: TweetProps) => {
   return (
-    <Link href={`/tweet/${tweet.id}`} asChild>
-      <Pressable style={styles.container}>
-        <Image src={tweet.user.image} style={styles.userImage} />
+    <View
+      style={{
+        flexDirection: "row",
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderColor: "lightgrey",
+        backgroundColor: "white",
+      }}
+    >
+      <View
+        style={{
+          width: 60,
+          flexDirection: "column",
+        }}
+      >
+        <Link href={`/profile/${tweet.user.id}`} asChild>
+          <Pressable
+            style={{
+              paddingTop: 10,
+              alignItems: "flex-end",
+            }}
+          >
+            <Image src={tweet.user.image} style={styles.userImage} />
+          </Pressable>
+        </Link>
+        <Link href={`/tweet/${tweet.id}`} asChild>
+          <Pressable style={{ flex: 2 }}></Pressable>
+        </Link>
+      </View>
+      <Link href={`/tweet/${tweet.id}`} asChild>
+        <Pressable style={styles.container}>
+          <View style={styles.mainContainer}>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.username}>@{tweet.user.username}</Text>
+              {calculateHoursAgo(tweet.created_at)}
+              <Entypo
+                name="dots-three-horizontal"
+                size={16}
+                color="grey"
+                style={{ marginLeft: "auto", paddingRight: 10 }}
+              />
+            </View>
 
-        <View style={styles.mainContainer}>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={styles.username}>@{tweet.user.username}</Text>
-            {calculateHoursAgo(tweet.created_at)}
-            <Entypo
-              name="dots-three-horizontal"
-              size={16}
-              color="grey"
-              style={{ marginLeft: "auto", paddingRight: 10 }}
-            />
+            <Text style={styles.content}> {tweet.content}</Text>
+
+            {tweet.image && <Image src={tweet.image} style={styles.image} />}
+
+            <View style={styles.footer}>
+              <Pressable style={styles.iconWrapper}>
+                <IconButton icon="comment" text={tweet.numberOfComments} />
+              </Pressable>
+              <Pressable style={styles.iconWrapper}>
+                <IconButton icon="heart" text={tweet.numberOfLikes} />
+              </Pressable>
+              {/* <IconButton icon="share-apple" /> */}
+            </View>
           </View>
-
-          <Text style={styles.content}> {tweet.content}</Text>
-
-          {tweet.image && <Image src={tweet.image} style={styles.image} />}
-
-          <View style={styles.footer}>
-            <Pressable style={styles.iconWrapper}>
-              <IconButton icon="comment" text={tweet.numberOfComments} />
-            </Pressable>
-            <Pressable style={styles.iconWrapper}>
-              <IconButton icon="heart" text={tweet.numberOfLikes} />
-            </Pressable>
-            {/* <IconButton icon="share-apple" /> */}
-          </View>
-        </View>
-      </Pressable>
-    </Link>
+        </Pressable>
+      </Link>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  imagePressable: {
+    padding: 5, // give some touchable space around the image
+    justifyContent: "center", // to vertically center the image if the main content is taller
+  },
   container: {
     flexDirection: "row",
     padding: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: "lightgrey",
-    backgroundColor: "white",
+    paddingLeft: 5,
+    flex: 1,
+  },
+  mainContainer: {
+    flex: 1,
+    marginLeft: 5,
   },
   userImage: {
     width: 50,
     height: 50,
     borderRadius: 50,
-  },
-  mainContainer: {
-    flex: 1,
-    marginLeft: 10,
   },
   username: {
     fontWeight: "bold",
