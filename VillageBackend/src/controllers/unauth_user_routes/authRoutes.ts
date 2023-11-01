@@ -79,14 +79,17 @@ router.post("/authenticate", async (req, res) => {
     });
 
     if (!dbPhoneToken || !dbPhoneToken.valid) {
+      console.log("Invalid OTP");
       return res.status(401).send("Invalid OTP.");
     }
 
     if (dbPhoneToken.expiration && dbPhoneToken.expiration < new Date()) {
+      console.log("OTP expired");
       return res.status(401).send("OTP expired.");
     }
 
     if (dbPhoneToken?.user?.phone_number !== phoneNumber) {
+      console.log("Phone number mismatch");
       return res.status(401);
     }
 

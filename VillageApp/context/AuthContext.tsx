@@ -24,6 +24,8 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     const isAuthGroup = segments[0] === "(auth)";
 
+    console.log("authToken", authToken);
+
     if (!authToken && !isAuthGroup) {
       router.replace("/signIn");
     }
