@@ -46,13 +46,20 @@ const Tweet = ({ tweet }: TweetProps) => {
         style={{
           width: 60,
           flexDirection: "column",
-          alignItems: "flex-end",
         }}
       >
         <Link href={`/profile/${tweet.user.id}`} asChild>
-          <Pressable style={{ marginTop: 10 }}>
+          <Pressable
+            style={{
+              paddingTop: 10,
+              alignItems: "flex-end",
+            }}
+          >
             <Image src={tweet.user.image} style={styles.userImage} />
           </Pressable>
+        </Link>
+        <Link href={`/tweet/${tweet.id}`} asChild>
+          <Pressable style={{ flex: 2 }}></Pressable>
         </Link>
       </View>
       <Link href={`/tweet/${tweet.id}`} asChild>

@@ -1,18 +1,19 @@
 import { Text } from "react-native";
-import Tweet from "../../components/Tweet";
 import tweets from "../../assets/data/tweets";
 import { useGlobalSearchParams } from "expo-router";
+import ModalScreen from "../modal";
 
 const ProfileScreen = () => {
   const { id } = useGlobalSearchParams();
 
-  const tweet = tweets.find((t) => t.id === id);
+  const tweet = tweets.find((t) => t.user.id === id);
+  const user = tweet?.user;
 
-  if (!tweet) {
-    return <Text>Post not found</Text>;
+  if (!user) {
+    return <Text>Profile not found</Text>;
   }
 
-  return <Tweet tweet={tweet} />;
+  return <ModalScreen user={user} />;
 };
 
 export default ProfileScreen;

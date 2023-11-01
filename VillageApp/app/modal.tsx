@@ -1,7 +1,12 @@
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { User } from "../types";
 
-export default function ModalScreen() {
+type ProfileProps = {
+  user: User;
+};
+
+const ModalScreen = ({ user }: ProfileProps) => {
   // Replace with your own image URL and user data
   const userProfile = {
     photo: "https://via.placeholder.com/150",
@@ -41,7 +46,7 @@ export default function ModalScreen() {
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -82,3 +87,5 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
 });
+
+export default ModalScreen;
