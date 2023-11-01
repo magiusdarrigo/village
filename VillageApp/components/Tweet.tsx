@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     marginVertical: 5,
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
   },
   iconWrapper: {
     marginRight: 40,

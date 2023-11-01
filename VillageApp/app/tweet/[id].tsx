@@ -9,7 +9,7 @@ const TweetScreen = () => {
   const tweet = tweets.find((t) => t.id === id);
 
   if (!tweet) {
-    return <Text>Tweet not found</Text>;
+    return <Text>Post not found</Text>;
   }
 
   return <Tweet tweet={tweet} />;

@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   floatingButton: {
-    backgroundColor: "#1C9BF0",
+    backgroundColor: "black",
     position: "absolute",
     bottom: 20,
     right: 20,
