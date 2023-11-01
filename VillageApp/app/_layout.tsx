@@ -6,8 +6,9 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
+import AuthContextProvider from "../context/AuthContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -50,16 +51,30 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        <Stack.Screen name="tweet/[id]" options={{ title: "tweet" }} />
-        <Stack.Screen
-          name="new-tweet"
-          options={{ title: "New Tweet", headerShown: false }}
-        />
-      </Stack>
-    </ThemeProvider>
+    <>
+      <AuthContextProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+            <Stack.Screen name="tweet/[id]" options={{ title: "tweet" }} />
+            <Stack.Screen
+              name="new-tweet"
+              options={{ title: "New Tweet", headerShown: false }}
+            />
+            <Stack.Screen
+              name="(auth)/signIn"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(auth)/authenticate"
+              options={{ headerShown: false }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </AuthContextProvider>
+    </>
   );
 }

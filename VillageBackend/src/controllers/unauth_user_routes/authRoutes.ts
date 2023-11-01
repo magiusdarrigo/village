@@ -4,54 +4,50 @@ import twilioClient from "../../clients/twilioClient";
 
 const router = Router();
 const jwt = require("jsonwebtoken");
+const PHONE_TOKEN_EXPIRY_MINUTES = 2;
 
 // new phone number not seen before -> create new user
 router.post("/login", async (req, res) => {
   const { phoneNumber } = req.body;
 
-  if (!phoneNumber) {
-    return res.status(400).send("Phone number is required.");
+  if (typeof phoneNumber !== "string") {
+    return res.status(400).send("Phone number incorrect.");
   }
 
-  // Generate OTP
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // generates a 6-digit code
+  // Generate OTP (6-digit code)
+  const phoneToken = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiration = new Date(
+    new Date().getTime() + 1000 * 60 * PHONE_TOKEN_EXPIRY_MINUTES
+  ); // 2 minutes
 
   try {
-    // check if phone number exists in users table
-    const user = await prisma.users.findUnique({
-      where: {
-        phone_number: phoneNumber,
+    // TODO: change this to be unique
+    const username =
+      Math.random().toString(36).substring(2, 5) +
+      Math.random().toString(36).substring(2, 12);
+
+    await prisma.tokens.create({
+      data: {
+        type: "PHONE",
+        phone_token: phoneToken,
+        expiration,
+        user: {
+          connectOrCreate: {
+            where: {
+              phone_number: phoneNumber,
+            },
+            create: {
+              username,
+              phone_number: phoneNumber,
+            },
+          },
+        },
       },
     });
 
-    // if phone number exists, then the user is logging in. update the user's otp
-    if (user) {
-      await prisma.users.update({
-        where: {
-          phone_number: phoneNumber,
-        },
-        data: {
-          otp,
-        },
-      });
-    } else {
-      // if phone number does not exist, then the user is signing up. create a new user
-      const username =
-        Math.random().toString(36).substring(2, 5) +
-        Math.random().toString(36).substring(2, 12);
-
-      await prisma.users.create({
-        data: {
-          username,
-          phone_number: phoneNumber,
-          otp,
-        },
-      });
-    }
-
     // Send OTP using Twilio
     await twilioClient.messages.create({
-      body: `Your Village OTP is: ${otp}`,
+      body: `Your Village OTP is: ${phoneToken}`,
       from: process.env.TWILIO_PHONE_NUMBER,
       to: phoneNumber,
     });
@@ -63,54 +59,65 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/validate", async (req, res) => {
-  const phoneNumber = req.body.phone_number;
-  const userOTP = req.body.otp;
+router.post("/authenticate", async (req, res) => {
+  const phoneNumber = req.body.phoneNumber;
+  const phoneToken = req.body.phoneToken;
 
-  if (!phoneNumber || !userOTP) {
+  if (!phoneNumber || !phoneToken) {
     return res.status(400).send("Phone number and OTP are required.");
   }
 
   try {
     // Fetch the OTP from the database for the given phone number
-    const result = await prisma.users.findUnique({
+    const dbPhoneToken = await prisma.tokens.findUnique({
       where: {
-        phone_number: phoneNumber,
+        phone_token: phoneToken,
       },
-      select: {
-        otp: true,
-        id: true,
+      include: {
+        user: true,
       },
     });
 
-    const storedOTP = result?.otp;
-    const userID = result?.id;
-
-    if (!storedOTP) {
-      return res.status(404).send("User not found.");
+    if (!dbPhoneToken || !dbPhoneToken.valid) {
+      console.log("Invalid OTP");
+      return res.status(401).send("Invalid OTP.");
     }
 
-    if (storedOTP !== userOTP) {
-      return res.status(400).send("Invalid OTP.");
+    if (dbPhoneToken.expiration && dbPhoneToken.expiration < new Date()) {
+      console.log("OTP expired");
+      return res.status(401).send("OTP expired.");
     }
+
+    if (dbPhoneToken?.user?.phone_number !== phoneNumber) {
+      console.log("Phone number mismatch");
+      return res.status(401);
+    }
+
+    // invalidate phone token
+    const invalidToken = await prisma.tokens.update({
+      where: {
+        id: dbPhoneToken.id,
+      },
+      data: {
+        valid: false,
+      },
+    });
 
     // If the OTP is valid, generate a JWT and send it back
     const token = jwt.sign(
-      { role: "user", phone: phoneNumber, userID },
-      process.env.JWT_SECRET
+      {
+        role: "user",
+        phone: phoneNumber,
+        id: invalidToken.user_id,
+      },
+      process.env.JWT_SECRET,
+      {
+        algorithm: "HS256",
+        noTimestamp: true,
+      }
     );
 
-    // invalidate/delete the OTP from the database after successful verification
-    await prisma.users.update({
-      where: {
-        phone_number: phoneNumber,
-      },
-      data: {
-        otp: null,
-      },
-    });
-
-    res.json({ token }); // Send the JWT to the client
+    res.send({ token });
   } catch (error) {
     console.error("Error in validate handler:", error);
     res.status(500).send("Internal Server Error.");
