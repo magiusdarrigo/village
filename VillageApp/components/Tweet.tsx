@@ -8,6 +8,30 @@ type TweetProps = {
   tweet: TweetType;
 };
 
+const calculateHoursAgo = (time: string) => {
+  const now = new Date();
+  const date = new Date(time);
+  const diff = now.getTime() - date.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor(diff / (1000 * 60));
+  const seconds = Math.floor(diff / 1000);
+
+  if (seconds < 60) {
+    return <Text style={styles.time}> · {seconds}s</Text>;
+  } else if (minutes < 60) {
+    return <Text style={styles.time}> · {minutes}m</Text>;
+  } else if (hours < 24) {
+    return <Text style={styles.time}> · {hours}h</Text>;
+  } else {
+    const dateWithoutYear = date
+      .toDateString()
+      .split(" ")
+      .slice(0, 3)
+      .join(" ");
+    return <Text style={styles.time}> · {dateWithoutYear}</Text>;
+  }
+};
+
 const Tweet = ({ tweet }: TweetProps) => {
   return (
     <Link href={`/tweet/${tweet.id}`} asChild>
@@ -16,8 +40,8 @@ const Tweet = ({ tweet }: TweetProps) => {
 
         <View style={styles.mainContainer}>
           <View style={{ flexDirection: "row" }}>
-            <Text style={styles.name}>{tweet.user.name}</Text>
-            <Text style={styles.username}>@{tweet.user.username} · 2h</Text>
+            <Text style={styles.username}>@{tweet.user.username}</Text>
+            {calculateHoursAgo(tweet.created_at)}
             <Entypo
               name="dots-three-horizontal"
               size={16}
@@ -31,11 +55,13 @@ const Tweet = ({ tweet }: TweetProps) => {
           {tweet.image && <Image src={tweet.image} style={styles.image} />}
 
           <View style={styles.footer}>
-            <IconButton icon="comment" text={tweet.numberOfComments} />
-            <IconButton icon="retweet" text={tweet.numberOfRetweets} />
-            <IconButton icon="heart" text={tweet.numberOfLikes} />
-            <IconButton icon="chart" text={tweet.impressions || 0} />
-            <IconButton icon="share-apple" />
+            <Pressable style={styles.iconWrapper}>
+              <IconButton icon="comment" text={tweet.numberOfComments} />
+            </Pressable>
+            <Pressable style={styles.iconWrapper}>
+              <IconButton icon="heart" text={tweet.numberOfLikes} />
+            </Pressable>
+            {/* <IconButton icon="share-apple" /> */}
           </View>
         </View>
       </Pressable>
@@ -60,10 +86,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
   },
-  name: {
+  username: {
     fontWeight: "bold",
   },
-  username: {
+  time: {
     color: "grey",
     marginLeft: 5,
   },
@@ -80,7 +106,10 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     marginVertical: 5,
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
+  },
+  iconWrapper: {
+    marginRight: 40,
   },
 });
 

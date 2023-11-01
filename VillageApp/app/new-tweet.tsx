@@ -37,7 +37,7 @@ const NewTweet = () => {
             Cancel
           </Link>
           <Pressable onPress={onTweetPress} style={styles.button}>
-            <Text style={styles.buttonText}>Tweet</Text>
+            <Text style={styles.buttonText}>Post</Text>
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    backgroundColor: "#1C9BF0",
+    backgroundColor: "black",
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,

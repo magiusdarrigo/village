@@ -6,7 +6,7 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 
@@ -58,7 +58,10 @@ function RootLayoutNav() {
         >
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+            <Stack.Screen
+              name="modal"
+              options={{ presentation: "modal", title: "Profile" }}
+            />
             <Stack.Screen name="tweet/[id]" options={{ title: "tweet" }} />
             <Stack.Screen
               name="new-tweet"
