@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import IconButton from "../components/IconButton";
@@ -6,6 +6,21 @@ import { Link } from "expo-router";
 
 type TweetProps = {
   tweet: TweetType;
+};
+
+const onReported = (id: string) => {
+  console.warn("Post reported");
+};
+
+const handleReportPostAlert = (id: string) => {
+  Alert.alert("Report Post?", "", [
+    {
+      text: "Cancel",
+      onPress: () => console.log("Cancel Pressed"),
+      style: "cancel",
+    },
+    { text: "Yes", onPress: (id) => onReported(id) },
+  ]);
 };
 
 const calculateHoursAgo = (time: string) => {
@@ -17,18 +32,18 @@ const calculateHoursAgo = (time: string) => {
   const seconds = Math.floor(diff / 1000);
 
   if (seconds < 60) {
-    return <Text style={styles.time}> · {seconds}s</Text>;
+    return <Text style={styles.time}>· {seconds}s</Text>;
   } else if (minutes < 60) {
-    return <Text style={styles.time}> · {minutes}m</Text>;
+    return <Text style={styles.time}>· {minutes}m</Text>;
   } else if (hours < 24) {
-    return <Text style={styles.time}> · {hours}h</Text>;
+    return <Text style={styles.time}>· {hours}h</Text>;
   } else {
     const dateWithoutYear = date
       .toDateString()
       .split(" ")
       .slice(0, 3)
       .join(" ");
-    return <Text style={styles.time}> · {dateWithoutYear}</Text>;
+    return <Text style={styles.time}>· {dateWithoutYear}</Text>;
   }
 };
 
@@ -68,12 +83,17 @@ const Tweet = ({ tweet }: TweetProps) => {
             <View style={{ flexDirection: "row" }}>
               <Text style={styles.username}>@{tweet.user.username}</Text>
               {calculateHoursAgo(tweet.created_at)}
-              <Entypo
-                name="dots-three-horizontal"
-                size={16}
-                color="grey"
-                style={{ marginLeft: "auto", paddingRight: 10 }}
-              />
+              <Pressable
+                style={{ marginLeft: "auto" }}
+                onPress={() => handleReportPostAlert(tweet.id)}
+              >
+                <Entypo
+                  name="dots-three-horizontal"
+                  size={16}
+                  color="grey"
+                  style={{ marginLeft: "auto", paddingRight: 10 }}
+                />
+              </Pressable>
             </View>
 
             <Text style={styles.content}> {tweet.content}</Text>
