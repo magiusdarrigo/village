@@ -18,8 +18,13 @@ export default function FeedScreen() {
         },
       });
 
+      // if (res.status === 403) {
+      //   useAuth().removeAuthToken();
+      //   return;
+      // }
+
       if (res.status !== 200) {
-        console.log("Error fetching tweets");
+        console.log(res);
         return;
       }
 

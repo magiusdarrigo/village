@@ -60,44 +60,46 @@ async function main() {
     await createPost();
   }
 
-  // seed the comments table with 50 comments (first 20 users comment on the first 5 posts)
-  // so post id 1 will have 10 comments.
-  const randomComments = Array.from({ length: 50 }).map((_, index) => {
-    return async () => {
-      await sleep(1); // Sleep for 1 ms
-      await prisma.comments.create({
-        data: {
-          user_id: (index % 20) + 1,
-          post_id: (index % 5) + 1,
-          text_content: `comment ${index}`,
-        },
-      });
-    };
-  });
+  // TODO: comment count on posts have to be updated too if i want to use this seed.
+  // // seed the comments table with 50 comments (first 20 users comment on the first 5 posts)
+  // // so post id 1 will have 10 comments.
+  // const randomComments = Array.from({ length: 50 }).map((_, index) => {
+  //   return async () => {
+  //     await sleep(1); // Sleep for 1 ms
+  //     await prisma.comments.create({
+  //       data: {
+  //         user_id: (index % 20) + 1,
+  //         post_id: (index % 5) + 1,
+  //         text_content: `comment ${index}`,
+  //       },
+  //     });
+  //   };
+  // });
 
-  for (const createComment of randomComments) {
-    await createComment();
-  }
+  // for (const createComment of randomComments) {
+  //   await createComment();
+  // }
 
-  // seed the comments table with 51 replies (all on the comments of the first post, first 20 users reply to the first 5 comments)
-  // so comment id 1 will have 11 replies, other comments will have 10 replies.
-  const randomReplies = Array.from({ length: 51 }).map((_, index) => {
-    return async () => {
-      await sleep(1); // Sleep for 1 ms
-      await prisma.comments.create({
-        data: {
-          user_id: (index % 20) + 1,
-          post_id: 1,
-          parent_comment_id: (index % 5) + 1,
-          text_content: `reply ${index}`,
-        },
-      });
-    };
-  });
+  // TODO: comment count on posts have to be updated too if i want to use this seed.
+  // // seed the comments table with 51 replies (all on the comments of the first post, first 20 users reply to the first 5 comments)
+  // // so comment id 1 will have 11 replies, other comments will have 10 replies.
+  // const randomReplies = Array.from({ length: 51 }).map((_, index) => {
+  //   return async () => {
+  //     await sleep(1); // Sleep for 1 ms
+  //     await prisma.comments.create({
+  //       data: {
+  //         user_id: (index % 20) + 1,
+  //         post_id: 1,
+  //         parent_comment_id: (index % 5) + 1,
+  //         text_content: `reply ${index}`,
+  //       },
+  //     });
+  //   };
+  // });
 
-  for (const createReply of randomReplies) {
-    await createReply();
-  }
+  //   for (const createReply of randomReplies) {
+  //     await createReply();
+  //   }
 }
 
 main()
