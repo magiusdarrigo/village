@@ -183,12 +183,10 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     marginVertical: 5,
-    justifyContent: "flex-start",
+    width: 120,
+    justifyContent: "space-between",
   },
-  iconWrapper: {
-    marginRight: 20,
-    width: 60,
-  },
+  iconWrapper: {},
 });
 
 export default Tweet;
