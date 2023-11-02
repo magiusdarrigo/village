@@ -186,7 +186,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   iconWrapper: {
-    marginRight: 40,
+    marginRight: 20,
+    width: 60,
   },
 });
 
