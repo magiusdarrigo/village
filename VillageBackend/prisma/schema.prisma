@@ -87,6 +87,7 @@ model posts {
   text_content    String?
   image_url       String          @default("")
   likes_count     Int             @default(0)
+  comments_count  Int             @default(0)
   created_at      DateTime        @default(now())
   tags           Json?
 

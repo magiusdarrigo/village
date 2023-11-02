@@ -9,11 +9,11 @@ type TweetProps = {
   tweet: TweetType;
 };
 
-const onReported = (id: string) => {
+const onReported = (id: number) => {
   console.warn("Post reported");
 };
 
-const handleReportPostAlert = (id: string) => {
+const handleReportPostAlert = (id: number) => {
   Alert.alert("Report Post?", "", [
     {
       text: "Cancel",
@@ -52,7 +52,7 @@ const Tweet = ({ tweet }: TweetProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  const handleToggleLike = (id: string) => {
+  const handleToggleLike = (id: number) => {
     if (isLiked) {
       setIsLiked(false);
     } else {
@@ -82,7 +82,7 @@ const Tweet = ({ tweet }: TweetProps) => {
               alignItems: "flex-end",
             }}
           >
-            <Image src={tweet.user.image} style={styles.userImage} />
+            <Image src={tweet.profile_image} style={styles.userImage} />
           </Pressable>
         </Link>
         <Link href={`/tweet/${tweet.id}`} asChild>
@@ -93,7 +93,7 @@ const Tweet = ({ tweet }: TweetProps) => {
         <Pressable style={styles.container}>
           <View style={styles.mainContainer}>
             <View style={{ flexDirection: "row" }}>
-              <Text style={styles.username}>@{tweet.user.username}</Text>
+              <Text style={styles.username}>@{tweet.username}</Text>
               {calculateHoursAgo(tweet.created_at)}
               <Pressable
                 style={{ marginLeft: "auto" }}
@@ -108,13 +108,15 @@ const Tweet = ({ tweet }: TweetProps) => {
               </Pressable>
             </View>
 
-            <Text style={styles.content}> {tweet.content}</Text>
+            <Text style={styles.content}> {tweet.text_content}</Text>
 
-            {tweet.image && <Image src={tweet.image} style={styles.image} />}
+            {tweet.image_url && (
+              <Image src={tweet.image_url} style={styles.image} />
+            )}
 
             <View style={styles.footer}>
               <Pressable style={styles.iconWrapper}>
-                <EvilIcon icon="comment" text={tweet.numberOfComments} />
+                <EvilIcon icon="comment" text={tweet.comments_count} />
               </Pressable>
               <Pressable
                 style={styles.iconWrapper}
@@ -123,13 +125,13 @@ const Tweet = ({ tweet }: TweetProps) => {
                 {(isLiked && (
                   <AntIcon
                     icon="heart"
-                    text={tweet.numberOfLikes}
+                    text={tweet.likes_count}
                     iconColor="red"
                   />
                 )) || (
                   <AntIcon
                     icon="hearto"
-                    text={tweet.numberOfLikes}
+                    text={tweet.likes_count}
                     iconColor="#b2b2b2"
                   />
                 )}

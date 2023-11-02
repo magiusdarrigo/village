@@ -6,13 +6,15 @@ export type User = {
 };
 
 export type TweetType = {
-  id: string;
+  id: number;
+  user_id: number;
+  username: string;
+  profile_image?: string;
+  neighborhood_id: number;
+  text_content?: string;
+  image_url?: string;
+  likes_count: number;
+  comments_count: number;
   created_at: string;
-  user: User;
-  content: string;
-  image?: string;
-  numberOfComments?: number;
-  numberOfRetweets?: number;
-  numberOfLikes?: number;
-  impressions?: number;
+  liked_by_user: boolean;
 };
