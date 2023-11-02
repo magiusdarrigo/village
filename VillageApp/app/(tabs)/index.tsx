@@ -3,35 +3,15 @@ import { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
 import { Link } from "expo-router";
+import { listTweets } from "../../lib/api/tweets";
 
 export default function FeedScreen() {
   const [tweets, setTweets] = useState([]);
 
   useEffect(() => {
     const fetchTweets = async () => {
-      const url = "http://localhost:3000/v1/neighborhoods/1/posts";
-      const authToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInBob25lIjoiKzE5NzI1MjI4MTY0IiwiaWQiOjF9.igkJqwNeIGyjNvQyC6_6wA7r5zh2ciFUzeMO-0qLRvI";
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-
-      // if (res.status === 403) {
-      //   useAuth().removeAuthToken();
-      //   return;
-      // }
-
-      if (res.status !== 200) {
-        console.log(res);
-        return;
-      }
-
-      const data = await res.json();
-
-      console.log(data);
-      setTweets(data);
+      const res = await listTweets();
+      setTweets(res);
     };
     fetchTweets();
   }, []);
