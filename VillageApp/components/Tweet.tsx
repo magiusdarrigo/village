@@ -1,7 +1,8 @@
 import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
+import { useState, useEffect } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
-import IconButton from "../components/IconButton";
+import { EvilIcon, AntIcon } from "./Icons";
 import { Link } from "expo-router";
 
 type TweetProps = {
@@ -48,6 +49,17 @@ const calculateHoursAgo = (time: string) => {
 };
 
 const Tweet = ({ tweet }: TweetProps) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleToggleLike = (id: string) => {
+    if (isLiked) {
+      setIsLiked(false);
+    } else {
+      setIsLiked(true);
+    }
+  };
+
   return (
     <View
       style={{
@@ -74,7 +86,7 @@ const Tweet = ({ tweet }: TweetProps) => {
           </Pressable>
         </Link>
         <Link href={`/tweet/${tweet.id}`} asChild>
-          <Pressable style={{ flex: 2 }}></Pressable>
+          <Pressable style={{ flex: 1 }}></Pressable>
         </Link>
       </View>
       <Link href={`/tweet/${tweet.id}`} asChild>
@@ -102,10 +114,25 @@ const Tweet = ({ tweet }: TweetProps) => {
 
             <View style={styles.footer}>
               <Pressable style={styles.iconWrapper}>
-                <IconButton icon="comment" text={tweet.numberOfComments} />
+                <EvilIcon icon="comment" text={tweet.numberOfComments} />
               </Pressable>
-              <Pressable style={styles.iconWrapper}>
-                <IconButton icon="heart" text={tweet.numberOfLikes} />
+              <Pressable
+                style={styles.iconWrapper}
+                onPress={() => handleToggleLike(tweet.id)}
+              >
+                {(isLiked && (
+                  <AntIcon
+                    icon="heart"
+                    text={tweet.numberOfLikes}
+                    iconColor="red"
+                  />
+                )) || (
+                  <AntIcon
+                    icon="hearto"
+                    text={tweet.numberOfLikes}
+                    iconColor="#b2b2b2"
+                  />
+                )}
               </Pressable>
               {/* <IconButton icon="share-apple" /> */}
             </View>
