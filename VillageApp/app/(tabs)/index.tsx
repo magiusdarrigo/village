@@ -31,7 +31,7 @@ export default function FeedScreen() {
       const data = await res.json();
 
       console.log(data);
-      // setTweets(data);
+      setTweets(data);
     };
     fetchTweets();
   }, []);

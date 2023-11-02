@@ -20,7 +20,7 @@ const handleReportPostAlert = (id: number) => {
       onPress: () => console.log("Cancel Pressed"),
       style: "cancel",
     },
-    { text: "Yes", onPress: (id) => onReported(id) },
+    { text: "Yes", onPress: () => onReported(id) },
   ]);
 };
 
@@ -75,7 +75,7 @@ const Tweet = ({ tweet }: TweetProps) => {
           flexDirection: "column",
         }}
       >
-        <Link href={`/profile/${tweet.user.id}`} asChild>
+        <Link href={`/profile/${tweet.user_id}`} asChild>
           <Pressable
             style={{
               paddingTop: 10,
