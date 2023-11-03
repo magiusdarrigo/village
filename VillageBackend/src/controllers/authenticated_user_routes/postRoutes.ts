@@ -3,6 +3,7 @@ import prisma from "../../clients/prismaClient";
 import { getTop10CommentsFromPostQuery } from "../../sql_queries/comments";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
+import { getSinglePostQuery } from "../../sql_queries/posts";
 
 const router = Router();
 
@@ -26,6 +27,27 @@ router.post("/", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: `error creating post for user`,
+    });
+  }
+});
+
+// get post
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  try {
+    const getPostQuery = getSinglePostQuery(currentUser.id, Number(id));
+    const posts = (await prisma.$queryRaw(getPostQuery)) as any[];
+
+    if (posts.length !== 1) {
+      return res.status(404).json({ error: "post not found" });
+    }
+
+    res.json(posts[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error fetching post: ${id}`,
     });
   }
 });

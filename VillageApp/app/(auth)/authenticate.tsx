@@ -24,7 +24,7 @@ const Authenticate = () => {
     try {
       const res = await authenticate({ phoneNumber, phoneToken: code });
       console.log(res);
-      await updateAuthToken(res.token);
+      updateAuthToken(res.token);
     } catch (e) {
       Alert.alert("Error", "Phone number code doesn't match");
     }
