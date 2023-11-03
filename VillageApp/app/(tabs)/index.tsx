@@ -6,23 +6,14 @@ import {
   ActivityIndicator,
   Text,
 } from "react-native";
-import { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
 import { Link } from "expo-router";
-import { listTweets } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../lib/api/tweets";
 import { useQuery } from "@tanstack/react-query";
 
 export default function FeedScreen() {
-  // const [tweets, setTweets] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchTweets = async () => {
-  //     const res = await listTweets();
-  //     setTweets(res);
-  //   };
-  //   fetchTweets();
-  // }, []);
+  const { listTweets } = useTweetsApi()!;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["tweets"],

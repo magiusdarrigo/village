@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import TweetsApiContextProvider from "../lib/api/tweets";
 
 const client = new QueryClient();
 
@@ -56,36 +57,38 @@ function RootLayoutNav() {
   return (
     <>
       <AuthContextProvider>
-        <QueryClientProvider client={client}>
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="modal"
-                options={{ presentation: "modal", title: "You" }}
-              />
-              <Stack.Screen
-                name="profile/[id]"
-                options={{ presentation: "modal", title: "User" }}
-              />
-              <Stack.Screen name="tweet/[id]" options={{ title: "Post" }} />
-              <Stack.Screen
-                name="new-tweet"
-                options={{ title: "New Tweet", headerShown: false }}
-              />
-              <Stack.Screen
-                name="(auth)/signIn"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="(auth)/authenticate"
-                options={{ headerShown: false }}
-              />
-            </Stack>
-          </ThemeProvider>
-        </QueryClientProvider>
+        <TweetsApiContextProvider>
+          <QueryClientProvider client={client}>
+            <ThemeProvider
+              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+            >
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="modal"
+                  options={{ presentation: "modal", title: "You" }}
+                />
+                <Stack.Screen
+                  name="profile/[id]"
+                  options={{ presentation: "modal", title: "User" }}
+                />
+                <Stack.Screen name="tweet/[id]" options={{ title: "Post" }} />
+                <Stack.Screen
+                  name="new-tweet"
+                  options={{ title: "New Tweet", headerShown: false }}
+                />
+                <Stack.Screen
+                  name="(auth)/signIn"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="(auth)/authenticate"
+                  options={{ headerShown: false }}
+                />
+              </Stack>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </TweetsApiContextProvider>
       </AuthContextProvider>
     </>
   );

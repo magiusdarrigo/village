@@ -43,6 +43,30 @@ export const getSinglePostQuery = (userID: number, postID: number) => {
             `;
 };
 
+// return the post as well as the user's username and profile image
+export const createPostQuery = (
+  userID: number,
+  neighborhoodID: number,
+  textContent: string,
+  imageURL: string
+) => {
+  return Prisma.sql`
+                WITH new_post AS (
+                    INSERT INTO posts (user_id, neighborhood_id, text_content, image_url)
+                    VALUES (${userID}, ${neighborhoodID}, ${textContent}, ${imageURL})
+                    RETURNING *
+                )
+                SELECT 
+                    new_post.*,
+                    u.username,
+                    u.image AS profile_image
+                FROM 
+                    new_post
+                JOIN 
+                    users u ON new_post.user_id = u.id;
+            `;
+};
+
 export const getPostsByUserQuery = (userID: number, cursor: number) => {
   return Prisma.sql`
             SELECT 

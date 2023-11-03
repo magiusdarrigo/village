@@ -34,7 +34,7 @@ export const authenticateUserToken = (
   const token = authHeader && authHeader.split(" ")[1];
 
   // If there's no token, return an error
-  if (!token) return res.status(401).send("Access Denied: No Token Provided!");
+  if (!token) return res.status(403).send("Access Denied: No Token Provided!");
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!);
@@ -73,7 +73,7 @@ export const authenticateAdminToken = (
   const token = authHeader && authHeader.split(" ")[1];
 
   // If there's no token, return an error
-  if (!token) return res.status(401).send("Access Denied: No Token Provided!");
+  if (!token) return res.status(403).send("Access Denied: No Token Provided!");
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!);
