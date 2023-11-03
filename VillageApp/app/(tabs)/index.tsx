@@ -1,20 +1,41 @@
-import { StyleSheet, View, FlatList, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+  Text,
+} from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
-import tweets from "../../assets/data/tweets";
 import { Link } from "expo-router";
+import { useTweetsApi } from "../../lib/api/tweets";
+import { useQuery } from "@tanstack/react-query";
+import colors from "../../constants/Colors";
 
-export default function TabOneScreen() {
+export default function FeedScreen() {
+  const { listTweets } = useTweetsApi()!;
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["tweets"],
+    queryFn: listTweets,
+  });
+
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return <Text>Couldn't Load Posts!</Text>;
+  }
+
   return (
     <View style={styles.page}>
-      <FlatList
-        data={tweets}
-        renderItem={({ item }) => <Tweet tweet={item} />}
-      />
+      <FlatList data={data} renderItem={({ item }) => <Tweet tweet={item} />} />
 
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={24} color="white" />
+          <Entypo name="plus" size={24} color="black" />
         </Pressable>
       </Link>
     </View>
@@ -27,7 +48,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   floatingButton: {
-    backgroundColor: "black",
+    backgroundColor: colors.light.tertiary,
     position: "absolute",
     bottom: 20,
     right: 20,

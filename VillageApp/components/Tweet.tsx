@@ -1,11 +1,27 @@
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
+import { useState, useEffect } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
-import IconButton from "../components/IconButton";
+import { EvilIcon, AntIcon } from "./Icons";
 import { Link } from "expo-router";
 
 type TweetProps = {
   tweet: TweetType;
+};
+
+const onReported = (id: number) => {
+  console.warn("Post reported");
+};
+
+const handleReportPostAlert = (id: number) => {
+  Alert.alert("Report Post?", "", [
+    {
+      text: "Cancel",
+      onPress: () => console.log("Cancel Pressed"),
+      style: "cancel",
+    },
+    { text: "Yes", onPress: () => onReported(id) },
+  ]);
 };
 
 const calculateHoursAgo = (time: string) => {
@@ -17,22 +33,33 @@ const calculateHoursAgo = (time: string) => {
   const seconds = Math.floor(diff / 1000);
 
   if (seconds < 60) {
-    return <Text style={styles.time}> · {seconds}s</Text>;
+    return <Text style={styles.time}>· {seconds}s</Text>;
   } else if (minutes < 60) {
-    return <Text style={styles.time}> · {minutes}m</Text>;
+    return <Text style={styles.time}>· {minutes}m</Text>;
   } else if (hours < 24) {
-    return <Text style={styles.time}> · {hours}h</Text>;
+    return <Text style={styles.time}>· {hours}h</Text>;
   } else {
     const dateWithoutYear = date
       .toDateString()
       .split(" ")
       .slice(0, 3)
       .join(" ");
-    return <Text style={styles.time}> · {dateWithoutYear}</Text>;
+    return <Text style={styles.time}>· {dateWithoutYear}</Text>;
   }
 };
 
 const Tweet = ({ tweet }: TweetProps) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleToggleLike = (id: number) => {
+    if (isLiked) {
+      setIsLiked(false);
+    } else {
+      setIsLiked(true);
+    }
+  };
+
   return (
     <View
       style={{
@@ -48,44 +75,66 @@ const Tweet = ({ tweet }: TweetProps) => {
           flexDirection: "column",
         }}
       >
-        <Link href={`/profile/${tweet.user.id}`} asChild>
+        <Link href={`/profile/${tweet.user_id}`} asChild>
           <Pressable
             style={{
               paddingTop: 10,
               alignItems: "flex-end",
             }}
           >
-            <Image src={tweet.user.image} style={styles.userImage} />
+            <Image src={tweet.profile_image} style={styles.userImage} />
           </Pressable>
         </Link>
         <Link href={`/tweet/${tweet.id}`} asChild>
-          <Pressable style={{ flex: 2 }}></Pressable>
+          <Pressable style={{ flex: 1 }}></Pressable>
         </Link>
       </View>
       <Link href={`/tweet/${tweet.id}`} asChild>
         <Pressable style={styles.container}>
           <View style={styles.mainContainer}>
             <View style={{ flexDirection: "row" }}>
-              <Text style={styles.username}>@{tweet.user.username}</Text>
+              <Text style={styles.username}>@{tweet.username}</Text>
               {calculateHoursAgo(tweet.created_at)}
-              <Entypo
-                name="dots-three-horizontal"
-                size={16}
-                color="grey"
-                style={{ marginLeft: "auto", paddingRight: 10 }}
-              />
+              <Pressable
+                style={{ marginLeft: "auto" }}
+                onPress={() => handleReportPostAlert(tweet.id)}
+              >
+                <Entypo
+                  name="dots-three-horizontal"
+                  size={16}
+                  color="grey"
+                  style={{ marginLeft: "auto", paddingRight: 10 }}
+                />
+              </Pressable>
             </View>
 
-            <Text style={styles.content}> {tweet.content}</Text>
+            <Text style={styles.content}> {tweet.text_content}</Text>
 
-            {tweet.image && <Image src={tweet.image} style={styles.image} />}
+            {tweet.image_url && (
+              <Image src={tweet.image_url} style={styles.image} />
+            )}
 
             <View style={styles.footer}>
               <Pressable style={styles.iconWrapper}>
-                <IconButton icon="comment" text={tweet.numberOfComments} />
+                <EvilIcon icon="comment" text={tweet.comments_count} />
               </Pressable>
-              <Pressable style={styles.iconWrapper}>
-                <IconButton icon="heart" text={tweet.numberOfLikes} />
+              <Pressable
+                style={styles.iconWrapper}
+                onPress={() => handleToggleLike(tweet.id)}
+              >
+                {(isLiked && (
+                  <AntIcon
+                    icon="heart"
+                    text={tweet.likes_count}
+                    iconColor="red"
+                  />
+                )) || (
+                  <AntIcon
+                    icon="hearto"
+                    text={tweet.likes_count}
+                    iconColor="#b2b2b2"
+                  />
+                )}
               </Pressable>
               {/* <IconButton icon="share-apple" /> */}
             </View>
@@ -136,11 +185,10 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     marginVertical: 5,
-    justifyContent: "flex-start",
+    width: 120,
+    justifyContent: "space-between",
   },
-  iconWrapper: {
-    marginRight: 40,
-  },
+  iconWrapper: {},
 });
 
 export default Tweet;
