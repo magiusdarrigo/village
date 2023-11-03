@@ -34,7 +34,7 @@ export default function FeedScreen() {
   }
 
   if (error) {
-    return <Text>{error.message}</Text>;
+    return <Text>Couldn't Load Posts!</Text>;
   }
 
   return (

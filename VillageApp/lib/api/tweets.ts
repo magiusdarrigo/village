@@ -52,7 +52,7 @@ export const createTweet = async (data: {
     body: JSON.stringify(data),
   });
 
-  if (res.status !== 201) {
+  if (res.status !== 200) {
     throw new Error("Error creating post");
   }
 
