@@ -17,7 +17,7 @@ const TweetsApiContext = createContext<TweetsApiContextType | undefined>(
 );
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
-  const { authToken } = useAuth();
+  const { authToken, removeAuthToken } = useAuth();
 
   const listTweets = async () => {
     if (!authToken) {
@@ -30,6 +30,11 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         Authorization: `Bearer ${authToken}`,
       },
     });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
 
     if (res.status !== 200) {
       throw new Error("Error fetching posts");
@@ -49,6 +54,11 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         Authorization: `Bearer ${authToken}`,
       },
     });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
 
     if (res.status !== 200) {
       throw new Error("Error fetching post");
@@ -76,6 +86,11 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       },
       body: JSON.stringify(data),
     });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
 
     if (res.status !== 200) {
       throw new Error("Error creating post");
