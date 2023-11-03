@@ -14,6 +14,7 @@ export const login = async (data: { phoneNumber: string }) => {
 
   const body = await res.json();
   console.log("body:\n", body);
+  return body;
 };
 
 export const authenticate = async (data: {

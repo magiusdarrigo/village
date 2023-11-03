@@ -23,7 +23,7 @@ const user = {
 const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
-  const { createTweet } = useTweetsApi()!;
+  const { createTweet } = useTweetsApi();
 
   const queryClient = useQueryClient();
 

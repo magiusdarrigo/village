@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import { EvilIcon, AntIcon } from "./Icons";

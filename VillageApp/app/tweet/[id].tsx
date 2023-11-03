@@ -6,7 +6,7 @@ import { useGlobalSearchParams } from "expo-router";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
-  const { getTweet } = useTweetsApi()!;
+  const { getTweet } = useTweetsApi();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["tweet", id],

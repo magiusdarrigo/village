@@ -9,15 +9,18 @@ import {
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { login } from "../../lib/api/auth";
+import { useUser } from "../../context/UserContext";
 
 const SignIn = () => {
   const [phoneNumber, setphoneNumber] = useState("");
   const router = useRouter();
 
+  const { updateUser } = useUser();
+
   const onSignIn = async () => {
-    console.warn("Sign in: ", phoneNumber);
     try {
-      await login({ phoneNumber });
+      const user = await login({ phoneNumber });
+      updateUser(user);
       router.push({ pathname: "/authenticate", params: { phoneNumber } });
     } catch (e: any) {
       Alert.alert("Error", e.message);

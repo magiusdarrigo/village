@@ -7,15 +7,20 @@ import {
   Alert,
 } from "react-native";
 import React, { useState } from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { authenticate } from "../../lib/api/auth";
 import { useAuth } from "../../context/AuthContext";
+import { useUser } from "../../context/UserContext";
 
 const Authenticate = () => {
   const [code, setCode] = useState("");
   const { phoneNumber } = useGlobalSearchParams();
-
+  const router = useRouter();
   const { updateAuthToken } = useAuth();
+  const { user } = useUser();
+
+  // if the user context does not have a neighborhood and building return true
+  const continueOnboarding = () => !user?.neighborhood_id || !user.building_id;
 
   const onConfirm = async () => {
     if (typeof phoneNumber !== "string") {
@@ -25,6 +30,11 @@ const Authenticate = () => {
       const res = await authenticate({ phoneNumber, phoneToken: code });
       console.log(res);
       updateAuthToken(res.token);
+      if (continueOnboarding()) {
+        router.push("/createProfile");
+      } else {
+        router.replace("/");
+      }
     } catch (e) {
       Alert.alert("Error", "Phone number code doesn't match");
     }

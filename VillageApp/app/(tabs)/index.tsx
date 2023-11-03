@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import colors from "../../constants/Colors";
 
 export default function FeedScreen() {
-  const { listTweets } = useTweetsApi()!;
+  const { listTweets } = useTweetsApi();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["tweets"],

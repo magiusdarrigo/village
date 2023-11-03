@@ -10,11 +10,15 @@ interface TweetsApiContextType {
     textContent?: string;
     imageURL?: string;
   }) => Promise<any>;
+  uploadProfile: (username: string, profileImage: string) => Promise<any>;
 }
 
-const TweetsApiContext = createContext<TweetsApiContextType | undefined>(
-  undefined
-);
+const TweetsApiContext = createContext<TweetsApiContextType>({
+  listTweets: async () => {},
+  getTweet: async () => {},
+  createTweet: async () => {},
+  uploadProfile: async () => {},
+});
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
@@ -102,12 +106,38 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const uploadProfile = async (username: string, profileImage: string) => {
+    if (!authToken) {
+      return {};
+    }
+    const url = `${API_URL}/v1/users`;
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching posts");
+    }
+
+    return await res.json();
+  };
+
   return (
     <TweetsApiContext.Provider
       value={{
         listTweets,
         getTweet,
         createTweet,
+        uploadProfile,
       }}
     >
       {children}
