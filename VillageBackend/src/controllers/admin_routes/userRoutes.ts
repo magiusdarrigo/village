@@ -22,40 +22,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// update user
-router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const {
-    image,
-    isVerified,
-    neighborhoodID,
-    buildingID,
-    followersCount,
-    followingCount,
-  } = req.body;
-  try {
-    const updatedUser = await prisma.users.update({
-      where: {
-        id: Number(id),
-      },
-      data: {
-        image,
-        is_verified: isVerified,
-        neighborhood_id: neighborhoodID,
-        building_id: buildingID,
-        followers_count: followersCount,
-        following_count: followingCount,
-      },
-    });
-    res.json(updatedUser);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: `error updating user: ${id}`,
-    });
-  }
-});
-
 // list users
 router.get("/", async (_, res) => {
   try {

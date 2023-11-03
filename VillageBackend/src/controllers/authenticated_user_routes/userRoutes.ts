@@ -6,6 +6,53 @@ import { AuthenticatedRequest } from "../../middleware/auth";
 
 const router = Router();
 
+// update user profile
+router.put("/", async (req, res) => {
+  // we won't use the request parameter for the user id. We will get the user id from the token
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  // get the attributes that can be updated from the request body
+  const { username, profileImage } = req.body;
+  try {
+    const updatedUser = await prisma.users.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        username,
+        image: profileImage,
+      },
+    });
+    res.json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error updating user",
+    });
+  }
+});
+
+// // update user profile (has custom image)
+// router.put("/upload", async (req, res) => {
+//   // we won't use the request parameter for the user id. We will get the user id from the token
+//   const currentUser = (req as unknown as AuthenticatedRequest).user;
+
+//   try {
+//     // Upload the file to Supabase Storage
+//     const { data, error } = await supabase.storage
+//       .from("avatars")
+//       .upload(`profiles/${file.originalname}`, file.stream);
+
+//     if (error) {
+//       throw error;
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       error: "error updating user",
+//     });
+//   }
+// });
+
 // follow a user
 router.post("/:id/follow", async (req, res) => {
   const { id } = req.params;

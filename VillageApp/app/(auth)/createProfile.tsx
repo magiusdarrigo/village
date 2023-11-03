@@ -8,6 +8,7 @@ import {
   Pressable,
   Text,
   Alert,
+  Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useUser } from "../../context/UserContext";
@@ -15,11 +16,18 @@ import { useTweetsApi } from "../../lib/api/tweets";
 
 const CreateProfile = () => {
   const { user, updateUser } = useUser();
-  const { uploadProfile } = useTweetsApi();
+  const { uploadProfileWithDefaultPic, uploadProfileWithCustomPic } =
+    useTweetsApi();
 
-  const [profileImage, setProfileImage] = useState(
-    user?.image || "https://picsum.photos/150"
-  );
+  const getRandomProfileImageURL = () => {
+    // pick a random number from 0 to 50
+    const randomNumber = Math.floor(Math.random() * 50);
+    return `https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults/profile${randomNumber}.jpg`;
+  };
+
+  const [profileImage, setProfileImage] = useState<
+    string | ImagePicker.ImagePickerAsset
+  >(user?.image || getRandomProfileImageURL());
   const [username, setUsername] = useState(user?.username || "");
 
   const handleChoosePhoto = async () => {
@@ -37,22 +45,45 @@ const CreateProfile = () => {
     });
 
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
+      setProfileImage(result.assets[0]);
     }
   };
 
   const onSave = async () => {
     try {
-      const updatedUser = await uploadProfile(username, profileImage);
+      let updatedUser;
+      if (typeof profileImage === "string") {
+        updatedUser = await uploadProfileWithDefaultPic({
+          username,
+          profileImage,
+        });
+      } else {
+        // custom image from user
+        const formData = new FormData();
+
+        formData.append("photo", {
+          username,
+          uri:
+            Platform.OS === "ios"
+              ? profileImage.uri.replace("file://", "")
+              : profileImage.uri,
+          type: profileImage.type,
+          name: profileImage.fileName,
+        } as any);
+        updatedUser = await uploadProfileWithCustomPic(formData);
+      }
       updateUser(updatedUser);
     } catch (err) {
       Alert.alert("Failed to upload your profile");
     }
   };
 
+  const imageToShow =
+    typeof profileImage === "string" ? profileImage : profileImage.uri;
+
   return (
     <View style={styles.container}>
-      <Image source={{ uri: profileImage }} style={styles.profileImage} />
+      <Image source={{ uri: imageToShow }} style={styles.profileImage} />
       <Button title="Change Profile" onPress={handleChoosePhoto} />
       <TextInput
         style={styles.usernameInput}

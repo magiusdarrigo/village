@@ -10,14 +10,19 @@ interface TweetsApiContextType {
     textContent?: string;
     imageURL?: string;
   }) => Promise<any>;
-  uploadProfile: (username: string, profileImage: string) => Promise<any>;
+  uploadProfileWithDefaultPic: (data: {
+    username: string;
+    profileImage: string;
+  }) => Promise<any>;
+  uploadProfileWithCustomPic: (formData: FormData) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
   listTweets: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
-  uploadProfile: async () => {},
+  uploadProfileWithDefaultPic: async () => {},
+  uploadProfileWithCustomPic: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -106,7 +111,10 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const uploadProfile = async (username: string, profileImage: string) => {
+  const uploadProfileWithDefaultPic = async (data: {
+    username: string;
+    profileImage: string;
+  }) => {
     if (!authToken) {
       return {};
     }
@@ -116,7 +124,9 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${authToken}`,
+        "Content-type": "Application/json",
       },
+      body: JSON.stringify(data),
     });
 
     if (res.status === 403) {
@@ -125,7 +135,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     if (res.status !== 200) {
-      throw new Error("Error fetching posts");
+      throw new Error("Error Uploading profile");
+    }
+
+    return await res.json();
+  };
+
+  const uploadProfileWithCustomPic = async (formData: FormData) => {
+    if (!authToken) {
+      return {};
+    }
+    const url = `${API_URL}/v1/users/upload`;
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: formData,
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error Uploading profile");
     }
 
     return await res.json();
@@ -137,7 +173,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         listTweets,
         getTweet,
         createTweet,
-        uploadProfile,
+        uploadProfileWithDefaultPic,
+        uploadProfileWithCustomPic,
       }}
     >
       {children}
