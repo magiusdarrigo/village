@@ -82,7 +82,10 @@ const Tweet = ({ tweet }: TweetProps) => {
               alignItems: "flex-end",
             }}
           >
-            <Image src={tweet.profile_image} style={styles.userImage} />
+            <Image
+              source={{ uri: tweet.profile_image }}
+              style={styles.userImage}
+            />
           </Pressable>
         </Link>
         <Link href={`/tweet/${tweet.id}`} asChild>
@@ -111,7 +114,7 @@ const Tweet = ({ tweet }: TweetProps) => {
             <Text style={styles.content}> {tweet.text_content}</Text>
 
             {tweet.image_url && (
-              <Image src={tweet.image_url} style={styles.image} />
+              <Image source={{ uri: tweet.image_url }} style={styles.image} />
             )}
 
             <View style={styles.footer}>

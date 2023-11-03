@@ -17,8 +17,7 @@ const user = {
   id: "u1",
   username: "VadimNotJustDev",
   name: "Vadim",
-  image:
-    "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/vadim.png",
+  image: "https://picsum.photos/50",
 };
 
 const NewTweet = () => {
@@ -60,7 +59,7 @@ const NewTweet = () => {
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
-          <Image src={user.image} style={styles.image} />
+          <Image source={{ uri: user.image }} style={styles.image} />
           <TextInput
             value={text}
             onChangeText={(value) => setText(value)}
