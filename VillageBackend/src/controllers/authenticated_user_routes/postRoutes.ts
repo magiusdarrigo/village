@@ -3,6 +3,7 @@ import prisma from "../../clients/prismaClient";
 import { getTop10CommentsFromPostQuery } from "../../sql_queries/comments";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
+import { getSinglePostQuery, createPostQuery } from "../../sql_queries/posts";
 
 const router = Router();
 
@@ -10,22 +11,49 @@ const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
 
 // create post
 router.post("/", async (req, res) => {
+  console.log("create post called");
   const { neighborhoodID, textContent, imageURL } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    const newPost = await prisma.posts.create({
-      data: {
-        user_id: currentUser.id,
-        neighborhood_id: neighborhoodID,
-        text_content: textContent,
-        image_url: imageURL,
-      },
-    });
-    res.json(newPost);
+    const newPostQuery = createPostQuery(
+      currentUser.id,
+      neighborhoodID,
+      textContent,
+      imageURL
+    );
+    const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
+
+    if (newPost.length !== 1) {
+      return res.status(500).json({ error: "error creating post" });
+    }
+
+    res.json(newPost[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({
       error: `error creating post for user`,
+    });
+  }
+});
+
+// get post
+router.get("/:id", async (req, res) => {
+  console.log("get post called");
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  try {
+    const getPostQuery = getSinglePostQuery(currentUser.id, Number(id));
+    const posts = (await prisma.$queryRaw(getPostQuery)) as any[];
+
+    if (posts.length !== 1) {
+      return res.status(404).json({ error: "post not found" });
+    }
+
+    res.json(posts[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error fetching post: ${id}`,
     });
   }
 });
@@ -38,6 +66,7 @@ router.post("/", async (req, res) => {
  * determine if each comment has been liked by a user
  */
 router.get("/:id/comments", async (req, res) => {
+  console.log("get comments called");
   const { id } = req.params;
   let lastLikesCount = getNumberFromQuery(req.query.lastLikesCount);
   let lastCommentID = getNumberFromQuery(req.query.lastCommentID);
@@ -76,6 +105,7 @@ router.get("/:id/comments", async (req, res) => {
 
 // like a post
 router.post("/:id/likes", async (req, res) => {
+  console.log("like a post called");
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 
@@ -110,6 +140,7 @@ router.post("/:id/likes", async (req, res) => {
 
 // unlike a post
 router.delete("/:id/likes", async (req, res) => {
+  console.log("unlike a post called");
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 

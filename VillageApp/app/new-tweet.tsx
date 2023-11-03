@@ -6,9 +6,12 @@ import {
   TextInput,
   Pressable,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { Link, useNavigation, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTweetsApi } from "../lib/api/tweets";
 
 const user = {
   id: "u1",
@@ -21,12 +24,27 @@ const user = {
 const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
+  const { createTweet } = useTweetsApi()!;
 
-  const onTweetPress = () => {
-    console.warn(`Tweeting: ${text}`);
+  const queryClient = useQueryClient();
 
-    setText("");
-    router.back();
+  const { isLoading, isError, mutateAsync } = useMutation({
+    mutationFn: createTweet,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["tweets"], (old: any) => {
+        return [data, ...old];
+      });
+    },
+  });
+
+  const onTweetPress = async () => {
+    try {
+      await mutateAsync({ neighborhoodID: 1, textContent: text, imageURL: "" });
+      setText("");
+      router.back();
+    } catch (e: any) {
+      console.log("Error creating tweet", e.message);
+    }
   };
 
   return (
@@ -36,6 +54,7 @@ const NewTweet = () => {
           <Link href="../" style={{ fontSize: 16 }}>
             Cancel
           </Link>
+          {isLoading && <ActivityIndicator />}
           <Pressable onPress={onTweetPress} style={styles.button}>
             <Text style={styles.buttonText}>Post</Text>
           </Pressable>
@@ -51,6 +70,9 @@ const NewTweet = () => {
             style={{ flex: 1 }}
           />
         </View>
+        {isError && (
+          <Text style={{ color: "red" }}>Failed posting. Try again!</Text>
+        )}
       </View>
     </SafeAreaView>
   );

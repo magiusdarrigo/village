@@ -9,14 +9,29 @@ router.post("/", async (req, res) => {
   const { postID, textContent, parentCommentID } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    const newComment = await prisma.comments.create({
-      data: {
-        user_id: currentUser.id,
-        post_id: postID,
-        text_content: textContent,
-        parent_comment_id: parentCommentID,
-      },
-    });
+    const newComment = await prisma.$transaction([
+      prisma.posts.update({
+        where: { id: Number(postID) },
+        data: { comments_count: { increment: 1 } },
+      }),
+      prisma.comments.create({
+        data: {
+          user_id: currentUser.id,
+          post_id: postID,
+          text_content: textContent,
+          parent_comment_id: parentCommentID,
+        },
+        select: {
+          id: true,
+          user_id: true,
+          post_id: true,
+          text_content: true,
+          parent_comment_id: true,
+          created_at: true,
+        },
+      }),
+    ]);
+
     res.json(newComment);
   } catch (error) {
     console.error(error);
@@ -28,16 +43,31 @@ router.post("/", async (req, res) => {
 
 // delete comment (if the user is the owner of the comment)
 router.delete("/:id", async (req, res) => {
+  console.log("delete comment called");
   const { id } = req.params;
+  const { postID } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 
   try {
-    const deletedComment = await prisma.comments.delete({
-      where: {
-        id: Number(id),
-        user_id: currentUser.id,
-      },
-    });
+    const deletedComment = await prisma.$transaction([
+      prisma.posts.update({
+        where: { id: Number(postID) },
+        data: { comments_count: { decrement: 1 } },
+      }),
+      prisma.comments.delete({
+        where: {
+          id: Number(id),
+        },
+        select: {
+          id: true,
+          user_id: true,
+          post_id: true,
+          text_content: true,
+          parent_comment_id: true,
+          created_at: true,
+        },
+      }),
+    ]);
     res.json(deletedComment);
   } catch (error) {
     console.error(error);
@@ -49,6 +79,7 @@ router.delete("/:id", async (req, res) => {
 
 // like a comment
 router.post("/:id/likes", async (req, res) => {
+  console.log("like a comment called");
   // the comment id
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
@@ -75,6 +106,7 @@ router.post("/:id/likes", async (req, res) => {
 
 // unlike a comment
 router.delete("/:id/likes", async (req, res) => {
+  console.log("unlike a comment called");
   // the comment id
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;

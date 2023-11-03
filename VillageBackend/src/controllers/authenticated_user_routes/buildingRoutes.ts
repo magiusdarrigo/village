@@ -5,6 +5,7 @@ const router = Router();
 
 // create building
 router.post("/", async (req, res) => {
+  console.log("create building called");
   const { address } = req.body;
   try {
     // TODO: find the neighborhood that the building resides in based on the address.
