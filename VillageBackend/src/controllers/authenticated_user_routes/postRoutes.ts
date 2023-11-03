@@ -11,6 +11,7 @@ const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
 
 // create post
 router.post("/", async (req, res) => {
+  console.log("create post called")
   const { neighborhoodID, textContent, imageURL } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
@@ -33,6 +34,7 @@ router.post("/", async (req, res) => {
 
 // get post
 router.get("/:id", async (req, res) => {
+  console.log("get post called")
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
@@ -60,6 +62,7 @@ router.get("/:id", async (req, res) => {
  * determine if each comment has been liked by a user
  */
 router.get("/:id/comments", async (req, res) => {
+  console.log("get comments called")
   const { id } = req.params;
   let lastLikesCount = getNumberFromQuery(req.query.lastLikesCount);
   let lastCommentID = getNumberFromQuery(req.query.lastCommentID);
@@ -98,6 +101,7 @@ router.get("/:id/comments", async (req, res) => {
 
 // like a post
 router.post("/:id/likes", async (req, res) => {
+  console.log("like a post called")
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 
@@ -132,6 +136,7 @@ router.post("/:id/likes", async (req, res) => {
 
 // unlike a post
 router.delete("/:id/likes", async (req, res) => {
+  console.log("unlike a post called")
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 

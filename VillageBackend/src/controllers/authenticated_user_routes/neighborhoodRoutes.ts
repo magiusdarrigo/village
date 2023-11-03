@@ -12,6 +12,7 @@ const router = Router();
  * paginate by 20 for infinite scroll on the frontend
  */
 router.get("/:id/posts", async (req, res) => {
+  console.log("get posts by neighborhood id called");
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const neighborhoodID = getNumberFromQuery(id);

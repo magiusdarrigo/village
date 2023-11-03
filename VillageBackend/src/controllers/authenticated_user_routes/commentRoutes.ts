@@ -43,6 +43,7 @@ router.post("/", async (req, res) => {
 
 // delete comment (if the user is the owner of the comment)
 router.delete("/:id", async (req, res) => {
+  console.log("delete comment called");
   const { id } = req.params;
   const { postID } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
@@ -78,6 +79,7 @@ router.delete("/:id", async (req, res) => {
 
 // like a comment
 router.post("/:id/likes", async (req, res) => {
+  console.log("like a comment called");
   // the comment id
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
@@ -104,6 +106,7 @@ router.post("/:id/likes", async (req, res) => {
 
 // unlike a comment
 router.delete("/:id/likes", async (req, res) => {
+  console.log("unlike a comment called");
   // the comment id
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
