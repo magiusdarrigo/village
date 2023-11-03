@@ -35,3 +35,26 @@ export const getTweet = async (id: string) => {
 
   return body;
 };
+
+export const createTweet = async (data: {
+  neighborhoodID: number;
+  textContent?: string;
+  imageURL?: string;
+}) => {
+  const url = `${API_URL}/v1/posts`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      "Content-type": "Application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.status !== 201) {
+    throw new Error("Error creating post");
+  }
+
+  return await res.json();
+};

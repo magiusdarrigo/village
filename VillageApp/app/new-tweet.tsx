@@ -6,9 +6,12 @@ import {
   TextInput,
   Pressable,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { Link, useNavigation, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
+import { createTweet } from "../lib/api/tweets";
 
 const user = {
   id: "u1",
@@ -22,8 +25,12 @@ const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
 
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: createTweet,
+  });
+
   const onTweetPress = () => {
-    console.warn(`Tweeting: ${text}`);
+    mutate({ neighborhoodID: 1, textContent: text, imageURL: "" });
 
     setText("");
     router.back();
@@ -36,6 +43,7 @@ const NewTweet = () => {
           <Link href="../" style={{ fontSize: 16 }}>
             Cancel
           </Link>
+          {isPending && <ActivityIndicator />}
           <Pressable onPress={onTweetPress} style={styles.button}>
             <Text style={styles.buttonText}>Post</Text>
           </Pressable>
@@ -51,6 +59,7 @@ const NewTweet = () => {
             style={{ flex: 1 }}
           />
         </View>
+        {error && <Text style={{ color: "red" }}>{error.message}</Text>}
       </View>
     </SafeAreaView>
   );
