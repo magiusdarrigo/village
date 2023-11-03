@@ -17,7 +17,7 @@ const user = {
   id: "u1",
   username: "VadimNotJustDev",
   name: "Vadim",
-  image: "https://picsum.photos/50",
+  image: "https://picsum.photos/150",
 };
 
 const NewTweet = () => {
@@ -38,7 +38,11 @@ const NewTweet = () => {
 
   const onTweetPress = async () => {
     try {
-      await mutateAsync({ neighborhoodID: 1, textContent: text, imageURL: "" });
+      await mutateAsync({
+        neighborhoodID: 1,
+        textContent: text,
+        imageURL: "https://picsum.photos/400/800",
+      });
       setText("");
       router.back();
     } catch (e: any) {

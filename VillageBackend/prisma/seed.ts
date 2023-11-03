@@ -36,6 +36,7 @@ async function main() {
         phone_number: `+1-000-${index}`,
         neighborhood_id: (index % 5) + 1,
         building_id: (index % 25) + 1,
+        image: "https://picsum.photos/150",
       },
     });
   });
