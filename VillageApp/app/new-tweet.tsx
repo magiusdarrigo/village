@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTweet } from "../lib/api/tweets";
 
 const user = {
@@ -25,8 +25,15 @@ const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
 
+  const queryClient = useQueryClient();
+
   const { isLoading, isError, mutateAsync } = useMutation({
     mutationFn: createTweet,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["tweets"], (old: any) => {
+        return [data, ...old];
+      });
+    },
   });
 
   const onTweetPress = async () => {
