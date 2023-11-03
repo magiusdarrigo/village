@@ -26,7 +26,7 @@ router.post("/login", async (req, res) => {
       Math.random().toString(36).substring(2, 5) +
       Math.random().toString(36).substring(2, 12);
 
-    await prisma.tokens.create({
+    const userWithToken = await prisma.tokens.create({
       data: {
         type: "PHONE",
         phone_token: phoneToken,
@@ -43,7 +43,12 @@ router.post("/login", async (req, res) => {
           },
         },
       },
+      include: {
+        user: true, // This tells Prisma to include the user data in the result
+      },
     });
+
+    const user = userWithToken.user;
 
     // Send OTP using Twilio
     await twilioClient.messages.create({
@@ -52,7 +57,7 @@ router.post("/login", async (req, res) => {
       to: phoneNumber,
     });
 
-    res.send("OTP sent successfully.");
+    res.send(user);
   } catch (error) {
     console.error("Error in login handler:", error);
     res.status(500).send("Internal Server Error.");

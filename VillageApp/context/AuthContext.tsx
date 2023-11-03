@@ -28,9 +28,11 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
     if (!authToken && !isAuthGroup) {
       router.replace("/signIn");
+      return;
     }
     if (authToken && isAuthGroup) {
       router.replace("/");
+      return;
     }
   }, [segments, authToken]);
 

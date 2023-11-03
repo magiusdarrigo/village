@@ -11,6 +11,9 @@ export const login = async (data: { phoneNumber: string }) => {
   if (res.status !== 200) {
     throw new Error("Error during the login process");
   }
+
+  const body = await res.json();
+  console.log("body:\n", body);
 };
 
 export const authenticate = async (data: {
