@@ -11,6 +11,7 @@ import Tweet from "../../components/Tweet";
 import { Link } from "expo-router";
 import { useTweetsApi } from "../../lib/api/tweets";
 import { useQuery } from "@tanstack/react-query";
+import colors from "../../constants/Colors";
 
 export default function FeedScreen() {
   const { listTweets } = useTweetsApi()!;
@@ -34,7 +35,7 @@ export default function FeedScreen() {
 
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={24} color="white" />
+          <Entypo name="plus" size={24} color="black" />
         </Pressable>
       </Link>
     </View>
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   floatingButton: {
-    backgroundColor: "black",
+    backgroundColor: colors.light.tertiary,
     position: "absolute",
     bottom: 20,
     right: 20,
