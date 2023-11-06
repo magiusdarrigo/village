@@ -95,14 +95,14 @@ function RootLayoutNav() {
                     name="(auth)/createProfile"
                     options={{ headerShown: false }}
                   />
-                  {/* <Stack.Screen
+                  <Stack.Screen
                     name="(auth)/pickBuilding"
                     options={{ headerShown: false }}
                   />
                   <Stack.Screen
                     name="(auth)/pickNeighborhood"
                     options={{ headerShown: false }}
-                  /> */}
+                  />
                 </Stack>
               </ThemeProvider>
             </QueryClientProvider>

@@ -11,11 +11,13 @@ import {
   Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../lib/api/tweets";
 
 const CreateProfile = () => {
   const { user, updateUser } = useUser();
+  const router = useRouter();
   const { uploadProfileWithDefaultPic, uploadProfileWithCustomPic } =
     useTweetsApi();
 
@@ -73,6 +75,7 @@ const CreateProfile = () => {
         updatedUser = await uploadProfileWithCustomPic(formData);
       }
       updateUser(updatedUser);
+      router.push("/pickBuilding");
     } catch (err) {
       Alert.alert("Failed to upload your profile");
     }

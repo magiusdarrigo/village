@@ -6,8 +6,8 @@ import React, {
 } from "react";
 
 type User = {
-  neighborhood_id: number;
-  building_id: number;
+  neighborhood_id?: number;
+  building_id?: number;
   id: number;
   username: string;
   created_at: string;

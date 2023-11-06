@@ -15,6 +15,7 @@ interface TweetsApiContextType {
     profileImage: string;
   }) => Promise<any>;
   uploadProfileWithCustomPic: (formData: FormData) => Promise<any>;
+  submitBuildingAddress: (address: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -23,6 +24,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   createTweet: async () => {},
   uploadProfileWithDefaultPic: async () => {},
   uploadProfileWithCustomPic: async () => {},
+  submitBuildingAddress: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -167,6 +169,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return await res.json();
   };
 
+  const submitBuildingAddress = async (address: string) => {};
+
   return (
     <TweetsApiContext.Provider
       value={{
@@ -175,6 +179,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         createTweet,
         uploadProfileWithDefaultPic,
         uploadProfileWithCustomPic,
+        submitBuildingAddress,
       }}
     >
       {children}

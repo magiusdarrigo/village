@@ -29,7 +29,8 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
     console.log("authToken", authToken);
 
     if (!authToken && !isAuthGroup) {
-      router.replace("/signIn");
+      // router.replace("/signIn");
+      router.replace("/pickNeighborhood");
       return;
     }
     if (
