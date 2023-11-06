@@ -33,3 +33,16 @@ export const authenticate = async (data: {
   }
   return res.json();
 };
+
+export const checkAppVersion = async () => {
+  const res = await fetch(`${API_URL}/v1/auth/version`, {
+    method: "GET",
+    headers: {
+      "Content-type": "Application/json",
+    },
+  });
+  if (res.status !== 200) {
+    throw new Error("Error during the login process");
+  }
+  return await res.json();
+};

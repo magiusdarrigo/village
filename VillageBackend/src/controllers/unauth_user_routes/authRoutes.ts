@@ -5,6 +5,7 @@ import twilioClient from "../../clients/twilioClient";
 const router = Router();
 const jwt = require("jsonwebtoken");
 const PHONE_TOKEN_EXPIRY_MINUTES = 2;
+const CURRENT_APP_VERSION = "1.0.0";
 
 // new phone number not seen before -> create new user
 router.post("/login", async (req, res) => {
@@ -125,6 +126,16 @@ router.post("/authenticate", async (req, res) => {
     res.send({ token });
   } catch (error) {
     console.error("Error in validate handler:", error);
+    res.status(500).send("Internal Server Error.");
+  }
+});
+
+// return the current version of the app
+router.get("/version", async (_, res) => {
+  try {
+    res.send({ mandatoryUpdate: true, latestVersion: CURRENT_APP_VERSION });
+  } catch (error) {
+    console.error("Error in version handler:", error);
     res.status(500).send("Internal Server Error.");
   }
 });

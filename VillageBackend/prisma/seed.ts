@@ -5,16 +5,38 @@ async function main() {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
-  // seed the neighborhoods table with 5 neighborhoods
-  const randomNeighborhoods = Array.from({ length: 5 }).map((_, index) => {
+  // seed the neighborhoods table with the top New York neighborhoods
+  const neighborhoods = [
+    "Chelsea",
+    "Chinatown",
+    "East Village",
+    "Fidi",
+    "Flatiron",
+    "Gramercy",
+    "Greenwich",
+    "Harlem",
+    "Hell's Kitchen",
+    "Hudson Yards",
+    "Little Italy",
+    "LES",
+    "Midtown East",
+    "Nolita",
+    "SoHo",
+    "Tribeca",
+    "Upper East Side",
+    "Upper West Side",
+    "West Village",
+    "Williamsburg",
+  ];
+  const neighborhoodPromises = neighborhoods.map((neighborhood) => {
     return prisma.neighborhoods.create({
       data: {
-        name: `neighborhood-${index}`,
+        name: neighborhood,
       },
     });
   });
 
-  await Promise.all(randomNeighborhoods);
+  await Promise.all(neighborhoodPromises);
 
   // seed the buildings table with 25 buildings (5 buildings per neighborhood)
   const randomBuildings = Array.from({ length: 25 }).map((_, index) => {
