@@ -23,7 +23,7 @@ const SignIn = () => {
       updateUser(user);
       router.push({ pathname: "/authenticate", params: { phoneNumber } });
     } catch (e: any) {
-      Alert.alert("Error", e.message);
+      Alert.alert("We had an issue signing you in. Try again.");
     }
   };
 

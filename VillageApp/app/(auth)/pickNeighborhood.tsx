@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Pressable } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useGlobalSearchParams } from "expo-router";
 
@@ -30,6 +30,11 @@ const PickNeighborhood = () => {
     "Williamsburg",
   ];
 
+  const onSubmit = async () => {
+    try {
+    } catch (error) {}
+  };
+
   return (
     <View style={styles.container}>
       {neighborhoodName ? (
@@ -58,6 +63,9 @@ const PickNeighborhood = () => {
           </Picker>
         </View>
       )}
+      <Pressable style={styles.button} onPress={onSubmit}>
+        <Text style={styles.buttonText}>Submit</Text>
+      </Pressable>
     </View>
   );
 };
@@ -80,6 +88,18 @@ const styles = StyleSheet.create({
   picker: {
     width: 300,
     height: 44,
+  },
+  button: {
+    backgroundColor: "#050A12",
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

@@ -36,7 +36,7 @@ const Authenticate = () => {
         router.replace("/");
       }
     } catch (e) {
-      Alert.alert("Error", "Phone number code doesn't match");
+      Alert.alert("Your phone number code doesn't match. Try again.");
     }
   };
 

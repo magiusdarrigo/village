@@ -77,7 +77,7 @@ const CreateProfile = () => {
       updateUser(updatedUser);
       router.push("/pickBuilding");
     } catch (err) {
-      Alert.alert("Failed to upload your profile");
+      Alert.alert("We had an issue uploading your profile. Try again.");
     }
   };
 
