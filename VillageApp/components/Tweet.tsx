@@ -68,15 +68,26 @@ const Tweet = ({ tweet }: TweetProps) => {
       });
       // update the list of tweets in the cache
       queryClient.setQueryData(["tweets"], (old: any) => {
-        return old.map((tweet: TweetType) =>
-          tweet.id === data.newLike.post_id
-            ? {
-                ...tweet,
-                liked_by_user: true,
-                likes_count: data.updatedPost.likes_count,
-              }
-            : tweet
-        );
+        if (!old) return;
+        // Map over the pages
+        return {
+          ...old,
+          pages: old.pages.map((page: { data: any[] }) => {
+            // Map over the tweets in the page
+            return {
+              ...page,
+              data: page.data.map((tweet) =>
+                tweet.id === data.newLike.post_id
+                  ? {
+                      ...tweet,
+                      liked_by_user: true,
+                      likes_count: data.updatedPost.likes_count,
+                    }
+                  : tweet
+              ),
+            };
+          }),
+        };
       });
     },
     onError: (error) => {
@@ -97,15 +108,26 @@ const Tweet = ({ tweet }: TweetProps) => {
       });
       // update the list of tweets in the cache
       queryClient.setQueryData(["tweets"], (old: any) => {
-        return old.map((tweet: TweetType) =>
-          tweet.id === data.newUnlike.post_id
-            ? {
-                ...tweet,
-                liked_by_user: false,
-                likes_count: data.updatedPost.likes_count,
-              }
-            : tweet
-        );
+        if (!old) return;
+        // Map over the pages
+        return {
+          ...old,
+          pages: old.pages.map((page: { data: any[] }) => {
+            // Map over the tweets in the page
+            return {
+              ...page,
+              data: page.data.map((tweet) =>
+                tweet.id === data.newUnlike.post_id
+                  ? {
+                      ...tweet,
+                      liked_by_user: false,
+                      likes_count: data.updatedPost.likes_count,
+                    }
+                  : tweet
+              ),
+            };
+          }),
+        };
       });
     },
     onError: (error) => {
