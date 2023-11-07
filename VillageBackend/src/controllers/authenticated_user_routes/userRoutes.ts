@@ -8,6 +8,7 @@ const router = Router();
 
 // update user profile
 router.put("/", async (req, res) => {
+  console.log("update user profile called");
   // we won't use the request parameter for the user id. We will get the user id from the token
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body

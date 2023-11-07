@@ -7,7 +7,8 @@ import { useTweetsApi } from "../../lib/api/tweets";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
-  const { buildingAddress, neighborhoodName } = useGlobalSearchParams();
+  const { buildingAddress, neighborhoodName, buildingID, neighborhoodID } =
+    useGlobalSearchParams();
   const { createBuilding, updateUserAttributes } = useTweetsApi();
   const { user, updateUser } = useUser();
 
@@ -18,12 +19,13 @@ const PickNeighborhood = () => {
     "Fidi",
     "Flatiron",
     "Gramercy",
-    "Greenwich",
+    "Greenwich Village",
     "Harlem",
     "Hell's Kitchen",
     "Hudson Yards",
     "Little Italy",
-    "LES",
+    "Lower East Side",
+    "Midtown",
     "Midtown East",
     "Nolita",
     "SoHo",
@@ -46,12 +48,12 @@ const PickNeighborhood = () => {
         throw new Error("User is null");
       }
       const updatedUser = await updateUserAttributes({
-        neighborhoodID: building.neighborhood.id,
+        neighborhoodID: building.neighborhood_id,
         buildingID: building.id,
       });
       // assign returned user to user context
       updateUser(updatedUser);
-      onContinue();
+      router.replace("/");
     } catch (error) {
       console.log(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
@@ -59,7 +61,20 @@ const PickNeighborhood = () => {
   };
 
   const onContinue = () => {
-    router.replace("/");
+    try {
+      if (user === null) {
+        throw new Error("User is null");
+      }
+      updateUser({
+        ...user,
+        neighborhood_id: Number(neighborhoodID),
+        building_id: Number(buildingID),
+      });
+      router.replace("/");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("We had an issue adding you to the neighborhood. Try again.");
+    }
   };
 
   return (

@@ -9,7 +9,7 @@ import { router } from "expo-router";
 const PickBuilding = () => {
   const [address, setAddress] = useState("");
   const { getBuilding } = useTweetsApi();
-  const { user, updateUser } = useUser();
+  const { user } = useUser();
 
   const onSubmit = async () => {
     try {
@@ -19,16 +19,14 @@ const PickBuilding = () => {
       if (user === null) {
         throw new Error("User is null");
       }
-      if (building?.neighborhood?.id) {
-        updateUser({
-          ...user,
-          building_id: building.id,
-          neighborhood_id: building.neighborhood.id,
-        });
-      }
       router.push({
         pathname: "/pickNeighborhood",
-        params: { buildingAddress: address, neighborhoodName },
+        params: {
+          buildingAddress: address,
+          neighborhoodName,
+          buildingID: building?.id,
+          neighborhoodID: building?.neighborhood?.id,
+        },
       });
     } catch (error) {
       console.log(error);

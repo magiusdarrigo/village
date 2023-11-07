@@ -36,14 +36,13 @@ const Authenticate = () => {
         router.replace("/");
       }
     } catch (e) {
-      Alert.alert("Your phone number code doesn't match. Try again.");
+      Alert.alert("Your OTP code doesn't match. Try again.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Confirm your phone number</Text>
-
+      <Text style={styles.label}>Paste the code we texted you.</Text>
       <TextInput
         placeholder="OTP code"
         value={code}
