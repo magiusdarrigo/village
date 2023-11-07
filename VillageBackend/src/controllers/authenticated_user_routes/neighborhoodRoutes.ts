@@ -28,9 +28,12 @@ router.get("/:id/posts", async (req, res) => {
       neighborhoodID,
       cursor
     );
-    const posts = await prisma.$queryRaw(getPostsSqlQuery);
+    const posts = (await prisma.$queryRaw(getPostsSqlQuery)) as any;
 
-    res.json(posts);
+    const prevCursor = cursor - 20 < 0 ? 0 : cursor - 20;
+    const nextCursor = posts.length < 20 ? cursor : cursor + 20;
+
+    res.json({ data: posts, prevCursor, nextCursor });
   } catch (error) {
     console.error(error);
     res.status(500).json({

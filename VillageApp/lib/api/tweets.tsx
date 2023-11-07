@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 interface TweetsApiContextType {
   likeTweet: (id: string) => Promise<any>;
   unlikeTweet: (id: string) => Promise<any>;
-  listTweets: () => Promise<any>;
+  listTweets: (page: number) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
     neighborhoodID: number;
@@ -95,11 +95,11 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const listTweets = async () => {
+  const listTweets = async (page: number) => {
     if (!authToken) {
       return {};
     }
-    const url = `${API_URL}/v1/neighborhoods/1/posts`;
+    const url = `${API_URL}/v1/neighborhoods/1/posts?cursor=${page}`;
 
     const res = await fetch(url, {
       headers: {
@@ -116,7 +116,10 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       throw new Error("Error fetching posts");
     }
 
-    return await res.json();
+    const body = await res.json();
+    // console.log("listTweets body:", body);
+
+    return body;
   };
 
   const getTweet = async (id: string) => {
