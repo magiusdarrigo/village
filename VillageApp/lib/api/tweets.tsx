@@ -65,8 +65,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log(body);
-
     return body;
   };
 
@@ -94,13 +92,10 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log(body);
-
     return body;
   };
 
   const listTweets = async () => {
-    console.log("call listTweets, authToken", authToken);
     if (!authToken) {
       return {};
     }
