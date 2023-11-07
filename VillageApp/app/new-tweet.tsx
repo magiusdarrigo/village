@@ -17,14 +17,13 @@ const user = {
   id: "u1",
   username: "VadimNotJustDev",
   name: "Vadim",
-  image:
-    "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/vadim.png",
+  image: "https://picsum.photos/150",
 };
 
 const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
-  const { createTweet } = useTweetsApi()!;
+  const { createTweet } = useTweetsApi();
 
   const queryClient = useQueryClient();
 
@@ -39,7 +38,11 @@ const NewTweet = () => {
 
   const onTweetPress = async () => {
     try {
-      await mutateAsync({ neighborhoodID: 1, textContent: text, imageURL: "" });
+      await mutateAsync({
+        neighborhoodID: 1,
+        textContent: text,
+        imageURL: "https://picsum.photos/400/800",
+      });
       setText("");
       router.back();
     } catch (e: any) {
@@ -60,7 +63,7 @@ const NewTweet = () => {
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
-          <Image src={user.image} style={styles.image} />
+          <Image source={{ uri: user.image }} style={styles.image} />
           <TextInput
             value={text}
             onChangeText={(value) => setText(value)}

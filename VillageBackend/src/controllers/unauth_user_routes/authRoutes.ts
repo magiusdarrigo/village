@@ -5,6 +5,7 @@ import twilioClient from "../../clients/twilioClient";
 const router = Router();
 const jwt = require("jsonwebtoken");
 const PHONE_TOKEN_EXPIRY_MINUTES = 2;
+const CURRENT_APP_VERSION = "1.0.0";
 
 // new phone number not seen before -> create new user
 router.post("/login", async (req, res) => {
@@ -26,7 +27,7 @@ router.post("/login", async (req, res) => {
       Math.random().toString(36).substring(2, 5) +
       Math.random().toString(36).substring(2, 12);
 
-    await prisma.tokens.create({
+    const userWithToken = await prisma.tokens.create({
       data: {
         type: "PHONE",
         phone_token: phoneToken,
@@ -43,7 +44,12 @@ router.post("/login", async (req, res) => {
           },
         },
       },
+      include: {
+        user: true, // This tells Prisma to include the user data in the result
+      },
     });
+
+    const user = userWithToken.user;
 
     // Send OTP using Twilio
     await twilioClient.messages.create({
@@ -52,7 +58,7 @@ router.post("/login", async (req, res) => {
       to: phoneNumber,
     });
 
-    res.send("OTP sent successfully.");
+    res.send(user);
   } catch (error) {
     console.error("Error in login handler:", error);
     res.status(500).send("Internal Server Error.");
@@ -120,6 +126,16 @@ router.post("/authenticate", async (req, res) => {
     res.send({ token });
   } catch (error) {
     console.error("Error in validate handler:", error);
+    res.status(500).send("Internal Server Error.");
+  }
+});
+
+// return the current version of the app
+router.get("/version", async (_, res) => {
+  try {
+    res.send({ mandatoryUpdate: true, latestVersion: CURRENT_APP_VERSION });
+  } catch (error) {
+    console.error("Error in version handler:", error);
     res.status(500).send("Internal Server Error.");
   }
 });
