@@ -1,2 +1,3 @@
 export const API_URL = "http://localhost:3000";
-//  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInBob25lIjoiKzE5NzI1MjI4MTY0IiwiaWQiOjF9.igkJqwNeIGyjNvQyC6_6wA7r5zh2ciFUzeMO-0qLRvI";
+export const GOOGLE_MAPS_API_KEY = "REDACTED_GOOGLE_MAPS_API_KEY";
+export const CURRENT_APP_VERSION = "1.0.0";

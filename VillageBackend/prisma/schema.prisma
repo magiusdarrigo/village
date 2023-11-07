@@ -57,7 +57,7 @@ enum TokenType {
 model neighborhoods {
   id             Int            @id @default(autoincrement())
   name           String         @unique
-  created_at      DateTime       @default(now())
+  created_at     DateTime       @default(now())
   tags           Json?
 
   users          users[]
@@ -68,7 +68,7 @@ model neighborhoods {
 
 model buildings {
   id             Int            @id @default(autoincrement())
-  address        String
+  address        String         @unique
   neighborhood   neighborhoods  @relation(fields: [neighborhood_id], references: [id])
   neighborhood_id Int
   created_at      DateTime       @default(now())

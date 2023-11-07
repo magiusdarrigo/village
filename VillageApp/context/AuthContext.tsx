@@ -7,6 +7,7 @@ import {
   useEffect,
 } from "react";
 import * as SecureStore from "expo-secure-store";
+import { useUser } from "./UserContext";
 
 interface AuthContextType {
   authToken: string | null;
@@ -17,6 +18,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
+  const { user } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
   const segments = useSegments();
   const router = useRouter();
@@ -28,9 +30,17 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
     if (!authToken && !isAuthGroup) {
       router.replace("/signIn");
+      // router.replace("/pickNeighborhood");
+      return;
     }
-    if (authToken && isAuthGroup) {
+    if (
+      authToken &&
+      isAuthGroup &&
+      user?.neighborhood_id &&
+      user?.building_id
+    ) {
       router.replace("/");
+      return;
     }
   }, [segments, authToken]);
 

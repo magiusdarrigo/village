@@ -7,10 +7,13 @@ import {
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
-import { useColorScheme } from "react-native";
+import { useColorScheme, Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
+import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TweetsApiContextProvider from "../lib/api/tweets";
+import { CURRENT_APP_VERSION } from "../lib/api/config";
+import { checkAppVersion } from "../lib/api/auth";
 
 const client = new QueryClient();
 
@@ -43,6 +46,17 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
     }
+    // call version check here
+    const checkVersion = async () => {
+      const { mandatoryUpdate, latestVersion } = await checkAppVersion();
+      if (mandatoryUpdate && latestVersion !== CURRENT_APP_VERSION) {
+        Alert.alert(
+          "Update Required",
+          "Please update Village to the latest version."
+        );
+      }
+    };
+    checkVersion();
   }, [loaded]);
 
   if (!loaded) {
@@ -57,40 +71,57 @@ function RootLayoutNav() {
 
   return (
     <>
-      <AuthContextProvider>
-        <TweetsApiContextProvider>
-          <QueryClientProvider client={client}>
-            <ThemeProvider
-              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="modal"
-                  options={{ presentation: "modal", title: "You" }}
-                />
-                <Stack.Screen
-                  name="profile/[id]"
-                  options={{ presentation: "modal", title: "User" }}
-                />
-                <Stack.Screen name="tweet/[id]" options={{ title: "Post" }} />
-                <Stack.Screen
-                  name="new-tweet"
-                  options={{ title: "New Tweet", headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(auth)/signIn"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(auth)/authenticate"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
-            </ThemeProvider>
-          </QueryClientProvider>
-        </TweetsApiContextProvider>
-      </AuthContextProvider>
+      <UserContextProvider>
+        <AuthContextProvider>
+          <TweetsApiContextProvider>
+            <QueryClientProvider client={client}>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                <Stack>
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="modal"
+                    options={{ presentation: "modal", title: "You" }}
+                  />
+                  <Stack.Screen
+                    name="profile/[id]"
+                    options={{ presentation: "modal", title: "User" }}
+                  />
+                  <Stack.Screen name="tweet/[id]" options={{ title: "Post" }} />
+                  <Stack.Screen
+                    name="new-tweet"
+                    options={{ title: "New Tweet", headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(auth)/signIn"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(auth)/authenticate"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(auth)/createProfile"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(auth)/pickBuilding"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(auth)/pickNeighborhood"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+              </ThemeProvider>
+            </QueryClientProvider>
+          </TweetsApiContextProvider>
+        </AuthContextProvider>
+      </UserContextProvider>
     </>
   );
 }

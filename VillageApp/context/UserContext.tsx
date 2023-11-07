@@ -1,0 +1,61 @@
+import React, {
+  createContext,
+  useContext,
+  useState,
+  PropsWithChildren,
+} from "react";
+
+type User = {
+  neighborhood_id?: number;
+  building_id?: number;
+  id: number;
+  username: string;
+  created_at: string;
+  folowers_count: number;
+  following_count: number;
+  phone_number: string;
+  tags?: any;
+  is_verified: boolean;
+  image?: string;
+};
+
+interface UserContextType {
+  user: User | null;
+  updateUser: (user: User) => void;
+  removeUser: () => void;
+}
+
+const UserContext = createContext<UserContextType | undefined>(undefined);
+
+// A component that provides the user context
+const UserContextProvider = ({ children }: PropsWithChildren) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  const updateUser = (newUser: User) => {
+    setUser(newUser);
+  };
+
+  const removeUser = () => {
+    setUser(null);
+  };
+
+  // Provide the user object to any descendants of this component
+  return (
+    <UserContext.Provider value={{ user, updateUser, removeUser }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export default UserContextProvider;
+
+// A hook to help us consume the user context
+export const useUser = (): UserContextType => {
+  const context = useContext(UserContext);
+
+  if (context === undefined) {
+    throw new Error("useUser must be used within a UserContextProvider");
+  }
+
+  return context;
+};
