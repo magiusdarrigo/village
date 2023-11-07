@@ -157,6 +157,34 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// get the current user
+router.get("/", async (req, res) => {
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        id: currentUser.id,
+      },
+      select: {
+        id: true,
+        username: true,
+        image: true,
+        is_verified: true,
+        followers_count: true,
+        following_count: true,
+        neighborhood_id: true,
+        building_id: true,
+      },
+    });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error getting current user",
+    });
+  }
+});
+
 /**
  * get posts by user id
  * order by createdAt descending
