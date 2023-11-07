@@ -43,11 +43,25 @@ export default function FeedScreen() {
   }
 
   const items = data?.pages.flatMap((page) => page.data) ?? [];
+  // Create a new Set to track unique tweet IDs
+  const uniqueIds = new Set();
+  const uniqueItems = items.filter((tweet) => {
+    const isDuplicate = uniqueIds.has(tweet.id);
+
+    // Add the ID to the Set if it's not already there
+    if (!isDuplicate) {
+      uniqueIds.add(tweet.id);
+      return true;
+    }
+
+    // If it's a duplicate, filter it out
+    return false;
+  });
 
   return (
     <View style={styles.page}>
       <FlatList
-        data={items}
+        data={uniqueItems}
         renderItem={({ item }) => <Tweet tweet={item} />}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
