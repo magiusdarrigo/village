@@ -4,6 +4,8 @@ import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import { EvilIcon, AntIcon } from "./Icons";
 import { Link } from "expo-router";
+import { useTweetsApi } from "../lib/api/tweets";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type TweetProps = {
   tweet: TweetType;
@@ -50,13 +52,62 @@ const calculateHoursAgo = (time: string) => {
 
 const Tweet = ({ tweet }: TweetProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(tweet.liked_by_user);
+  const { likeTweet, unlikeTweet } = useTweetsApi();
+  const queryClient = useQueryClient();
 
-  const handleToggleLike = (id: number) => {
-    if (isLiked) {
-      setIsLiked(false);
-    } else {
-      setIsLiked(true);
+  // like a tweet
+  const { mutate: mutateLike } = useMutation(likeTweet, {
+    onSuccess: (data) => {
+      queryClient.setQueryData(["tweets"], (old: any) =>
+        old.map((tweet: TweetType) =>
+          tweet.id === data.newLike.post_id
+            ? {
+                ...tweet,
+                liked_by_user: true,
+                likes_count: data.updatedPost.likes_count,
+              }
+            : tweet
+        )
+      );
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  // unlike a tweet
+  const { mutate: mutateUnlike } = useMutation(unlikeTweet, {
+    onSuccess: (data) => {
+      queryClient.setQueryData(["tweets"], (old: any) =>
+        old.map((tweet: TweetType) =>
+          tweet.id === data.newUnlike.post_id
+            ? {
+                ...tweet,
+                liked_by_user: false,
+                likes_count: data.updatedPost.likes_count,
+              }
+            : tweet
+        )
+      );
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  const handleToggleLike = async (postID: number) => {
+    try {
+      if (isLiked) {
+        setIsLiked(false);
+        mutateUnlike(String(postID));
+      } else {
+        setIsLiked(true);
+        mutateLike(String(postID));
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      Alert.alert("We couldn't like this post. Try again.");
     }
   };
 

@@ -131,7 +131,7 @@ router.post("/:id/likes", async (req, res) => {
       incrementLikes,
     ]);
 
-    res.status(201).json({ newLike, updatedPost });
+    res.status(200).json({ newLike, updatedPost });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error liking the post." });
@@ -163,9 +163,12 @@ router.delete("/:id/likes", async (req, res) => {
       },
     });
 
-    await prisma.$transaction([deleteLike, decrementLikes]);
+    const [newUnlike, updatedPost] = await prisma.$transaction([
+      deleteLike,
+      decrementLikes,
+    ]);
 
-    res.status(204).send({ success: true });
+    res.status(200).json({ newUnlike, updatedPost });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error unliking the post." });

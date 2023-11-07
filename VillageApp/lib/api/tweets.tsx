@@ -3,6 +3,8 @@ import { API_URL } from "./config";
 import { useAuth } from "../../context/AuthContext";
 
 interface TweetsApiContextType {
+  likeTweet: (id: string) => Promise<any>;
+  unlikeTweet: (id: string) => Promise<any>;
   listTweets: () => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
@@ -25,6 +27,8 @@ interface TweetsApiContextType {
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
+  likeTweet: async () => {},
+  unlikeTweet: async () => {},
   listTweets: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
@@ -36,6 +40,64 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
+
+  const likeTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}/likes`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error liking post");
+    }
+
+    const body = await res.json();
+    console.log(body);
+
+    return body;
+  };
+
+  const unlikeTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}/likes`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error unliking post");
+    }
+
+    const body = await res.json();
+    console.log(body);
+
+    return body;
+  };
 
   const listTweets = async () => {
     console.log("call listTweets, authToken", authToken);
@@ -242,6 +304,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   return (
     <TweetsApiContext.Provider
       value={{
+        likeTweet,
+        unlikeTweet,
         listTweets,
         getTweet,
         createTweet,
