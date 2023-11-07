@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet, Pressable } from "react-native";
+import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useGlobalSearchParams } from "expo-router";
+import { router, useGlobalSearchParams } from "expo-router";
+import { useUser } from "../../context/UserContext";
+import { useTweetsApi } from "../../lib/api/tweets";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
-  const { neighborhoodName } = useGlobalSearchParams();
+  const { buildingAddress, neighborhoodName } = useGlobalSearchParams();
+  const { createBuilding, updateUserAttributes } = useTweetsApi();
+  const { user, updateUser } = useUser();
 
   const neighborhoods = [
     "Chelsea",
@@ -32,15 +36,43 @@ const PickNeighborhood = () => {
 
   const onSubmit = async () => {
     try {
-    } catch (error) {}
+      // create building and attach to neighborhood
+      const building = await createBuilding(
+        buildingAddress as string,
+        selectedNeighborhood
+      );
+      // attach neighborhood and building to user
+      if (user === null) {
+        throw new Error("User is null");
+      }
+      const updatedUser = await updateUserAttributes({
+        neighborhoodID: building.neighborhood.id,
+        buildingID: building.id,
+      });
+      // assign returned user to user context
+      updateUser(updatedUser);
+      onContinue();
+    } catch (error) {
+      console.log(error);
+      Alert.alert("We had an issue adding you to the neighborhood. Try again.");
+    }
+  };
+
+  const onContinue = () => {
+    router.replace("/");
   };
 
   return (
     <View style={styles.container}>
       {neighborhoodName ? (
-        <Text style={styles.welcomeText}>
-          Welcome to {neighborhoodName} on Village.
-        </Text>
+        <View>
+          <Text style={styles.welcomeText}>
+            Welcome to {neighborhoodName} on Village.
+          </Text>
+          <Pressable style={styles.button} onPress={onContinue}>
+            <Text style={styles.buttonText}>Continue</Text>
+          </Pressable>
+        </View>
       ) : (
         <View>
           <Text style={styles.questionText}>
@@ -61,11 +93,11 @@ const PickNeighborhood = () => {
               />
             ))}
           </Picker>
+          <Pressable style={styles.button} onPress={onSubmit}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </Pressable>
         </View>
       )}
-      <Pressable style={styles.button} onPress={onSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
-      </Pressable>
     </View>
   );
 };

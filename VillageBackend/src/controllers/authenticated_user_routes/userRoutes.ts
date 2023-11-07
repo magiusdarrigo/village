@@ -11,7 +11,7 @@ router.put("/", async (req, res) => {
   // we won't use the request parameter for the user id. We will get the user id from the token
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
-  const { username, profileImage } = req.body;
+  const { username, profileImage, buildingID, neighborhoodID } = req.body;
   try {
     const updatedUser = await prisma.users.update({
       where: {
@@ -20,6 +20,8 @@ router.put("/", async (req, res) => {
       data: {
         username,
         image: profileImage,
+        building_id: buildingID,
+        neighborhood_id: neighborhoodID,
       },
     });
     res.json(updatedUser);

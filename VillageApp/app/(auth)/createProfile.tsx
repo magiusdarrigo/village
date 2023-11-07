@@ -18,8 +18,7 @@ import { useTweetsApi } from "../../lib/api/tweets";
 const CreateProfile = () => {
   const { user, updateUser } = useUser();
   const router = useRouter();
-  const { uploadProfileWithDefaultPic, uploadProfileWithCustomPic } =
-    useTweetsApi();
+  const { updateUserAttributes, uploadProfileWithCustomPic } = useTweetsApi();
 
   const getRandomProfileImageURL = () => {
     // pick a random number from 0 to 50
@@ -55,7 +54,7 @@ const CreateProfile = () => {
     try {
       let updatedUser;
       if (typeof profileImage === "string") {
-        updatedUser = await uploadProfileWithDefaultPic({
+        updatedUser = await updateUserAttributes({
           username,
           profileImage,
         });

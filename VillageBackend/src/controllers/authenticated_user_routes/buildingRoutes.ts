@@ -6,16 +6,16 @@ const router = Router();
 // create building
 router.post("/", async (req, res) => {
   console.log("create building called");
-  const { address } = req.body;
+  const { address, neighborhood } = req.body;
   try {
-    // TODO: find the neighborhood that the building resides in based on the address.
-    // below is a temporary solution
-    const neighborhoodID = 1; // connecting to UES neighborhood ID
-
     const newBuilding = await prisma.buildings.create({
       data: {
         address,
-        neighborhood_id: neighborhoodID,
+        neighborhood: {
+          connect: {
+            name: neighborhood,
+          },
+        },
       },
     });
     res.json(newBuilding);
@@ -23,6 +23,34 @@ router.post("/", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: `error creating building with address ${address}`,
+    });
+  }
+});
+
+// get building by address
+router.get("/", async (req, res) => {
+  console.log("get building by address called");
+  let { address } = req.query;
+  if (typeof address !== "string") {
+    return res.status(400).json({
+      error: "address must be a string",
+    });
+  }
+  try {
+    // get building by address and associated neighborhood name
+    const building = await prisma.buildings.findUnique({
+      where: {
+        address,
+      },
+      include: {
+        neighborhood: true,
+      },
+    });
+    res.json(building);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error fetching building with address ${address}`,
     });
   }
 });

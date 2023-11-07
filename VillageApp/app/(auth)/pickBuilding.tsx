@@ -8,21 +8,27 @@ import { router } from "expo-router";
 
 const PickBuilding = () => {
   const [address, setAddress] = useState("");
-  const { submitBuildingAddress } = useTweetsApi();
+  const { getBuilding } = useTweetsApi();
   const { user, updateUser } = useUser();
 
   const onSubmit = async () => {
     try {
       console.log(address);
-      const building = await submitBuildingAddress(address);
+      const building = await getBuilding(address);
+      const neighborhoodName = building?.neighborhood?.name;
       if (user === null) {
         throw new Error("User is null");
       }
-      updateUser({ ...user, building_id: building.id });
-      const neighborhoodName = building.neighborhood?.name;
+      if (building?.neighborhood?.id) {
+        updateUser({
+          ...user,
+          building_id: building.id,
+          neighborhood_id: building.neighborhood.id,
+        });
+      }
       router.push({
         pathname: "/pickNeighborhood",
-        params: { neighborhoodName },
+        params: { buildingAddress: address, neighborhoodName },
       });
     } catch (error) {
       console.log(error);
