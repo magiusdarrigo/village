@@ -38,6 +38,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
 
   const listTweets = async () => {
+    console.log("call listTweets, authToken", authToken);
     if (!authToken) {
       return {};
     }
