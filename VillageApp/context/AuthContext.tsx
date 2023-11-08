@@ -57,7 +57,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
     // Redirect to sign in if there is no auth token and user is not already on an auth-related route
     // authTokenLoaded &&
     if (!authToken && segments[0] !== "(auth)") {
-      router.replace("/createProfile");
+      router.replace("/pickNeighborhood");
       return;
     }
 
