@@ -29,9 +29,27 @@ const NewTweet = () => {
 
   const { isLoading, isError, mutateAsync } = useMutation({
     mutationFn: createTweet,
-    onSuccess: (data) => {
+    onSuccess: (newData) => {
       queryClient.setQueryData(["tweets"], (old: any) => {
-        return [data, ...old];
+        if (!old) {
+          // If for some reason we don't have the pages, just return a new page structure
+          return {
+            pageParams: [],
+            pages: [{ data: [newData], nextCursor: null, prevCursor: null }],
+          };
+        }
+
+        // Otherwise, add the new tweet to the beginning of the first page
+        return {
+          ...old,
+          pages: [
+            {
+              ...old.pages[0],
+              data: [newData, ...old.pages[0].data],
+            },
+            ...old.pages.slice(1),
+          ],
+        };
       });
     },
   });

@@ -9,6 +9,76 @@ const router = Router();
 
 const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
 
+// report a post
+router.post("/:id/report", async (req, res) => {
+  console.log("report post called");
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+
+  try {
+    const newReport = await prisma.reported_posts.create({
+      data: {
+        user_id_reporting: currentUser.id,
+        post_id: Number(id),
+      },
+    });
+
+    res.status(200).json(newReport);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error reporting the post." });
+  }
+});
+
+// delete post
+router.delete("/:id", async (req, res) => {
+  console.log("delete post called");
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+
+  try {
+    // query for the post
+    const post = await prisma.posts.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    // ensure user is the author of the post
+    if (post && post.user_id !== currentUser.id) {
+      return res.status(400).json({ error: "Unauthorized" });
+    }
+    // we have to delete the foreign key constraints first
+    await prisma.post_likes.deleteMany({
+      where: {
+        post_id: Number(id),
+      },
+    });
+
+    await prisma.comments.deleteMany({
+      where: {
+        post_id: Number(id),
+      },
+    });
+
+    await prisma.reported_posts.deleteMany({
+      where: {
+        post_id: Number(id),
+      },
+    });
+
+    const deletePost = await prisma.posts.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    res.status(200).json(deletePost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error deleting the post." });
+  }
+});
+
 // create post
 router.post("/", async (req, res) => {
   console.log("create post called");
@@ -131,7 +201,7 @@ router.post("/:id/likes", async (req, res) => {
       incrementLikes,
     ]);
 
-    res.status(201).json({ newLike, updatedPost });
+    res.status(200).json({ newLike, updatedPost });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error liking the post." });
@@ -163,9 +233,12 @@ router.delete("/:id/likes", async (req, res) => {
       },
     });
 
-    await prisma.$transaction([deleteLike, decrementLikes]);
+    const [newUnlike, updatedPost] = await prisma.$transaction([
+      deleteLike,
+      decrementLikes,
+    ]);
 
-    res.status(204).send({ success: true });
+    res.status(200).json({ newUnlike, updatedPost });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error unliking the post." });

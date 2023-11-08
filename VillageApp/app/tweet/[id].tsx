@@ -9,7 +9,7 @@ const TweetScreen = () => {
   const { getTweet } = useTweetsApi();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["tweet", id],
+    queryKey: ["tweets", id],
     queryFn: () => getTweet(id as string),
   });
 

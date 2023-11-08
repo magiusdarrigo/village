@@ -3,7 +3,11 @@ import { API_URL } from "./config";
 import { useAuth } from "../../context/AuthContext";
 
 interface TweetsApiContextType {
-  listTweets: () => Promise<any>;
+  reportTweet: (id: string) => Promise<any>;
+  deleteTweet: (id: string) => Promise<any>;
+  likeTweet: (id: string) => Promise<any>;
+  unlikeTweet: (id: string) => Promise<any>;
+  listTweets: (page: number) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
     neighborhoodID: number;
@@ -25,6 +29,10 @@ interface TweetsApiContextType {
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
+  reportTweet: async () => {},
+  deleteTweet: async () => {},
+  likeTweet: async () => {},
+  unlikeTweet: async () => {},
   listTweets: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
@@ -37,11 +45,119 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
 
-  const listTweets = async () => {
+  const reportTweet = async (id: string) => {
     if (!authToken) {
       return {};
     }
-    const url = `${API_URL}/v1/neighborhoods/1/posts`;
+
+    const url = `${API_URL}/v1/posts/${id}/report`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error reporting post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const deleteTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error deleting post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const likeTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}/likes`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error liking post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const unlikeTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}/likes`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error unliking post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const listTweets = async (page: number) => {
+    if (!authToken) {
+      return {};
+    }
+    const url = `${API_URL}/v1/neighborhoods/1/posts?cursor=${page}`;
 
     const res = await fetch(url, {
       headers: {
@@ -58,7 +174,10 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       throw new Error("Error fetching posts");
     }
 
-    return await res.json();
+    const body = await res.json();
+    // console.log("listTweets body:", body);
+
+    return body;
   };
 
   const getTweet = async (id: string) => {
@@ -241,6 +360,10 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   return (
     <TweetsApiContext.Provider
       value={{
+        reportTweet,
+        deleteTweet,
+        likeTweet,
+        unlikeTweet,
         listTweets,
         getTweet,
         createTweet,
