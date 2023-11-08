@@ -7,6 +7,12 @@ import React, {
 
 type User = {
   neighborhood_id?: number;
+  neighborhood?: {
+    name: string;
+  };
+  building?: {
+    address: string;
+  };
   building_id?: number;
   id: number;
   username: string;
