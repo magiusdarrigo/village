@@ -34,6 +34,7 @@ model users {
   likes          post_likes[]
   liked_comments  comment_likes[]
   tokens          tokens[]
+  reported_posts  reported_posts[]
 }
 
 model tokens {
@@ -103,6 +104,8 @@ model reported_posts {
   id             Int             @id @default(autoincrement())
   post           posts           @relation(fields: [post_id], references: [id])
   post_id         Int
+  user           users           @relation(fields: [user_id_reporting], references: [id])
+  user_id_reporting         Int
   reason         String?
   created_at      DateTime        @default(now())
   tags           Json?

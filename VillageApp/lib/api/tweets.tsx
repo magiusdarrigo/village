@@ -3,6 +3,7 @@ import { API_URL } from "./config";
 import { useAuth } from "../../context/AuthContext";
 
 interface TweetsApiContextType {
+  reportTweet: (id: string) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
   likeTweet: (id: string) => Promise<any>;
   unlikeTweet: (id: string) => Promise<any>;
@@ -28,6 +29,7 @@ interface TweetsApiContextType {
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
+  reportTweet: async () => {},
   deleteTweet: async () => {},
   likeTweet: async () => {},
   unlikeTweet: async () => {},
@@ -42,6 +44,33 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
+
+  const reportTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}/report`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error reporting post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
 
   const deleteTweet = async (id: string) => {
     if (!authToken) {
@@ -67,7 +96,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log(body);
     return body;
   };
 
@@ -332,6 +360,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   return (
     <TweetsApiContext.Provider
       value={{
+        reportTweet,
         deleteTweet,
         likeTweet,
         unlikeTweet,

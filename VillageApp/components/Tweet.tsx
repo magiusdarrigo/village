@@ -38,7 +38,7 @@ const calculateHoursAgo = (time: string) => {
 
 const Tweet = ({ tweet }: TweetProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { likeTweet, unlikeTweet, deleteTweet } = useTweetsApi();
+  const { likeTweet, unlikeTweet, deleteTweet, reportTweet } = useTweetsApi();
   const queryClient = useQueryClient();
   const navigation = useNavigation();
   const segments = useSegments();
@@ -166,8 +166,13 @@ const Tweet = ({ tweet }: TweetProps) => {
     },
   });
 
-  const onReport = (id: number) => {
-    console.warn("Post reported");
+  const onReport = async (id: number) => {
+    try {
+      await reportTweet(String(id));
+      Alert.alert("Post reported.");
+    } catch (error) {
+      Alert.alert("We couldn't report this post. Try again.");
+    }
   };
 
   const handle3DotsPressed = (userID: number, tweet: TweetType) => {

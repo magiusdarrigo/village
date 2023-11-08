@@ -9,6 +9,27 @@ const router = Router();
 
 const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
 
+// report a post
+router.post("/:id/report", async (req, res) => {
+  console.log("report post called");
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+
+  try {
+    const newReport = await prisma.reported_posts.create({
+      data: {
+        user_id_reporting: currentUser.id,
+        post_id: Number(id),
+      },
+    });
+
+    res.status(200).json(newReport);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error reporting the post." });
+  }
+});
+
 // delete post
 router.delete("/:id", async (req, res) => {
   console.log("delete post called");
