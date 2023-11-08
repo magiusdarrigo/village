@@ -71,6 +71,7 @@ router.put("/", async (req, res) => {
 
 // follow a user
 router.post("/:id/follow", async (req, res) => {
+  console.log("follow user called");
   const { id } = req.params;
   // the id of the user who is following
   const currentUser = (req as unknown as AuthenticatedRequest).user;
@@ -108,6 +109,7 @@ router.post("/:id/follow", async (req, res) => {
 
 // unfollow a user
 router.delete("/:id/follow", async (req, res) => {
+  console.log("unfollow user called");
   const { id } = req.params;
   // the id of the user who is unfollowing
   const currentUser = (req as unknown as AuthenticatedRequest).user;
@@ -146,6 +148,7 @@ router.delete("/:id/follow", async (req, res) => {
 // get one user
 // only select the fields we need: id, username, image, is_verified, followers_count, following_count
 router.get("/:id", async (req, res) => {
+  console.log("get one user called");
   const { id } = req.params;
   try {
     const user = await prisma.users.findUnique({
@@ -172,6 +175,7 @@ router.get("/:id", async (req, res) => {
 
 // get the current user
 router.get("/", async (req, res) => {
+  console.log("get current user called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
     const user = await prisma.users.findUnique({

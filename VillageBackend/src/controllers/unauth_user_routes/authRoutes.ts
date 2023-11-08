@@ -9,6 +9,7 @@ const CURRENT_APP_VERSION = "1.0.0";
 
 // new phone number not seen before -> create new user
 router.post("/login", async (req, res) => {
+  console.log("login called");
   const { phoneNumber } = req.body;
 
   if (typeof phoneNumber !== "string") {
@@ -66,6 +67,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/authenticate", async (req, res) => {
+  console.log("authenticate called");
   const phoneNumber = req.body.phoneNumber;
   const phoneToken = req.body.phoneToken;
 
