@@ -12,18 +12,15 @@ import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../lib/api/tweets";
-
-const user = {
-  id: "u1",
-  username: "VadimNotJustDev",
-  name: "Vadim",
-  image: "https://picsum.photos/150",
-};
+import { useUser } from "../context/UserContext";
 
 const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
   const { createTweet } = useTweetsApi();
+  const { user } = useUser();
+
+  console.log("user", user);
 
   const queryClient = useQueryClient();
 
@@ -81,11 +78,11 @@ const NewTweet = () => {
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
-          <Image source={{ uri: user.image }} style={styles.image} />
+          <Image source={{ uri: user?.image }} style={styles.image} />
           <TextInput
             value={text}
             onChangeText={(value) => setText(value)}
-            placeholder="What's going on in East Village?"
+            placeholder={`What's going on in ${user?.neighborhood?.name}?`}
             multiline
             numberOfLines={5}
             style={{ flex: 1 }}
