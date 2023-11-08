@@ -17,7 +17,7 @@ router.put("/", async (req, res) => {
   // ensure username is not racist
   if (!usernameAllowed(username)) {
     return res.status(400).json({
-      error: "username is not allowed",
+      error: "That username is not allowed.",
     });
   }
   try {
@@ -33,8 +33,14 @@ router.put("/", async (req, res) => {
       },
     });
     res.json(updatedUser);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
+    // if the username is already taken, return a 400
+    if (error.code === "P2002") {
+      return res.status(400).json({
+        error: "That username is already taken.",
+      });
+    }
     res.status(500).json({
       error: "error updating user",
     });
