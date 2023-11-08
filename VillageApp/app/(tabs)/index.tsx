@@ -10,18 +10,31 @@ import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
 import { Link } from "expo-router";
 import { useTweetsApi } from "../../lib/api/tweets";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import colors from "../../constants/Colors";
 
 export default function FeedScreen() {
   const { listTweets } = useTweetsApi();
 
-  const { data, isLoading, error } = useQuery({
+  const {
+    data,
+    isFetching,
+    error,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
     queryKey: ["tweets"],
-    queryFn: listTweets,
+    queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
+    getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
+    getPreviousPageParam: (firstPage, allPages) => firstPage.prevCursor,
   });
 
-  if (isLoading) {
+  const handleLoadMore = () => {
+    if (hasNextPage) fetchNextPage();
+  };
+
+  if (isFetching && !isFetchingNextPage) {
     return <ActivityIndicator />;
   }
 
@@ -29,9 +42,33 @@ export default function FeedScreen() {
     return <Text>Couldn't Load Posts!</Text>;
   }
 
+  const items = data?.pages.flatMap((page) => page.data) ?? [];
+  // Create a new Set to track unique tweet IDs
+  const uniqueIds = new Set();
+  const uniqueItems = items.filter((tweet) => {
+    const isDuplicate = uniqueIds.has(tweet.id);
+
+    // Add the ID to the Set if it's not already there
+    if (!isDuplicate) {
+      uniqueIds.add(tweet.id);
+      return true;
+    }
+
+    // If it's a duplicate, filter it out
+    return false;
+  });
+
   return (
     <View style={styles.page}>
-      <FlatList data={data} renderItem={({ item }) => <Tweet tweet={item} />} />
+      <FlatList
+        data={uniqueItems}
+        renderItem={({ item }) => <Tweet tweet={item} />}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isFetchingNextPage ? () => <ActivityIndicator size="large" /> : null
+        }
+      />
 
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>

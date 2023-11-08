@@ -132,6 +132,7 @@ router.post("/authenticate", async (req, res) => {
 
 // return the current version of the app
 router.get("/version", async (_, res) => {
+  console.log("check version called");
   try {
     res.send({ mandatoryUpdate: true, latestVersion: CURRENT_APP_VERSION });
   } catch (error) {
