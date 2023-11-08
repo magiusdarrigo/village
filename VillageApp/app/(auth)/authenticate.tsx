@@ -5,12 +5,15 @@ import {
   Pressable,
   StyleSheet,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { authenticate } from "../../lib/api/auth";
 import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
+import Colors from "../../constants/Colors";
 
 const Authenticate = () => {
   const [code, setCode] = useState("");
@@ -41,45 +44,53 @@ const Authenticate = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
       <Text style={styles.label}>Paste the code we texted you.</Text>
-      <TextInput
-        placeholder="OTP code"
-        value={code}
-        onChangeText={setCode}
-        style={styles.input}
-      />
-
-      <Pressable style={styles.button} onPress={onConfirm}>
-        <Text style={styles.buttonText}>Confirm</Text>
-      </Pressable>
-    </View>
+      <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <TextInput
+          placeholder=""
+          value={code}
+          onChangeText={setCode}
+          style={styles.input}
+          keyboardType="phone-pad"
+          autoFocus={true}
+        />
+        <Pressable style={styles.button} onPress={onConfirm}>
+          <Text style={styles.buttonText}>Confirm</Text>
+        </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    flex: 1,
-    justifyContent: "center",
-    padding: 24,
-  },
-  label: {
-    fontSize: 24,
-    marginVertical: 5,
-    color: "gray",
-  },
   error: {
     marginVertical: 5,
     color: "red",
   },
+  container: {
+    backgroundColor: Colors.light.tertiary,
+    flex: 1,
+    paddingTop: 24, // for top space
+    paddingHorizontal: 24,
+  },
+  label: {
+    marginTop: 36, // space above the label
+    fontSize: 24,
+    marginBottom: 8, // space below the label
+    color: "black",
+    fontWeight: "bold",
+    alignSelf: "flex-start", // align to top-left
+  },
   input: {
-    borderColor: "gray",
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: 10,
+    borderColor: "transparent", // no border
+    borderWidth: 0,
+    paddingTop: 10,
     fontSize: 20,
-    marginVertical: 5,
-    borderRadius: 10,
+    color: "black",
   },
   button: {
     backgroundColor: "#050A12",
@@ -87,7 +98,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    marginVertical: 5,
+    marginTop: 5, // space above the button
+    marginBottom: 50, // space below the button
   },
   buttonText: {
     color: "white",
