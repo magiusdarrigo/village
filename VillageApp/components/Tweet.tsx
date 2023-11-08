@@ -3,27 +3,13 @@ import { useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import { EvilIcon, AntIcon } from "./Icons";
-import { Link } from "expo-router";
+import { Link, useNavigation, useSegments } from "expo-router";
 import { useTweetsApi } from "../lib/api/tweets";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "../context/UserContext";
 
 type TweetProps = {
   tweet: TweetType;
-};
-
-const onReported = (id: number) => {
-  console.warn("Post reported");
-};
-
-const handleReportPostAlert = (id: number) => {
-  Alert.alert("Report Post?", "", [
-    {
-      text: "Cancel",
-      onPress: () => console.log("Cancel Pressed"),
-      style: "cancel",
-    },
-    { text: "Yes", onPress: () => onReported(id) },
-  ]);
 };
 
 const calculateHoursAgo = (time: string) => {
@@ -52,20 +38,104 @@ const calculateHoursAgo = (time: string) => {
 
 const Tweet = ({ tweet }: TweetProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { likeTweet, unlikeTweet } = useTweetsApi();
+  const { likeTweet, unlikeTweet, deleteTweet } = useTweetsApi();
   const queryClient = useQueryClient();
+  const navigation = useNavigation();
+  const segments = useSegments();
+  const { user } = useUser();
+  if (!user) {
+    return Alert.alert("Something went wrong. Try again.");
+  }
 
   // like a tweet
-  const { mutate: mutateLike } = useMutation(likeTweet, {
+  const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
+    likeTweet,
+    {
+      onSuccess: (data) => {
+        // update the single tweet in the cache
+        queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
+          return {
+            ...old,
+            liked_by_user: true,
+            likes_count: data.updatedPost.likes_count,
+          };
+        });
+        // update the list of tweets in the cache
+        queryClient.setQueryData(["tweets"], (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.map((tweet) =>
+                  tweet.id === data.newLike.post_id
+                    ? {
+                        ...tweet,
+                        liked_by_user: true,
+                        likes_count: data.updatedPost.likes_count,
+                      }
+                    : tweet
+                ),
+              };
+            }),
+          };
+        });
+      },
+      onError: (error) => {
+        Alert.alert("We couldn't like this post. Try again.");
+      },
+    }
+  );
+
+  // unlike a tweet
+  const { mutate: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
+    unlikeTweet,
+    {
+      onSuccess: (data) => {
+        // update the single tweet in the cache
+        queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
+          return {
+            ...old,
+            liked_by_user: false,
+            likes_count: data.updatedPost.likes_count,
+          };
+        });
+        // update the list of tweets in the cache
+        queryClient.setQueryData(["tweets"], (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.map((tweet) =>
+                  tweet.id === data.newUnlike.post_id
+                    ? {
+                        ...tweet,
+                        liked_by_user: false,
+                        likes_count: data.updatedPost.likes_count,
+                      }
+                    : tweet
+                ),
+              };
+            }),
+          };
+        });
+      },
+      onError: (error) => {
+        Alert.alert("We couldn't like this post. Try again.");
+      },
+    }
+  );
+
+  // delete a tweet
+  const { mutate: mutateDelete } = useMutation(deleteTweet, {
     onSuccess: (data) => {
-      // update the single tweet in the cache
-      queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
-        return {
-          ...old,
-          liked_by_user: true,
-          likes_count: data.updatedPost.likes_count,
-        };
-      });
       // update the list of tweets in the cache
       queryClient.setQueryData(["tweets"], (old: any) => {
         if (!old) return;
@@ -76,74 +146,65 @@ const Tweet = ({ tweet }: TweetProps) => {
             // Map over the tweets in the page
             return {
               ...page,
-              data: page.data.map((tweet) =>
-                tweet.id === data.newLike.post_id
-                  ? {
-                      ...tweet,
-                      liked_by_user: true,
-                      likes_count: data.updatedPost.likes_count,
-                    }
-                  : tweet
-              ),
+              data: page.data.filter((tweet) => tweet.id !== data.id),
             };
           }),
         };
       });
+      // if the tweet is open, go back to the feed
+      const segLen = segments.length;
+      if (
+        segLen >= 2 &&
+        segments[segLen - 2] === "tweet" &&
+        segments[segLen - 1] === "[id]"
+      ) {
+        navigation.goBack();
+      }
     },
     onError: (error) => {
-      console.error(error);
+      Alert.alert("We couldn't delete this post. Try again.");
     },
   });
 
-  // unlike a tweet
-  const { mutate: mutateUnlike } = useMutation(unlikeTweet, {
-    onSuccess: (data) => {
-      // update the single tweet in the cache
-      queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
-        return {
-          ...old,
-          liked_by_user: false,
-          likes_count: data.updatedPost.likes_count,
-        };
-      });
-      // update the list of tweets in the cache
-      queryClient.setQueryData(["tweets"], (old: any) => {
-        if (!old) return;
-        // Map over the pages
-        return {
-          ...old,
-          pages: old.pages.map((page: { data: any[] }) => {
-            // Map over the tweets in the page
-            return {
-              ...page,
-              data: page.data.map((tweet) =>
-                tweet.id === data.newUnlike.post_id
-                  ? {
-                      ...tweet,
-                      liked_by_user: false,
-                      likes_count: data.updatedPost.likes_count,
-                    }
-                  : tweet
-              ),
-            };
-          }),
-        };
-      });
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  const onReport = (id: number) => {
+    console.warn("Post reported");
+  };
+
+  const handle3DotsPressed = (userID: number, tweet: TweetType) => {
+    if (userID !== tweet.user_id) {
+      Alert.alert("Report Post?", "", [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Yes", onPress: () => onReport(tweet.id) },
+      ]);
+    } else {
+      Alert.alert(
+        "Delete Post?",
+        "Are you sure you want to delete this post?",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          { text: "Yes", onPress: () => mutateDelete(String(tweet.id)) },
+        ]
+      );
+    }
+  };
 
   const handleToggleLike = async (postID: number) => {
     try {
+      if (isLoadingLike || isLoadingUnlike) return;
       if (tweet.liked_by_user) {
         mutateUnlike(String(postID));
       } else {
         mutateLike(String(postID));
       }
     } catch (error) {
-      console.error("Error toggling like:", error);
       Alert.alert("We couldn't like this post. Try again.");
     }
   };
@@ -188,7 +249,7 @@ const Tweet = ({ tweet }: TweetProps) => {
               {calculateHoursAgo(tweet.created_at)}
               <Pressable
                 style={{ marginLeft: "auto" }}
-                onPress={() => handleReportPostAlert(tweet.id)}
+                onPress={() => handle3DotsPressed(user.id, tweet)}
               >
                 <Entypo
                   name="dots-three-horizontal"

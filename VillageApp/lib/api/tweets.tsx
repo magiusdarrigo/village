@@ -3,6 +3,7 @@ import { API_URL } from "./config";
 import { useAuth } from "../../context/AuthContext";
 
 interface TweetsApiContextType {
+  deleteTweet: (id: string) => Promise<any>;
   likeTweet: (id: string) => Promise<any>;
   unlikeTweet: (id: string) => Promise<any>;
   listTweets: (page: number) => Promise<any>;
@@ -27,6 +28,7 @@ interface TweetsApiContextType {
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
+  deleteTweet: async () => {},
   likeTweet: async () => {},
   unlikeTweet: async () => {},
   listTweets: async () => {},
@@ -40,6 +42,34 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
+
+  const deleteTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error deleting post");
+    }
+
+    const body = await res.json();
+    console.log(body);
+    return body;
+  };
 
   const likeTweet = async (id: string) => {
     if (!authToken) {
@@ -302,6 +332,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   return (
     <TweetsApiContext.Provider
       value={{
+        deleteTweet,
         likeTweet,
         unlikeTweet,
         listTweets,
