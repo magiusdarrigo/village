@@ -33,6 +33,18 @@ router.delete("/:id", async (req, res) => {
       },
     });
 
+    await prisma.comments.deleteMany({
+      where: {
+        post_id: Number(id),
+      },
+    });
+
+    await prisma.reported_posts.deleteMany({
+      where: {
+        post_id: Number(id),
+      },
+    });
+
     const deletePost = await prisma.posts.delete({
       where: {
         id: Number(id),
