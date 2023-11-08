@@ -9,103 +9,196 @@ import {
   Text,
   Alert,
   Platform,
+  KeyboardAvoidingView,
+  TouchableOpacity,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../lib/api/tweets";
+import Colors from "../../constants/Colors";
 
 const CreateProfile = () => {
   const { user, updateUser } = useUser();
   const router = useRouter();
   const { updateUserAttributes, uploadProfileWithCustomPic } = useTweetsApi();
 
-  const getRandomProfileImageURL = () => {
-    // pick a random number from 0 to 50
-    const randomNumber = Math.floor(Math.random() * 50);
-    return `https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults/profile${randomNumber}.jpg`;
+  // const getRandomProfileImageURL = () => {
+  //   // pick a random number from 0 to 50
+  //   const randomNumber = Math.floor(Math.random() * 50);
+  //   return `https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults/profile${randomNumber}.jpg`;
+  // };
+
+  // const [profileImage, setProfileImage] = useState<
+  //   string | ImagePicker.ImagePickerAsset
+  // >(user?.image || getRandomProfileImageURL());
+  const [username, setUsername] = useState("");
+  const [selectedColor, setSelectedColor] = useState("#0047AB");
+  const colors = [
+    "#065535",
+    "#F8BBD0",
+    "#E1BEE7",
+    "#990000",
+    "#20b2aa",
+    "#C5CAE9",
+    "#BBDEFB",
+    "#003366",
+    "#333333",
+    "#B2DFDB",
+    "#ffa500",
+    "#bada55",
+    "#000000",
+    "#ffffff",
+    "#ff4040",
+    "#0000ff",
+    "#00ff7f",
+    "#ffff00",
+  ];
+
+  // Function to render color options
+  const renderColorOptions = () => {
+    return colors.map((color) => (
+      <TouchableOpacity
+        key={color}
+        style={[
+          styles.colorOption,
+          { backgroundColor: color },
+          selectedColor === color && styles.selectedColor,
+        ]}
+        onPress={() => setSelectedColor(color)}
+      />
+    ));
   };
 
-  const [profileImage, setProfileImage] = useState<
-    string | ImagePicker.ImagePickerAsset
-  >(user?.image || getRandomProfileImageURL());
-  const [username, setUsername] = useState(user?.username || "");
+  // const handleChoosePhoto = async () => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== "granted") {
+  //     alert("Sorry, we need camera roll permissions to make this work!");
+  //     return;
+  //   }
 
-  const handleChoosePhoto = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
-      return;
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   if (!result.canceled) {
+  //     setProfileImage(result.assets[0]);
+  //   }
+  // };
+
+  const validateInput = () => {
+    if (!username) {
+      Alert.alert("Please enter a username.");
+      return true;
+    } else if (username.length > 30) {
+      Alert.alert("Please enter a username less than 30 characters.");
+      return true;
     }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setProfileImage(result.assets[0]);
-    }
+    return false;
   };
 
   const onSave = async () => {
     try {
-      let updatedUser;
-      if (typeof profileImage === "string") {
-        updatedUser = await updateUserAttributes({
-          username,
-          profileImage,
-        });
-      } else {
-        // custom image from user
-        const formData = new FormData();
-
-        formData.append("photo", {
-          username,
-          uri:
-            Platform.OS === "ios"
-              ? profileImage.uri.replace("file://", "")
-              : profileImage.uri,
-          type: profileImage.type,
-          name: profileImage.fileName,
-        } as any);
-        updatedUser = await uploadProfileWithCustomPic(formData);
+      const hasErr = validateInput();
+      if (hasErr) {
+        return;
       }
+      const updatedUser = await updateUserAttributes({
+        username,
+        profileImage: selectedColor,
+      });
       updateUser(updatedUser);
       router.push("/pickBuilding");
-    } catch (err) {
+    } catch (error) {
       Alert.alert("We had an issue uploading your profile. Try again.");
     }
   };
 
-  const imageToShow =
-    typeof profileImage === "string" ? profileImage : profileImage.uri;
+  // const onSave = async () => {
+  //   try {
+  //     const hasErr = validateInput();
+  //     if (hasErr) {
+  //       return;
+  //     }
+  //     let updatedUser;
+  //     if (typeof profileImage === "string") {
+  //       updatedUser = await updateUserAttributes({
+  //         username,
+  //         profileImage,
+  //       });
+  //     } else {
+  //       // custom image from user
+  //       const formData = new FormData();
+
+  //       formData.append("photo", {
+  //         username,
+  //         uri:
+  //           Platform.OS === "ios"
+  //             ? profileImage.uri.replace("file://", "")
+  //             : profileImage.uri,
+  //         type: profileImage.type,
+  //         name: profileImage.fileName,
+  //       } as any);
+  //       updatedUser = await uploadProfileWithCustomPic(formData);
+  //     }
+  //     updateUser(updatedUser);
+  //     router.push("/pickBuilding");
+  //   } catch (err) {
+  //     Alert.alert("We had an issue uploading your profile. Try again.");
+  //   }
+  // };
+
+  // const imageToShow =
+  //   typeof profileImage === "string" ? profileImage : profileImage.uri;
+
+  // return (
+  //   <View style={styles.container}>
+  //     <Image source={{ uri: imageToShow }} style={styles.profileImage} />
+  //     <Button title="Change Profile" onPress={handleChoosePhoto} />
+  //     <TextInput
+  //       style={styles.usernameInput}
+  //       onChangeText={setUsername}
+  //       value={username}
+  //       placeholder="Username"
+  //     />
+  //     <Pressable style={styles.button} onPress={onSave}>
+  //       <Text style={styles.buttonText}>Save</Text>
+  //     </Pressable>
+  //   </View>
+  // );
 
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: imageToShow }} style={styles.profileImage} />
-      <Button title="Change Profile" onPress={handleChoosePhoto} />
-      <TextInput
-        style={styles.usernameInput}
-        onChangeText={setUsername}
-        value={username}
-        placeholder="Username"
-      />
-      <Pressable style={styles.button} onPress={onSave}>
-        <Text style={styles.buttonText}>Save</Text>
-      </Pressable>
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <Text style={styles.label}>Create your anonymous profile.</Text>
+      <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <View>
+          <Text style={styles.inputLabel}>Username</Text>
+          <TextInput
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+            style={styles.input}
+          />
+          <Text style={styles.inputLabel}>Color</Text>
+          <View style={styles.colorPickerContainer}>
+            {renderColorOptions()}
+          </View>
+        </View>
+        <Pressable style={styles.button} onPress={onSave}>
+          <Text style={styles.buttonText}>Save</Text>
+        </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   profileImage: {
     width: 150,
     height: 150,
@@ -119,17 +212,62 @@ const styles = StyleSheet.create({
     padding: 10,
     width: "80%",
   },
+  container: {
+    backgroundColor: Colors.light.tertiary,
+    flex: 1,
+    paddingTop: 24,
+    paddingHorizontal: 24,
+  },
+  label: {
+    marginTop: 36,
+    fontSize: 24,
+    marginBottom: 8,
+    color: "black",
+    fontWeight: "bold",
+    alignSelf: "flex-start",
+  },
+  inputLabel: {
+    marginTop: 24,
+    fontSize: 15,
+    marginBottom: 4,
+    color: "black",
+    alignSelf: "flex-start",
+  },
+  input: {
+    borderColor: "transparent",
+    borderWidth: 0,
+    paddingTop: 10,
+    fontSize: 20,
+    color: "black",
+  },
   button: {
     backgroundColor: "#050A12",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    marginVertical: 5,
+    marginTop: 5,
+    marginBottom: 50,
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  colorPickerContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  colorOption: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    margin: 3,
+  },
+  selectedColor: {
+    borderWidth: 2,
+    borderColor: "#000", // Change this color as needed for your design
   },
 });
 

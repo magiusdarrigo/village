@@ -3,6 +3,7 @@ import prisma from "../../clients/prismaClient";
 import { getPostsByUserQuery } from "../../sql_queries/posts";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
+import { usernameAllowed } from "../../utils/badwords";
 
 const router = Router();
 
@@ -13,6 +14,12 @@ router.put("/", async (req, res) => {
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
   const { username, profileImage, buildingID, neighborhoodID } = req.body;
+  // ensure username is not racist
+  if (!usernameAllowed(username)) {
+    return res.status(400).json({
+      error: "username is not allowed",
+    });
+  }
   try {
     const updatedUser = await prisma.users.update({
       where: {
