@@ -1,6 +1,6 @@
 export const usernameAllowed = (username: string) => {
   // ensure username is not empty
-  if (!username) {
+  if (username.includes(" ")) {
     return false;
   }
   // ensure username is not too long

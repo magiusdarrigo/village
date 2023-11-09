@@ -22,8 +22,9 @@ const PickBuilding = () => {
 
   const onSubmit = async () => {
     try {
-      console.log(address);
+      console.log("address", address);
       const building = await getBuilding(address);
+      console.log("building", building);
       const neighborhoodName = building?.neighborhood?.name;
       if (user === null) {
         throw new Error("User is null");

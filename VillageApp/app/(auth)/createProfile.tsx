@@ -37,7 +37,7 @@ const CreateProfile = () => {
   const colors = [
     "#065535",
     "#F8BBD0",
-    "#E1BEE7",
+    "#800080",
     "#990000",
     "#20b2aa",
     "#C5CAE9",
@@ -47,12 +47,12 @@ const CreateProfile = () => {
     "#B2DFDB",
     "#ffa500",
     "#bada55",
-    "#000000",
-    "#ffffff",
+    "#854442",
+    "#96ceb4",
     "#ff4040",
-    "#0000ff",
+    "#005b96",
     "#00ff7f",
-    "#ffff00",
+    "#ffcf40",
   ];
 
   // Function to render color options
@@ -95,6 +95,9 @@ const CreateProfile = () => {
       return true;
     } else if (username.length > 30) {
       Alert.alert("Please enter a username less than 30 characters.");
+      return true;
+    } else if (username.includes(" ")) {
+      Alert.alert("Please enter a username without spaces.");
       return true;
     }
     return false;

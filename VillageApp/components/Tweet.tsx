@@ -86,6 +86,7 @@ const Tweet = ({ tweet }: TweetProps) => {
         });
       },
       onError: (error) => {
+        console.log(error);
         Alert.alert("We couldn't like this post. Try again.");
       },
     }
@@ -129,6 +130,7 @@ const Tweet = ({ tweet }: TweetProps) => {
         });
       },
       onError: (error) => {
+        console.log(error);
         Alert.alert("We couldn't like this post. Try again.");
       },
     }
@@ -163,6 +165,7 @@ const Tweet = ({ tweet }: TweetProps) => {
       }
     },
     onError: (error) => {
+      console.log(error);
       Alert.alert("We couldn't delete this post. Try again.");
     },
   });
@@ -230,16 +233,29 @@ const Tweet = ({ tweet }: TweetProps) => {
           flexDirection: "column",
         }}
       >
-        <Link href={`/profile/${tweet.user_id}`} asChild>
+        <Link
+          href={{
+            pathname: `/profile/${tweet.user_id}`,
+            params: {
+              userID: tweet.user_id,
+              username: tweet.username,
+              image: tweet.profile_image ?? "",
+            },
+          }}
+          asChild
+        >
           <Pressable
             style={{
               paddingTop: 10,
               alignItems: "flex-end",
             }}
           >
-            <Image
-              source={{ uri: tweet.profile_image }}
-              style={styles.userImage}
+            <View
+              // source={{ uri: tweet.profile_image }}
+              style={[
+                styles.userImage,
+                { backgroundColor: tweet.profile_image },
+              ]}
             />
           </Pressable>
         </Link>
@@ -273,9 +289,11 @@ const Tweet = ({ tweet }: TweetProps) => {
             )}
 
             <View style={styles.footer}>
-              <Pressable style={styles.iconWrapper}>
-                <EvilIcon icon="comment" text={tweet.comments_count} />
-              </Pressable>
+              <Link href={`/tweet/${tweet.id}`} asChild>
+                <Pressable style={styles.iconWrapper}>
+                  <EvilIcon icon="comment" text={tweet.comments_count} />
+                </Pressable>
+              </Link>
               <Pressable
                 style={styles.iconWrapper}
                 onPress={() => handleToggleLike(tweet.id)}

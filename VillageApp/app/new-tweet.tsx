@@ -7,12 +7,14 @@ import {
   Pressable,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../lib/api/tweets";
 import { useUser } from "../context/UserContext";
+import Colors from "../constants/Colors";
 
 const NewTweet = () => {
   const [text, setText] = useState("");
@@ -51,12 +53,23 @@ const NewTweet = () => {
     },
   });
 
+  const getCharCount = (tweet: string) => {
+    return tweet.length;
+  };
+
   const onTweetPress = async () => {
     try {
+      const characterCount = getCharCount(text);
+      if (characterCount < 1 || characterCount > 400) {
+        Alert.alert(
+          `Your post is ${characterCount} characters long. It needs to be between 1 and 400 characters.`
+        );
+        return;
+      }
       await mutateAsync({
         neighborhoodID: 1,
         textContent: text,
-        imageURL: "https://picsum.photos/400/800",
+        // imageURL: "https://picsum.photos/400/800",
       });
       setText("");
       router.back();
@@ -78,7 +91,7 @@ const NewTweet = () => {
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
-          <Image source={{ uri: user?.image }} style={styles.image} />
+          <View style={[styles.image, { backgroundColor: user?.image }]} />
           <TextInput
             value={text}
             onChangeText={(value) => setText(value)}
@@ -114,14 +127,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    backgroundColor: "black",
+    backgroundColor: Colors.light.tertiary,
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
   },
   buttonText: {
     fontWeight: "600",
-    color: "white",
+    color: "black",
     fontSize: 16,
   },
   inputContainer: {
