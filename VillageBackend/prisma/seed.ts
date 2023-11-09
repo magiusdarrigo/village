@@ -51,6 +51,27 @@ async function main() {
 
   await Promise.all(randomBuildings);
 
+  const colors = [
+    "#065535",
+    "#F8BBD0",
+    "#800080",
+    "#990000",
+    "#20b2aa",
+    "#C5CAE9",
+    "#BBDEFB",
+    "#003366",
+    "#333333",
+    "#B2DFDB",
+    "#ffa500",
+    "#bada55",
+    "#854442",
+    "#96ceb4",
+    "#ff4040",
+    "#005b96",
+    "#00ff7f",
+    "#ffcf40",
+  ];
+
   // seed the users table with 100 users (20 users per building)
   const randomUsers = Array.from({ length: 100 }).map((_, index) => {
     return prisma.users.create({
@@ -59,7 +80,8 @@ async function main() {
         phone_number: `+1-000-${index}`,
         neighborhood_id: (index % 5) + 1,
         building_id: (index % 25) + 1,
-        image: "https://picsum.photos/150",
+        // random color from the colors array for the image
+        image: colors[Math.floor(Math.random() * colors.length)],
       },
     });
   });

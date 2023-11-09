@@ -170,5 +170,5 @@ model user_following {
   created_at          DateTime  @default(now())
   tags               Json?
 
-  @@index([follower_user_id, following_user_id], name: "idx_userfollowing_relationship")
+  @@unique([follower_user_id, following_user_id], name: "idx_userfollowing_relationship")
 }

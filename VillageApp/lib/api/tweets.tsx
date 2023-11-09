@@ -3,6 +3,9 @@ import { API_URL } from "./config";
 import { useAuth } from "../../context/AuthContext";
 
 interface TweetsApiContextType {
+  followUser: (id: string) => Promise<any>;
+  unFollowUser: (id: string) => Promise<any>;
+  getUserProfile: (id: string) => Promise<any>;
   reportTweet: (id: string) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
   likeTweet: (id: string) => Promise<any>;
@@ -29,6 +32,9 @@ interface TweetsApiContextType {
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
+  followUser: async () => {},
+  unFollowUser: async () => {},
+  getUserProfile: async () => {},
   reportTweet: async () => {},
   deleteTweet: async () => {},
   likeTweet: async () => {},
@@ -44,6 +50,89 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
+
+  const followUser = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${id}/follow`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error following user");
+    }
+
+    const body = await res.json();
+    console.log("api response for following user:", body);
+    return body;
+  };
+
+  const unFollowUser = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${id}/follow`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error unfollowing user");
+    }
+
+    const body = await res.json();
+    console.log("api response for unfollowing user:", body);
+    return body;
+  };
+
+  const getUserProfile = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${id}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching user profile");
+    }
+
+    const body = await res.json();
+    console.log("getUserProfile body:", body);
+    return body;
+  };
 
   const reportTweet = async (id: string) => {
     if (!authToken) {
@@ -365,6 +454,9 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   return (
     <TweetsApiContext.Provider
       value={{
+        followUser,
+        unFollowUser,
+        getUserProfile,
         reportTweet,
         deleteTweet,
         likeTweet,

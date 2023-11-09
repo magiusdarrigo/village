@@ -84,12 +84,8 @@ function RootLayoutNav() {
                     options={{ headerShown: false }}
                   />
                   <Stack.Screen
-                    name="modal"
-                    options={{ presentation: "modal", title: "You" }}
-                  />
-                  <Stack.Screen
                     name="profile/[id]"
-                    options={{ presentation: "modal", title: "User" }}
+                    options={{ presentation: "modal" }}
                   />
                   <Stack.Screen name="tweet/[id]" options={{ title: "Post" }} />
                   <Stack.Screen
