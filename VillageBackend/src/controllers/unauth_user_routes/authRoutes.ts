@@ -18,6 +18,7 @@ router.post("/login", async (req, res) => {
 
   // Generate OTP (6-digit code)
   const phoneToken = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log("phoneToken", phoneToken);
   const expiration = new Date(
     new Date().getTime() + 1000 * 60 * PHONE_TOKEN_EXPIRY_MINUTES
   ); // 2 minutes
@@ -86,25 +87,26 @@ router.post("/authenticate", async (req, res) => {
       },
     });
 
-    if (!dbPhoneToken || !dbPhoneToken.valid) {
-      console.log("Invalid OTP");
-      return res.status(401).send("Invalid OTP.");
-    }
+    // TODO: once i get twilio working, uncomment this
+    // if (!dbPhoneToken || !dbPhoneToken.valid) {
+    //   console.log("Invalid OTP");
+    //   return res.status(401).send("Invalid OTP.");
+    // }
 
-    if (dbPhoneToken.expiration && dbPhoneToken.expiration < new Date()) {
-      console.log("OTP expired");
-      return res.status(401).send("OTP expired.");
-    }
+    // if (dbPhoneToken.expiration && dbPhoneToken.expiration < new Date()) {
+    //   console.log("OTP expired");
+    //   return res.status(401).send("OTP expired.");
+    // }
 
-    if (dbPhoneToken?.user?.phone_number !== phoneNumber) {
-      console.log("Phone number mismatch");
-      return res.status(401);
-    }
+    // if (dbPhoneToken?.user?.phone_number !== phoneNumber) {
+    //   console.log("Phone number mismatch");
+    //   return res.status(401);
+    // }
 
     // invalidate phone token
     const invalidToken = await prisma.tokens.update({
       where: {
-        id: dbPhoneToken.id,
+        id: dbPhoneToken?.id,
       },
       data: {
         valid: false,

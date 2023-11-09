@@ -44,7 +44,8 @@ const Tweet = ({ tweet }: TweetProps) => {
   const segments = useSegments();
   const { user } = useUser();
   if (!user) {
-    return Alert.alert("Something went wrong. Try again.");
+    Alert.alert("Something went wrong. Try again.");
+    return null;
   }
 
   // like a tweet
