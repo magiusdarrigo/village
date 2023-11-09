@@ -264,6 +264,11 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       return {};
     }
 
+    if (res.status === 400) {
+      const body = await res.json();
+      throw new Error(JSON.stringify({ status: res.status, body }));
+    }
+
     if (res.status !== 200) {
       throw new Error("Error Uploading profile");
     }

@@ -4,6 +4,7 @@ import { Picker } from "@react-native-picker/picker";
 import { router, useGlobalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../lib/api/tweets";
+import Colors from "../../constants/Colors";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
@@ -60,7 +61,7 @@ const PickNeighborhood = () => {
     }
   };
 
-  const onContinue = () => {
+  const onEnter = () => {
     try {
       if (user === null) {
         throw new Error("User is null");
@@ -78,63 +79,77 @@ const PickNeighborhood = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <>
       {neighborhoodName ? (
-        <View>
-          <Text style={styles.welcomeText}>
-            Welcome to {neighborhoodName} on Village.
-          </Text>
-          <Pressable style={styles.button} onPress={onContinue}>
-            <Text style={styles.buttonText}>Continue</Text>
-          </Pressable>
+        <View style={styles.container}>
+          <View style={{ flex: 1, justifyContent: "space-between" }}>
+            <Text style={styles.welcomeLabel}>
+              Welcome to {neighborhoodName} on Village.
+            </Text>
+            <Pressable style={styles.button} onPress={onEnter}>
+              <Text style={styles.buttonText}>Enter</Text>
+            </Pressable>
+          </View>
         </View>
       ) : (
-        <View>
-          <Text style={styles.questionText}>
-            What neighborhood is your building in?
-          </Text>
-          <Picker
-            selectedValue={selectedNeighborhood}
-            onValueChange={(itemValue: string) =>
-              setSelectedNeighborhood(itemValue)
-            }
-            style={styles.picker}
-          >
-            {neighborhoods.map((neighborhood) => (
-              <Picker.Item
-                key={neighborhood}
-                label={neighborhood}
-                value={neighborhood}
-              />
-            ))}
-          </Picker>
-          <Pressable style={styles.button} onPress={onSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </Pressable>
+        <View style={styles.container}>
+          <View style={{ flex: 1, justifyContent: "space-between" }}>
+            <Text style={styles.label}>
+              What neighborhood is your building in?
+            </Text>
+            <Picker
+              selectedValue={selectedNeighborhood}
+              onValueChange={(itemValue: string) =>
+                setSelectedNeighborhood(itemValue)
+              }
+            >
+              {neighborhoods.map((neighborhood) => (
+                <Picker.Item
+                  key={neighborhood}
+                  label={neighborhood}
+                  value={neighborhood}
+                />
+              ))}
+            </Picker>
+            <Pressable style={styles.button} onPress={onSubmit}>
+              <Text style={styles.buttonText}>Submit</Text>
+            </Pressable>
+          </View>
         </View>
       )}
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: Colors.light.tertiary,
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingTop: 24, // for top space
+    paddingHorizontal: 24,
   },
-  welcomeText: {
-    fontSize: 24,
+  welcomeLabel: {
+    marginTop: 36, // space above the label
+    fontSize: 36,
+    marginBottom: 8, // space below the label
+    color: "black",
     fontWeight: "bold",
+    alignSelf: "flex-start", // align to top-left
   },
-  questionText: {
+  label: {
+    marginTop: 36, // space above the label
+    fontSize: 24,
+    marginBottom: 8, // space below the label
+    color: "black",
+    fontWeight: "bold",
+    alignSelf: "flex-start", // align to top-left
+  },
+  input: {
+    borderColor: "transparent", // no border
+    borderWidth: 0,
+    paddingTop: 10,
     fontSize: 20,
-    fontWeight: "normal",
-    marginBottom: 20,
-  },
-  picker: {
-    width: 300,
-    height: 44,
+    color: "black",
   },
   button: {
     backgroundColor: "#050A12",
@@ -142,7 +157,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    marginVertical: 5,
+    marginTop: 5, // space above the button
+    marginBottom: 50, // space below the button
   },
   buttonText: {
     color: "white",

@@ -3,6 +3,7 @@ import prisma from "../../clients/prismaClient";
 import { getPostsByUserQuery } from "../../sql_queries/posts";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
+import { usernameAllowed } from "../../utils/badwords";
 
 const router = Router();
 
@@ -13,6 +14,12 @@ router.put("/", async (req, res) => {
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
   const { username, profileImage, buildingID, neighborhoodID } = req.body;
+  // ensure username is not racist
+  if (!usernameAllowed(username)) {
+    return res.status(400).json({
+      error: "That username is not allowed.",
+    });
+  }
   try {
     const updatedUser = await prisma.users.update({
       where: {
@@ -26,8 +33,14 @@ router.put("/", async (req, res) => {
       },
     });
     res.json(updatedUser);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
+    // if the username is already taken, return a 400
+    if (error.code === "P2002") {
+      return res.status(400).json({
+        error: "That username is already taken.",
+      });
+    }
     res.status(500).json({
       error: "error updating user",
     });
@@ -58,6 +71,7 @@ router.put("/", async (req, res) => {
 
 // follow a user
 router.post("/:id/follow", async (req, res) => {
+  console.log("follow user called");
   const { id } = req.params;
   // the id of the user who is following
   const currentUser = (req as unknown as AuthenticatedRequest).user;
@@ -95,6 +109,7 @@ router.post("/:id/follow", async (req, res) => {
 
 // unfollow a user
 router.delete("/:id/follow", async (req, res) => {
+  console.log("unfollow user called");
   const { id } = req.params;
   // the id of the user who is unfollowing
   const currentUser = (req as unknown as AuthenticatedRequest).user;
@@ -133,6 +148,7 @@ router.delete("/:id/follow", async (req, res) => {
 // get one user
 // only select the fields we need: id, username, image, is_verified, followers_count, following_count
 router.get("/:id", async (req, res) => {
+  console.log("get one user called");
   const { id } = req.params;
   try {
     const user = await prisma.users.findUnique({
@@ -159,6 +175,7 @@ router.get("/:id", async (req, res) => {
 
 // get the current user
 router.get("/", async (req, res) => {
+  console.log("get current user called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
     const user = await prisma.users.findUnique({

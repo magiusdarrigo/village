@@ -5,14 +5,46 @@ import {
   Pressable,
   StyleSheet,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { login } from "../../lib/api/auth";
 import { useUser } from "../../context/UserContext";
+import Colors from "../../constants/Colors";
+
+const formatPhoneNumber = (input: string, currentPhoneNumber: string) => {
+  // Remove all non-digit characters from the phone number
+  let cleaned = input.replace(/\D/g, "");
+
+  // Start with the cleaned input if it's shorter than the current number, likely a delete action
+  if (input.length < currentPhoneNumber.length) {
+    return cleaned;
+  }
+
+  // Begin with the formatted number as the cleaned input
+  let formattedNumber = cleaned;
+
+  // Only if we have enough digits, start to format
+  if (cleaned.length >= 6) {
+    // We have enough for the first two groups
+    formattedNumber = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}`;
+    // If we have more than 6 digits, add the last part
+    if (cleaned.length > 6) {
+      formattedNumber += `-${cleaned.slice(6, 10)}`;
+    }
+  } else if (cleaned.length >= 3) {
+    // Only enough for the area code part
+    formattedNumber = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+  }
+
+  // If not enough for any formatting, just return the cleaned input
+  return formattedNumber;
+};
 
 const SignIn = () => {
-  const [phoneNumber, setphoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const router = useRouter();
 
   const { updateUser } = useUser();
@@ -22,53 +54,60 @@ const SignIn = () => {
       const user = await login({ phoneNumber });
       updateUser(user);
       router.push({ pathname: "/authenticate", params: { phoneNumber } });
-    } catch (e: any) {
+    } catch (e) {
       Alert.alert("We had an issue signing you in. Try again.");
     }
   };
 
+  const handlePhoneChange = (input: string) => {
+    const formattedInput = formatPhoneNumber(input, phoneNumber);
+    setPhoneNumber(formattedInput); // Assuming setPhoneNumber is your state setter
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Sign in or create an account</Text>
-
-      <TextInput
-        placeholder="+1 (212) 522-7024"
-        value={phoneNumber}
-        onChangeText={setphoneNumber}
-        style={styles.input}
-        inputMode="tel"
-      />
-
-      <Pressable style={styles.button} onPress={onSignIn}>
-        <Text style={styles.buttonText}>Sign in</Text>
-      </Pressable>
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <Text style={styles.label}>Enter your phone number.</Text>
+      <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <TextInput
+          placeholder=""
+          value={phoneNumber}
+          onChangeText={handlePhoneChange}
+          style={styles.input}
+          keyboardType="phone-pad"
+          autoFocus={true}
+        />
+        <Pressable style={styles.button} onPress={onSignIn}>
+          <Text style={styles.buttonText}>Get Code</Text>
+        </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: Colors.light.tertiary,
     flex: 1,
-    justifyContent: "center",
-    padding: 24,
+    paddingTop: 24, // for top space
+    paddingHorizontal: 24,
   },
   label: {
+    marginTop: 36, // space above the label
     fontSize: 24,
-    marginVertical: 5,
-    color: "gray",
-  },
-  error: {
-    marginVertical: 5,
-    color: "red",
+    marginBottom: 8, // space below the label
+    color: "black",
+    fontWeight: "bold",
+    alignSelf: "flex-start", // align to top-left
   },
   input: {
-    borderColor: "gray",
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: 10,
+    borderColor: "transparent", // no border
+    borderWidth: 0,
+    paddingTop: 10,
     fontSize: 20,
-    marginVertical: 5,
-    borderRadius: 10,
+    color: "black",
   },
   button: {
     backgroundColor: "#050A12",
@@ -76,7 +115,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    marginVertical: 5,
+    marginTop: 5, // space above the button
+    marginBottom: 50, // space below the button
   },
   buttonText: {
     color: "white",
