@@ -7,6 +7,7 @@ import {
   Pressable,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
@@ -52,12 +53,23 @@ const NewTweet = () => {
     },
   });
 
+  const getCharCount = (tweet: string) => {
+    return tweet.length;
+  };
+
   const onTweetPress = async () => {
     try {
+      const characterCount = getCharCount(text);
+      if (characterCount < 1 || characterCount > 400) {
+        Alert.alert(
+          `Your post is ${characterCount} characters long. It needs to be between 1 and 400 characters.`
+        );
+        return;
+      }
       await mutateAsync({
         neighborhoodID: 1,
         textContent: text,
-        imageURL: "https://picsum.photos/400/800",
+        // imageURL: "https://picsum.photos/400/800",
       });
       setText("");
       router.back();

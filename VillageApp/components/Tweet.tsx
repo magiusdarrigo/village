@@ -289,9 +289,11 @@ const Tweet = ({ tweet }: TweetProps) => {
             )}
 
             <View style={styles.footer}>
-              <Pressable style={styles.iconWrapper}>
-                <EvilIcon icon="comment" text={tweet.comments_count} />
-              </Pressable>
+              <Link href={`/tweet/${tweet.id}`} asChild>
+                <Pressable style={styles.iconWrapper}>
+                  <EvilIcon icon="comment" text={tweet.comments_count} />
+                </Pressable>
+              </Link>
               <Pressable
                 style={styles.iconWrapper}
                 onPress={() => handleToggleLike(tweet.id)}
