@@ -31,6 +31,7 @@ const ProfileScreen = () => {
   });
 
   if (error) {
+    console.log(error);
     Alert.alert("We had an issue getting this profile.");
     return null;
   }

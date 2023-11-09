@@ -4,6 +4,7 @@ import { getPostsByUserQuery } from "../../sql_queries/posts";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
 import { usernameAllowed } from "../../utils/badwords";
+import { getUserProfileQuery } from "../../sql_queries/users";
 
 const router = Router();
 
@@ -97,13 +98,13 @@ router.post("/:id/follow", async (req, res) => {
       data: { followers_count: { increment: 1 } },
     });
 
-    await prisma.$transaction([
+    const [userFollowing, _, user] = await prisma.$transaction([
       createFollowing,
       incrementFollowingCount,
       incrementFollowersCount,
     ]);
 
-    res.status(200).json({ message: "Successfully followed the user." });
+    res.status(200).json(user);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error following the user." });
@@ -135,13 +136,13 @@ router.delete("/:id/follow", async (req, res) => {
       data: { followers_count: { decrement: 1 } },
     });
 
-    await prisma.$transaction([
+    const [userFollowing, _, user] = await prisma.$transaction([
       deleteFollowing,
       decrementFollowingCount,
       decrementFollowersCount,
     ]);
 
-    res.status(200).json({ message: "Successfully unfollowed the user." });
+    res.status(200).json(user);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error unfollowing the user." });
@@ -149,25 +150,18 @@ router.delete("/:id/follow", async (req, res) => {
 });
 
 // get one user
-// only select the fields we need: id, username, image, is_verified, followers_count, following_count
 router.get("/:id", async (req, res) => {
-  console.log("get one user called");
   const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    const user = await prisma.users.findUnique({
-      where: {
-        id: Number(id),
-      },
-      select: {
-        id: true,
-        username: true,
-        image: true,
-        is_verified: true,
-        followers_count: true,
-        following_count: true,
-      },
-    });
-    res.json(user);
+    const getUserQuery = getUserProfileQuery(currentUser.id, Number(id));
+    const user = (await prisma.$queryRaw(getUserQuery)) as any[];
+
+    if (user.length !== 1) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    res.json(user[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({

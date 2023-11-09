@@ -86,6 +86,7 @@ const Tweet = ({ tweet }: TweetProps) => {
         });
       },
       onError: (error) => {
+        console.log(error);
         Alert.alert("We couldn't like this post. Try again.");
       },
     }
@@ -129,6 +130,7 @@ const Tweet = ({ tweet }: TweetProps) => {
         });
       },
       onError: (error) => {
+        console.log(error);
         Alert.alert("We couldn't like this post. Try again.");
       },
     }
@@ -163,6 +165,7 @@ const Tweet = ({ tweet }: TweetProps) => {
       }
     },
     onError: (error) => {
+      console.log(error);
       Alert.alert("We couldn't delete this post. Try again.");
     },
   });

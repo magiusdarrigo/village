@@ -23,6 +23,7 @@ export type User = {
   tags?: any;
   is_verified?: boolean;
   image?: string;
+  followed_by_user?: boolean;
 };
 
 interface UserContextType {
