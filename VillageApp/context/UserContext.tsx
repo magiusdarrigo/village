@@ -5,7 +5,7 @@ import React, {
   PropsWithChildren,
 } from "react";
 
-type User = {
+export type User = {
   neighborhood_id?: number;
   neighborhood?: {
     name: string;
@@ -16,12 +16,12 @@ type User = {
   building_id?: number;
   id: number;
   username: string;
-  created_at: string;
-  folowers_count: number;
-  following_count: number;
-  phone_number: string;
+  created_at?: string;
+  followers_count?: number;
+  following_count?: number;
+  phone_number?: string;
   tags?: any;
-  is_verified: boolean;
+  is_verified?: boolean;
   image?: string;
 };
 

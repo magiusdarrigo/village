@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { User } from "../types";
+import { User } from "../context/UserContext";
 
 type ProfileProps = {
   user: User;
@@ -8,42 +8,28 @@ type ProfileProps = {
 
 const ModalScreen = ({ user }: ProfileProps) => {
   // Replace with your own image URL and user data
-  const userProfile = {
-    photo: "https://via.placeholder.com/150",
-    username: "Username",
-    following: 120,
-    followers: 200,
-    tweets: [
-      { id: "t1", content: "First tweet" },
-      { id: "t2", content: "Second tweet" },
-      // ... more tweets
-    ],
-  };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image
-          source={{ uri: userProfile.photo }}
-          style={styles.profilePhoto}
-        />
-        <Text style={styles.username}>@{userProfile.username}</Text>
+        <View style={[styles.profilePhoto, { backgroundColor: user.image }]} />
+        <Text style={styles.username}>@{user.username}</Text>
         <View style={styles.countContainer}>
           <Text style={styles.countText}>
-            Following: {userProfile.following}
+            Following: {user.following_count ?? ""}
           </Text>
           <Text style={styles.countText}>
-            Followers: {userProfile.followers}
+            Followers: {user.followers_count ?? ""}
           </Text>
         </View>
       </View>
-      <View style={styles.tweetsContainer}>
+      {/* <View style={styles.tweetsContainer}>
         {userProfile.tweets.map((tweet) => (
           <View key={tweet.id} style={styles.tweet}>
             <Text>{tweet.content}</Text>
           </View>
         ))}
-      </View>
+      </View> */}
     </ScrollView>
   );
 };

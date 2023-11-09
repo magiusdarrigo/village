@@ -230,7 +230,17 @@ const Tweet = ({ tweet }: TweetProps) => {
           flexDirection: "column",
         }}
       >
-        <Link href={`/profile/${tweet.user_id}`} asChild>
+        <Link
+          href={{
+            pathname: `/profile/${tweet.user_id}`,
+            params: {
+              userID: tweet.user_id,
+              username: tweet.username,
+              image: tweet.profile_image ?? "",
+            },
+          }}
+          asChild
+        >
           <Pressable
             style={{
               paddingTop: 10,
