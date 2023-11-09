@@ -237,9 +237,12 @@ const Tweet = ({ tweet }: TweetProps) => {
               alignItems: "flex-end",
             }}
           >
-            <Image
-              source={{ uri: tweet.profile_image }}
-              style={styles.userImage}
+            <View
+              // source={{ uri: tweet.profile_image }}
+              style={[
+                styles.userImage,
+                { backgroundColor: tweet.profile_image },
+              ]}
             />
           </Pressable>
         </Link>

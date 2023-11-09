@@ -61,16 +61,23 @@ const PickNeighborhood = () => {
     }
   };
 
-  const onEnter = () => {
+  const onEnter = async () => {
     try {
       if (user === null) {
         throw new Error("User is null");
       }
-      updateUser({
-        ...user,
-        neighborhood_id: Number(neighborhoodID),
-        building_id: Number(buildingID),
+      // validate that neighborhoodID and buildingID are strings
+      if (typeof neighborhoodID !== "string") {
+        throw new Error("Neighborhood ID is not a string");
+      }
+      if (typeof buildingID !== "string") {
+        throw new Error("Building ID is not a string");
+      }
+      const updatedUser = await updateUserAttributes({
+        neighborhoodID: neighborhoodID,
+        buildingID: buildingID,
       });
+      updateUser(updatedUser);
       router.replace("/");
     } catch (error) {
       console.log(error);

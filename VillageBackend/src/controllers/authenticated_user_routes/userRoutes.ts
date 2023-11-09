@@ -13,13 +13,16 @@ router.put("/", async (req, res) => {
   // we won't use the request parameter for the user id. We will get the user id from the token
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
-  const { username, profileImage, buildingID, neighborhoodID } = req.body;
+  let { username, profileImage, buildingID, neighborhoodID } = req.body;
   // ensure username is not racist
-  if (!usernameAllowed(username)) {
+  if (username && !usernameAllowed(username)) {
     return res.status(400).json({
       error: "That username is not allowed.",
     });
   }
+  // change buildingID and neighborhoodID to numbers
+  buildingID = buildingID ? Number(buildingID) : null;
+  neighborhoodID = neighborhoodID ? Number(neighborhoodID) : null;
   try {
     const updatedUser = await prisma.users.update({
       where: {

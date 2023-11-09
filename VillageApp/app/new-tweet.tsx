@@ -13,6 +13,7 @@ import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../lib/api/tweets";
 import { useUser } from "../context/UserContext";
+import Colors from "../constants/Colors";
 
 const NewTweet = () => {
   const [text, setText] = useState("");
@@ -78,7 +79,7 @@ const NewTweet = () => {
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
-          <Image source={{ uri: user?.image }} style={styles.image} />
+          <View style={[styles.image, { backgroundColor: user?.image }]} />
           <TextInput
             value={text}
             onChangeText={(value) => setText(value)}
@@ -114,14 +115,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    backgroundColor: "black",
+    backgroundColor: Colors.light.tertiary,
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
   },
   buttonText: {
     fontWeight: "600",
-    color: "white",
+    color: "black",
     fontSize: 16,
   },
   inputContainer: {
