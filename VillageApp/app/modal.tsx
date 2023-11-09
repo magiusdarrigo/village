@@ -86,10 +86,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
             Followers: {user.followers_count ?? ""}
           </Text>
         </View>
-        {currentUser?.id === user.id ? // <Pressable
-        //   style={styles.followButton}
-        //   onPress={() => console.log("edit profile")}
-        // >
+        {currentUser?.id === user.id ? // > //   onPress={() => console.log("edit profile")} //   style={styles.followButton} // <Pressable
         //   <Text style={styles.followButtonText}>Edit Profile</Text>
         // </Pressable>
         null : (
@@ -144,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
-    borderColor: "grey",
+    borderColor: "lightgrey",
     borderWidth: 1,
     width: 105,
     height: 32,
