@@ -12,6 +12,7 @@ import { User } from "../context/UserContext";
 import Colors from "../constants/Colors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../lib/api/tweets";
+import { useUser } from "../context/UserContext";
 
 type ProfileProps = {
   user: User;
@@ -22,6 +23,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
   console.log("user", user);
   const queryClient = useQueryClient();
   const { followUser, unFollowUser } = useTweetsApi();
+  const { user: currentUser } = useUser();
 
   const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
     followUser,
@@ -84,20 +86,28 @@ const ModalScreen = ({ user }: ProfileProps) => {
             Followers: {user.followers_count ?? ""}
           </Text>
         </View>
-        <View style={styles.followButtonContainer}>
-          {user.followed_by_user ? (
-            <Pressable
-              style={styles.unfollowButton}
-              onPress={handleUnfollowUser}
-            >
-              <Text style={styles.unfollowButtonText}>Following</Text>
-            </Pressable>
-          ) : (
-            <Pressable style={styles.followButton} onPress={handleFollowUser}>
-              <Text style={styles.followButtonText}>Follow</Text>
-            </Pressable>
-          )}
-        </View>
+        {currentUser?.id === user.id ? // <Pressable
+        //   style={styles.followButton}
+        //   onPress={() => console.log("edit profile")}
+        // >
+        //   <Text style={styles.followButtonText}>Edit Profile</Text>
+        // </Pressable>
+        null : (
+          <View style={styles.followButtonContainer}>
+            {user.followed_by_user ? (
+              <Pressable
+                style={styles.unfollowButton}
+                onPress={handleUnfollowUser}
+              >
+                <Text style={styles.unfollowButtonText}>Following</Text>
+              </Pressable>
+            ) : (
+              <Pressable style={styles.followButton} onPress={handleFollowUser}>
+                <Text style={styles.followButtonText}>Follow</Text>
+              </Pressable>
+            )}
+          </View>
+        )}
       </View>
       {/* <View style={styles.tweetsContainer}>
         {userProfile.tweets.map((tweet) => (
@@ -119,24 +129,32 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
+    width: 105,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
   },
   followButtonText: {
     fontWeight: "600",
     color: "black",
-    fontSize: 16,
+    fontSize: 14,
   },
   unfollowButton: {
     backgroundColor: "transparent",
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
-    borderColor: "black",
+    borderColor: "grey",
     borderWidth: 1,
+    width: 105,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
   },
   unfollowButtonText: {
     fontWeight: "600",
     color: "black",
-    fontSize: 16,
+    fontSize: 14,
   },
   container: {
     flex: 1,
