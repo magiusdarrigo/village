@@ -1,4 +1,4 @@
-import { ActivityIndicator, Text } from "react-native";
+import { ActivityIndicator, Alert, Text } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useTweetsApi } from "../../lib/api/tweets";
 import Tweet from "../../components/Tweet";
@@ -18,7 +18,9 @@ const TweetScreen = () => {
   }
 
   if (error) {
-    return <Text>Post couldn't be found!</Text>;
+    return Alert.alert(
+      "We had an issue getting this post. It might've been deleted."
+    );
   }
 
   return <Tweet tweet={data} />;
