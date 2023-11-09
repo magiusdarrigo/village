@@ -1,6 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Pressable, useColorScheme } from "react-native";
+import { useUser } from "../../context/UserContext";
 
 import Colors from "../../constants/Colors";
 
@@ -16,6 +17,7 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { user } = useUser();
 
   return (
     <Tabs
@@ -29,7 +31,17 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerRight: () => (
-            <Link href="/profile/you" asChild>
+            <Link
+              href={{
+                pathname: `/profile/you`,
+                params: {
+                  userID: user?.id ?? -1,
+                  username: user?.username ?? "",
+                  image: user?.image ?? "",
+                },
+              }}
+              asChild
+            >
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
