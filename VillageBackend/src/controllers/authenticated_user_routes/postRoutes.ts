@@ -3,7 +3,10 @@ import prisma from "../../clients/prismaClient";
 import { getTop10CommentsFromPostQuery } from "../../sql_queries/comments";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
-import { getSinglePostQuery, createPostQuery } from "../../sql_queries/posts";
+import {
+  getSinglePostQuery,
+  createPostOnlyTextQuery,
+} from "../../sql_queries/posts";
 
 const router = Router();
 
@@ -85,11 +88,10 @@ router.post("/", async (req, res) => {
   const { neighborhoodID, textContent, imageURL } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    const newPostQuery = createPostQuery(
+    const newPostQuery = createPostOnlyTextQuery(
       currentUser.id,
       neighborhoodID,
-      textContent,
-      imageURL
+      textContent
     );
     const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
 

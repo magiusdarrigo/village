@@ -35,6 +35,26 @@ router.put("/", async (req, res) => {
         building_id: buildingID,
         neighborhood_id: neighborhoodID,
       },
+      select: {
+        id: true,
+        username: true,
+        image: true,
+        is_verified: true,
+        followers_count: true,
+        following_count: true,
+        neighborhood_id: true,
+        building_id: true,
+        neighborhood: {
+          select: {
+            name: true,
+          },
+        },
+        building: {
+          select: {
+            address: true,
+          },
+        },
+      },
     });
     res.json(updatedUser);
   } catch (error: any) {

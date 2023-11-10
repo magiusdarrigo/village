@@ -21,12 +21,9 @@ const NewTweet = () => {
   const router = useRouter();
   const { createTweet } = useTweetsApi();
   const { user } = useUser();
-
-  console.log("user", user);
-
   const queryClient = useQueryClient();
 
-  const { isLoading, isError, mutateAsync } = useMutation({
+  const { isLoading, mutateAsync } = useMutation({
     mutationFn: createTweet,
     onSuccess: (newData) => {
       queryClient.setQueryData(["tweets"], (old: any) => {
@@ -50,6 +47,10 @@ const NewTweet = () => {
           ],
         };
       });
+    },
+    onError: (error) => {
+      console.log(error);
+      Alert.alert("We had an issue your post. Try again.");
     },
   });
 
@@ -101,9 +102,6 @@ const NewTweet = () => {
             style={{ flex: 1 }}
           />
         </View>
-        {isError && (
-          <Text style={{ color: "red" }}>Failed posting. Try again!</Text>
-        )}
       </View>
     </SafeAreaView>
   );

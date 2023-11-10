@@ -190,6 +190,7 @@ const CreateProfile = () => {
         <View>
           <Text style={styles.inputLabel}>Username</Text>
           <TextInput
+            autoCapitalize="none"
             placeholder="Username"
             value={username}
             onChangeText={setUsername}

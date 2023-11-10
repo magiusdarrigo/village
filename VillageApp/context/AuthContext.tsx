@@ -73,10 +73,10 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
         const getCurrentUser = async () => {
           try {
             const currentUser = await getUser();
-            console.log("currentUser", currentUser);
             // check if we have the necessary ids from the user
             if (currentUser?.neighborhood_id && currentUser?.building_id) {
               // Redirect to home if the user has both ids
+              console.log("currentUser set to:", currentUser);
               updateUser(currentUser);
               router.replace("/");
             } else {
