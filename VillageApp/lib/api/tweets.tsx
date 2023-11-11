@@ -264,8 +264,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    // console.log("listTweets body:", body);
-
     return body;
   };
 

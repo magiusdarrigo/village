@@ -43,9 +43,6 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
     // call version check here
     const checkVersion = async () => {
       const { mandatoryUpdate, latestVersion } = await checkAppVersion();

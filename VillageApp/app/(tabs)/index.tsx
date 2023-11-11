@@ -26,8 +26,8 @@ export default function FeedScreen() {
   } = useInfiniteQuery({
     queryKey: ["tweets"],
     queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
-    getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
-    getPreviousPageParam: (firstPage, allPages) => firstPage.prevCursor,
+    getNextPageParam: (lastPage, _) => lastPage.nextCursor,
+    getPreviousPageParam: (firstPage, _) => firstPage.prevCursor,
   });
 
   const handleLoadMore = () => {
@@ -46,6 +46,7 @@ export default function FeedScreen() {
   // Create a new Set to track unique tweet IDs
   const uniqueIds = new Set();
   const uniqueItems = items.filter((tweet) => {
+    if (!tweet) return false;
     const isDuplicate = uniqueIds.has(tweet.id);
 
     // Add the ID to the Set if it's not already there

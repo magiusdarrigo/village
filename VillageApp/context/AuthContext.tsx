@@ -1,4 +1,4 @@
-import { useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments, SplashScreen } from "expo-router";
 import {
   PropsWithChildren,
   createContext,
@@ -22,7 +22,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const { user, updateUser } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
-  // const [authTokenLoaded, setAuthTokenLoaded] = useState<boolean>(false);
   const segments = useSegments();
   const router = useRouter();
 
@@ -54,8 +53,6 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     console.log("authToken", authToken);
     console.log("segments", segments);
-    // Redirect to sign in if there is no auth token and user is not already on an auth-related route
-    // authTokenLoaded &&
     if (!authToken && segments[0] !== "(auth)") {
       router.replace("/signIn");
       return;
@@ -101,10 +98,17 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
       const res = await SecureStore.getItemAsync("authToken");
       if (res) {
         setAuthToken(res);
-        // setAuthTokenLoaded(true);
       }
     };
     loadAuthToken();
+  }, []);
+
+  // set a timeout to go off in 3 seconds
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 1000);
+    return () => clearTimeout(timeout);
   }, []);
 
   const updateAuthToken = async (newToken: string) => {
