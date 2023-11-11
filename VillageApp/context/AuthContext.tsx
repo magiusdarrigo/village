@@ -63,7 +63,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
       if (user?.neighborhood_id && user?.building_id) {
         // If the user has both ids, redirect to home if they're not already there
         if (segments[0] === "(auth)") {
-          router.replace("/");
+          router.replace("/(tabs)/chat");
         }
       } else {
         // If the user does not have both ids, fetch the user data
