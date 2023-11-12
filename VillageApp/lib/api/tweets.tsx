@@ -1,6 +1,7 @@
 import { PropsWithChildren, createContext, useContext } from "react";
 import { API_URL } from "./config";
 import { useAuth } from "../../context/AuthContext";
+import { useUser } from "../../context/UserContext";
 
 interface TweetsApiContextType {
   followUser: (id: string) => Promise<any>;
@@ -10,6 +11,11 @@ interface TweetsApiContextType {
   deleteTweet: (id: string) => Promise<any>;
   likeTweet: (id: string) => Promise<any>;
   unlikeTweet: (id: string) => Promise<any>;
+  listComments: (
+    postID: string,
+    lastLikesCount: string,
+    lastCommentID: string
+  ) => Promise<any>;
   listTweets: (page: number) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
@@ -39,6 +45,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   deleteTweet: async () => {},
   likeTweet: async () => {},
   unlikeTweet: async () => {},
+  listComments: async () => {},
   listTweets: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
@@ -50,6 +57,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
+  const { user } = useUser();
 
   const followUser = async (id: string) => {
     if (!authToken) {
@@ -239,11 +247,47 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const listComments = async (
+    postID: string,
+    lastLikesCount: string,
+    lastCommentID: string
+  ) => {
+    if (!authToken) {
+      return {};
+    }
+
+    console.log("listComments API params: ", {
+      lastLikesCount,
+      lastCommentID,
+    });
+
+    const url = `${API_URL}/v1/posts/${postID}/comments?lastLikesCount=${lastLikesCount}&lastCommentID=${lastCommentID}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error(`Error fetching comments for post ${postID}`);
+    }
+
+    const body = await res.json();
+    console.log("comments API body: ", body);
+    return body;
+  };
+
   const listTweets = async (page: number) => {
     if (!authToken) {
       return {};
     }
-    const url = `${API_URL}/v1/neighborhoods/1/posts?cursor=${page}`;
+    const url = `${API_URL}/v1/neighborhoods/${user?.neighborhood_id}/posts?cursor=${page}`;
 
     const res = await fetch(url, {
       headers: {
@@ -458,6 +502,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         deleteTweet,
         likeTweet,
         unlikeTweet,
+        listComments,
         listTweets,
         getTweet,
         createTweet,

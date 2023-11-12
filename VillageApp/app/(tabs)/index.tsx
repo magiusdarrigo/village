@@ -26,7 +26,7 @@ export default function FeedScreen() {
   } = useInfiniteQuery({
     queryKey: ["tweets"],
     queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
-    getNextPageParam: (lastPage, _) => lastPage.nextCursor,
+    getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     getPreviousPageParam: (firstPage, _) => firstPage.prevCursor,
   });
 

@@ -9,7 +9,7 @@ export const getTop10CommentsFromPostQuery = (
   return Prisma.sql`
   WITH TopComments AS (
     SELECT 
-        c.id AS comment_id,
+        c.id,
         c.post_id,
         c.user_id,
         c.text_content,
@@ -36,7 +36,7 @@ SELECT * FROM TopComments
 UNION ALL
 
 SELECT 
-    r.id AS comment_id,
+    r.id,
     r.post_id,
     r.user_id,
     r.text_content,
@@ -50,7 +50,7 @@ FROM
 LEFT JOIN
     comment_likes cl ON r.id = cl.comment_id AND cl.user_id = ${userID}
 WHERE 
-    r.parent_comment_id IN (SELECT comment_id FROM TopComments)
-ORDER BY likes_count DESC, comment_id DESC;
+    r.parent_comment_id IN (SELECT id FROM TopComments)
+ORDER BY likes_count DESC, id DESC;
 `;
 };

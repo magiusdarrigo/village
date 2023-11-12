@@ -24,11 +24,18 @@ async function main() {
     "Nolita",
     "SoHo",
     "Tribeca",
-    "Upper East Side",
     "Upper West Side",
     "West Village",
     "Williamsburg",
   ];
+
+  // enforce upper east side to be id 1
+  await prisma.neighborhoods.create({
+    data: {
+      name: "Upper East Side",
+    },
+  });
+
   const neighborhoodPromises = neighborhoods.map((neighborhood) => {
     return prisma.neighborhoods.create({
       data: {
@@ -97,6 +104,7 @@ async function main() {
           user_id: (index % 20) + 1,
           neighborhood_id: (index % 5) + 1,
           text_content: `post ${index}`,
+          comments_count: index === 0 ? 50 : 0,
         },
       });
     };
@@ -107,45 +115,44 @@ async function main() {
   }
 
   // TODO: comment count on posts have to be updated too if i want to use this seed.
-  // // seed the comments table with 50 comments (first 20 users comment on the first 5 posts)
-  // // so post id 1 will have 10 comments.
-  // const randomComments = Array.from({ length: 50 }).map((_, index) => {
-  //   return async () => {
-  //     await sleep(1); // Sleep for 1 ms
-  //     await prisma.comments.create({
-  //       data: {
-  //         user_id: (index % 20) + 1,
-  //         post_id: (index % 5) + 1,
-  //         text_content: `comment ${index}`,
-  //       },
-  //     });
-  //   };
-  // });
+  // seed the comments table with 50 comments (first 20 users comment on the first 5 posts)
+  // so post id 1 will have 10 comments.
+  const randomComments = Array.from({ length: 50 }).map((_, index) => {
+    return async () => {
+      await sleep(1); // Sleep for 1 ms
+      await prisma.comments.create({
+        data: {
+          user_id: (index % 20) + 1,
+          post_id: 0 + 1,
+          text_content: `comment ${index}`,
+        },
+      });
+    };
+  });
 
-  // for (const createComment of randomComments) {
-  //   await createComment();
-  // }
+  for (const createComment of randomComments) {
+    await createComment();
+  }
 
-  // TODO: comment count on posts have to be updated too if i want to use this seed.
-  // // seed the comments table with 51 replies (all on the comments of the first post, first 20 users reply to the first 5 comments)
-  // // so comment id 1 will have 11 replies, other comments will have 10 replies.
-  // const randomReplies = Array.from({ length: 51 }).map((_, index) => {
-  //   return async () => {
-  //     await sleep(1); // Sleep for 1 ms
-  //     await prisma.comments.create({
-  //       data: {
-  //         user_id: (index % 20) + 1,
-  //         post_id: 1,
-  //         parent_comment_id: (index % 5) + 1,
-  //         text_content: `reply ${index}`,
-  //       },
-  //     });
-  //   };
-  // });
+  // seed the comments table with 51 replies (all on the comments of the first post, first 20 users reply to the first 5 comments)
+  // so comment id 1 will have 11 replies, other comments will have 10 replies.
+  const randomReplies = Array.from({ length: 51 }).map((_, index) => {
+    return async () => {
+      await sleep(1); // Sleep for 1 ms
+      await prisma.comments.create({
+        data: {
+          user_id: (index % 20) + 1,
+          post_id: 1,
+          parent_comment_id: (index % 5) + 1,
+          text_content: `reply ${index}`,
+        },
+      });
+    };
+  });
 
-  //   for (const createReply of randomReplies) {
-  //     await createReply();
-  //   }
+  for (const createReply of randomReplies) {
+    await createReply();
+  }
 }
 
 main()
