@@ -7,6 +7,7 @@ import {
   getSinglePostQuery,
   createPostOnlyTextQuery,
 } from "../../sql_queries/posts";
+import { postTextContentAllowed } from "../../utils/badwords";
 
 const router = Router();
 
@@ -87,6 +88,13 @@ router.post("/", async (req, res) => {
   console.log("create post called");
   const { neighborhoodID, textContent, imageURL } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
+
+  if (textContent && !postTextContentAllowed(textContent)) {
+    return res
+      .status(400)
+      .json({ error: "That post's content is not allowed." });
+  }
+
   try {
     const newPostQuery = createPostOnlyTextQuery(
       currentUser.id,

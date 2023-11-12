@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prisma from "../../clients/prismaClient";
 import twilioClient from "../../clients/twilioClient";
+import streamChatClient from "../../clients/streamChatClient";
 
 const router = Router();
 const jwt = require("jsonwebtoken");
@@ -24,10 +25,8 @@ router.post("/login", async (req, res) => {
   ); // 2 minutes
 
   try {
-    // TODO: change this to be unique
-    const username =
-      Math.random().toString(36).substring(2, 5) +
-      Math.random().toString(36).substring(2, 12);
+    // create a random 10 character username
+    const username = Math.random().toString(36).substring(2, 15);
 
     const userWithToken = await prisma.tokens.create({
       data: {
@@ -53,12 +52,24 @@ router.post("/login", async (req, res) => {
 
     const user = userWithToken.user;
 
-    // Send OTP using Twilio
-    await twilioClient.messages.create({
-      body: `Your Village OTP is: ${phoneToken}`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: phoneNumber,
-    });
+    if (!user.chat_token) {
+      const chatToken = streamChatClient.createToken(user.id.toString());
+      await prisma.users.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          chat_token: chatToken,
+        },
+      });
+    }
+
+    // // Send OTP using Twilio
+    // await twilioClient.messages.create({
+    //   body: `Your Village OTP is: ${phoneToken}`,
+    //   from: process.env.TWILIO_PHONE_NUMBER,
+    //   to: phoneNumber,
+    // });
 
     res.send(user);
   } catch (error) {

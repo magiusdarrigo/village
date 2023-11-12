@@ -59,7 +59,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: "Chat",
+          title: user?.building?.address ?? "Chat",
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="comments" color={color} />
           ),

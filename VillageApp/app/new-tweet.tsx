@@ -48,7 +48,13 @@ const NewTweet = () => {
         };
       });
     },
-    onError: (error) => {
+    onError: async (error: any) => {
+      // convert error to json
+      const err = await error.json();
+      if (err?.status === 400) {
+        Alert.alert(err?.body?.error);
+        return;
+      }
       console.log(error);
       Alert.alert("We had an issue your post. Try again.");
     },

@@ -75,7 +75,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log("api response for following user:", body);
     return body;
   };
 
@@ -103,7 +102,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log("api response for unfollowing user:", body);
     return body;
   };
 
@@ -130,7 +128,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log("getUserProfile body:", body);
     return body;
   };
 
@@ -316,13 +313,16 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       return {};
     }
 
+    if (res.status === 400) {
+      const body = await res.json();
+      throw new Error(JSON.stringify({ status: res.status, body }));
+    }
+
     if (res.status !== 200) {
       throw new Error("Error creating post");
     }
 
     const body = await res.json();
-    console.log(body);
-
     return body;
   };
 
@@ -445,7 +445,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log(body);
     return body;
   };
 

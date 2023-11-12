@@ -93,8 +93,8 @@ const CreateProfile = () => {
     if (!username) {
       Alert.alert("Please enter a username.");
       return true;
-    } else if (username.length > 30) {
-      Alert.alert("Please enter a username less than 30 characters.");
+    } else if (username.length > 16) {
+      Alert.alert("Please enter a username no greater than 16 characters.");
       return true;
     } else if (username.includes(" ")) {
       Alert.alert("Please enter a username without spaces.");
