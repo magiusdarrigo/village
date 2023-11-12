@@ -22,9 +22,7 @@ const PickBuilding = () => {
 
   const onSubmit = async () => {
     try {
-      console.log("address", address);
       const building = await getBuilding(address);
-      console.log("building", building);
       const neighborhoodName = building?.neighborhood?.name;
       if (user === null) {
         throw new Error("User is null");
@@ -58,8 +56,6 @@ const PickBuilding = () => {
             rankby: "distance",
           }}
           onPress={(data, details = null) => {
-            // 'details' is provided when fetchDetails = true
-            console.log(data, details);
             setAddress(data.structured_formatting.main_text);
           }}
           query={{

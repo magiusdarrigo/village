@@ -78,6 +78,7 @@ const PickNeighborhood = () => {
         buildingID: buildingID,
       });
       updateUser(updatedUser);
+      // TODO: await for user to be added to building chat instance
       router.replace("/");
     } catch (error) {
       console.log(error);

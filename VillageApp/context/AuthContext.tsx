@@ -1,4 +1,4 @@
-import { useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments, SplashScreen } from "expo-router";
 import {
   PropsWithChildren,
   createContext,
@@ -22,7 +22,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const { user, updateUser } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
-  // const [authTokenLoaded, setAuthTokenLoaded] = useState<boolean>(false);
   const segments = useSegments();
   const router = useRouter();
 
@@ -54,8 +53,6 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     console.log("authToken", authToken);
     console.log("segments", segments);
-    // Redirect to sign in if there is no auth token and user is not already on an auth-related route
-    // authTokenLoaded &&
     if (!authToken && segments[0] !== "(auth)") {
       router.replace("/signIn");
       return;
@@ -66,6 +63,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
       if (user?.neighborhood_id && user?.building_id) {
         // If the user has both ids, redirect to home if they're not already there
         if (segments[0] === "(auth)") {
+          // router.replace("/(tabs)/chat");
           router.replace("/");
         }
       } else {
@@ -73,10 +71,10 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
         const getCurrentUser = async () => {
           try {
             const currentUser = await getUser();
-            console.log("currentUser", currentUser);
             // check if we have the necessary ids from the user
             if (currentUser?.neighborhood_id && currentUser?.building_id) {
               // Redirect to home if the user has both ids
+              console.log("currentUser set to:", currentUser);
               updateUser(currentUser);
               router.replace("/");
             } else {
@@ -101,10 +99,17 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
       const res = await SecureStore.getItemAsync("authToken");
       if (res) {
         setAuthToken(res);
-        // setAuthTokenLoaded(true);
       }
     };
     loadAuthToken();
+  }, []);
+
+  // set a timeout to go off in 3 seconds
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 1000);
+    return () => clearTimeout(timeout);
   }, []);
 
   const updateAuthToken = async (newToken: string) => {

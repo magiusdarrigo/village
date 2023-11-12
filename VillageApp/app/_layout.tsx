@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
@@ -43,9 +44,6 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
     // call version check here
     const checkVersion = async () => {
       const { mandatoryUpdate, latestVersion } = await checkAppVersion();

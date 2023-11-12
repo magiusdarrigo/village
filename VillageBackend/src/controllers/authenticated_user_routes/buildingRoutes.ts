@@ -1,9 +1,10 @@
 import { Router } from "express";
 import prisma from "../../clients/prismaClient";
+import streamChatClient from "../../clients/streamChatClient";
 
 const router = Router();
 
-// create building
+// create building and create building chat
 router.post("/", async (req, res) => {
   console.log("create building called");
   const { address, neighborhood } = req.body;
@@ -18,8 +19,24 @@ router.post("/", async (req, res) => {
         },
       },
     });
+    // create building chat
+    const channel = streamChatClient.channel(
+      "messaging",
+      String(newBuilding.id),
+      {
+        name: address,
+        created_by_id: "village-app",
+      }
+    );
+    await channel.create();
     res.json(newBuilding);
   } catch (error) {
+    // delete building if chat creation fails
+    await prisma.buildings.delete({
+      where: {
+        address,
+      },
+    });
     console.error(error);
     res.status(500).json({
       error: `error creating building with address ${address}`,
