@@ -20,6 +20,7 @@ export type User = {
   followers_count?: number;
   following_count?: number;
   phone_number?: string;
+  chat_token?: string;
   tags?: any;
   is_verified?: boolean;
   image?: string;

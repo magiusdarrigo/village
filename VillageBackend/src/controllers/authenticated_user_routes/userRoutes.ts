@@ -5,6 +5,7 @@ import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
 import { usernameAllowed } from "../../utils/badwords";
 import { getUserProfileQuery } from "../../sql_queries/users";
+import streamChatClient from "../../clients/streamChatClient";
 
 const router = Router();
 
@@ -35,7 +36,49 @@ router.put("/", async (req, res) => {
         building_id: buildingID,
         neighborhood_id: neighborhoodID,
       },
+      select: {
+        id: true,
+        username: true,
+        image: true,
+        is_verified: true,
+        followers_count: true,
+        following_count: true,
+        neighborhood_id: true,
+        building_id: true,
+        chat_token: true,
+        neighborhood: {
+          select: {
+            name: true,
+          },
+        },
+        building: {
+          select: {
+            address: true,
+          },
+        },
+      },
     });
+    // if buildingID was updated, add the user to the building chat
+    if (buildingID) {
+      const _id = String(buildingID);
+      const channels = await streamChatClient.queryChannels({
+        id: { $eq: _id },
+      });
+      const channel = channels[0];
+      // create user in stream chat
+      await streamChatClient.upsertUser({
+        id: updatedUser.id.toString(),
+        role: "user",
+        name: updatedUser.username,
+      });
+      await channel.addMembers([updatedUser.id.toString()]);
+      // send a message to the building chat that the user joined
+      await channel.sendMessage({
+        text: `${updatedUser.username} joined the building chat.`,
+        user_id: "village-app",
+      });
+      // TODO: remove user from old building chat
+    }
     res.json(updatedUser);
   } catch (error: any) {
     console.error(error);
@@ -188,6 +231,7 @@ router.get("/", async (req, res) => {
         following_count: true,
         neighborhood_id: true,
         building_id: true,
+        chat_token: true,
         neighborhood: {
           select: {
             name: true,

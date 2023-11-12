@@ -13,17 +13,18 @@ import Colors from "../constants/Colors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../lib/api/tweets";
 import { useUser } from "../context/UserContext";
+import { useAuth } from "../context/AuthContext";
+import { router } from "expo-router";
 
 type ProfileProps = {
   user: User;
 };
 
 const ModalScreen = ({ user }: ProfileProps) => {
-  // todo: delete below line
-  console.log("user", user);
   const queryClient = useQueryClient();
   const { followUser, unFollowUser } = useTweetsApi();
   const { user: currentUser } = useUser();
+  const { removeAuthToken } = useAuth();
 
   const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
     followUser,
@@ -73,6 +74,23 @@ const ModalScreen = ({ user }: ProfileProps) => {
     mutateUnfollowUser(String(user.id));
   };
 
+  const handleLogOut = () => {
+    // ask user if they're sure they want to log out
+    Alert.alert("Are you sure you want to log out?", "", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Log out",
+        onPress: () => {
+          removeAuthToken();
+          router.replace("/signIn");
+        },
+      },
+    ]);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
@@ -86,10 +104,11 @@ const ModalScreen = ({ user }: ProfileProps) => {
             Followers: {user.followers_count ?? ""}
           </Text>
         </View>
-        {currentUser?.id === user.id ? // > //   onPress={() => console.log("edit profile")} //   style={styles.followButton} // <Pressable
-        //   <Text style={styles.followButtonText}>Edit Profile</Text>
-        // </Pressable>
-        null : (
+        {currentUser?.id === user.id ? (
+          <Pressable style={styles.followButton} onPress={handleLogOut}>
+            <Text style={styles.followButtonText}>Log out</Text>
+          </Pressable>
+        ) : (
           <View style={styles.followButtonContainer}>
             {user.followed_by_user ? (
               <Pressable
