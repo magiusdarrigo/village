@@ -5,6 +5,7 @@ import { calculateHoursAgo } from "../lib/helpers";
 import { Entypo } from "@expo/vector-icons";
 import { EvilIcon, AntIcon } from "./Icons";
 import { useUser } from "../context/UserContext";
+import Colors from "../constants/Colors";
 
 type CommentProps = {
   comment: CommentType;
@@ -44,6 +45,8 @@ const handle3DotsPressed = (userID: number, comment: CommentType) => {
 const Comment = ({ comment }: CommentProps) => {
   const { user } = useUser();
 
+  const isReply = comment.parent_comment_id !== null;
+
   if (!user) {
     return null;
   }
@@ -63,12 +66,21 @@ const Comment = ({ comment }: CommentProps) => {
 
   return (
     <View
-      style={{
-        flexDirection: "row",
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderColor: "lightgrey",
-        backgroundColor: "white",
-      }}
+      style={
+        !isReply
+          ? {
+              flexDirection: "row",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderColor: "lightgrey",
+              backgroundColor: "white",
+            }
+          : {
+              flexDirection: "row",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderColor: "lightgrey",
+              backgroundColor: Colors.light.replyBackground,
+            }
+      }
     >
       <View
         style={{
@@ -96,7 +108,7 @@ const Comment = ({ comment }: CommentProps) => {
             <View
               // source={{ uri: tweet.profile_image }}
               style={[
-                styles.userImage,
+                !isReply ? styles.userImage : styles.replyUserImage,
                 // { backgroundColor: tweet.profile_image },
                 { backgroundColor: "black" },
               ]}
@@ -175,6 +187,11 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 50,
+  },
+  replyUserImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
   },
   username: {
     fontWeight: "bold",

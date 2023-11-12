@@ -255,12 +255,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     if (!authToken) {
       return {};
     }
-
-    console.log("listComments API params: ", {
-      lastLikesCount,
-      lastCommentID,
-    });
-
     const url = `${API_URL}/v1/posts/${postID}/comments?lastLikesCount=${lastLikesCount}&lastCommentID=${lastCommentID}`;
 
     const res = await fetch(url, {
@@ -279,7 +273,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log("comments API body: ", body);
     return body;
   };
 

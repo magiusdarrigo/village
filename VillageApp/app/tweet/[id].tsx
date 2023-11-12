@@ -1,9 +1,16 @@
-import { ActivityIndicator, Alert, View, FlatList } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  View,
+  FlatList,
+  KeyboardAvoidingView,
+} from "react-native";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useTweetsApi } from "../../lib/api/tweets";
 import Tweet from "../../components/Tweet";
 import { useGlobalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
+import { CommentType } from "../../types";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -58,8 +65,8 @@ const TweetScreen = () => {
   const items = commentsData?.pages.flatMap((page) => page.data) ?? [];
   // Create a new Set to track unique tweet IDs
   const uniqueIds = new Set();
-  const uniqueItems = items.filter((comment) => {
-    if (!comment) return false;
+  const uniqueItems = items.filter((comment: CommentType) => {
+    if (!comment || comment.parent_comment_id) return false;
     const isDuplicate = uniqueIds.has(comment.id);
 
     // Add the ID to the Set if it's not already there
@@ -72,8 +79,21 @@ const TweetScreen = () => {
     return false;
   });
 
+  // Add replies to the corresponding parent comment
+  items.forEach((comment: CommentType) => {
+    if (comment.parent_comment_id && uniqueIds.has(comment.parent_comment_id)) {
+      const parentIndex = uniqueItems.findIndex(
+        (c) => c.id === comment.parent_comment_id
+      );
+      if (parentIndex !== -1) {
+        // Insert the reply after the parent comment
+        uniqueItems.splice(parentIndex + 1, 0, comment);
+      }
+    }
+  });
+
   return (
-    <View>
+    <KeyboardAvoidingView>
       <Tweet tweet={data} />
       <FlatList
         data={uniqueItems}
@@ -84,7 +104,7 @@ const TweetScreen = () => {
           isFetchingNextPage ? () => <ActivityIndicator size="large" /> : null
         }
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
