@@ -4,6 +4,11 @@ import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
 
 interface TweetsApiContextType {
+  createComment: (data: {
+    postID: string;
+    textContent: string;
+    parentCommentID?: string;
+  }) => Promise<any>;
   followUser: (id: string) => Promise<any>;
   unFollowUser: (id: string) => Promise<any>;
   getUserProfile: (id: string) => Promise<any>;
@@ -38,6 +43,7 @@ interface TweetsApiContextType {
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
+  createComment: async () => {},
   followUser: async () => {},
   unFollowUser: async () => {},
   getUserProfile: async () => {},
@@ -58,6 +64,45 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   const { authToken, removeAuthToken } = useAuth();
   const { user } = useUser();
+
+  const createComment = async (data: {
+    postID: string;
+    textContent: string;
+    parentCommentID?: string;
+  }) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/comments`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-type": "Application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status === 400) {
+      const body = await res.json();
+      throw new Error(JSON.stringify({ status: res.status, body }));
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error creating comment");
+    }
+
+    const body = await res.json();
+    console.log("createComment body", body);
+    return body;
+  };
 
   const followUser = async (id: string) => {
     if (!authToken) {
@@ -488,6 +533,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   return (
     <TweetsApiContext.Provider
       value={{
+        createComment,
         followUser,
         unFollowUser,
         getUserProfile,

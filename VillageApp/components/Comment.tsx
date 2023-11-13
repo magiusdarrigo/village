@@ -109,8 +109,7 @@ const Comment = ({ comment }: CommentProps) => {
               // source={{ uri: tweet.profile_image }}
               style={[
                 !isReply ? styles.userImage : styles.replyUserImage,
-                // { backgroundColor: tweet.profile_image },
-                { backgroundColor: "black" },
+                { backgroundColor: comment.profile_image },
               ]}
             />
           </Pressable>

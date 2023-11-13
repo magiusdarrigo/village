@@ -267,14 +267,11 @@ const Tweet = ({ tweet }: TweetProps) => {
 
             <View style={styles.footer}>
               <Link href={`/tweet/${tweet.id}`} asChild>
-                <Pressable style={styles.iconWrapper}>
+                <Pressable>
                   <EvilIcon icon="comment" text={tweet.comments_count} />
                 </Pressable>
               </Link>
-              <Pressable
-                style={styles.iconWrapper}
-                onPress={() => handleToggleLike(tweet.id)}
-              >
+              <Pressable onPress={() => handleToggleLike(tweet.id)}>
                 {(tweet.liked_by_user && (
                   <AntIcon
                     icon="heart"
@@ -300,8 +297,8 @@ const Tweet = ({ tweet }: TweetProps) => {
 
 const styles = StyleSheet.create({
   imagePressable: {
-    padding: 5, // give some touchable space around the image
-    justifyContent: "center", // to vertically center the image if the main content is taller
+    padding: 5,
+    justifyContent: "center",
   },
   container: {
     flexDirection: "row",
@@ -337,7 +334,6 @@ const styles = StyleSheet.create({
     width: 120,
     justifyContent: "space-between",
   },
-  iconWrapper: {},
 });
 
 export default Tweet;

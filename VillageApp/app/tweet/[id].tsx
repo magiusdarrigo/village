@@ -5,13 +5,18 @@ import {
   FlatList,
   KeyboardAvoidingView,
   TextInput,
-  Button,
+  Text,
   StyleSheet,
   Platform,
   Pressable,
 } from "react-native";
 import { useState, useRef } from "react";
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Entypo } from "@expo/vector-icons";
 import { useTweetsApi } from "../../lib/api/tweets";
 import Tweet from "../../components/Tweet";
@@ -21,7 +26,8 @@ import { CommentType } from "../../types";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
-  const { getTweet, listComments } = useTweetsApi();
+  const { getTweet, listComments, createComment } = useTweetsApi();
+  const queryClient = useQueryClient();
 
   const [commentText, setCommentText] = useState("");
 
@@ -30,10 +36,21 @@ const TweetScreen = () => {
     queryFn: () => getTweet(id as string),
   });
 
-  const handleAddComment = () => {
-    // Logic to add a comment goes here
-    console.log(commentText);
-    setCommentText("");
+  const handleAddComment = async () => {
+    try {
+      console.log("handleAddComment");
+      const characterCount = commentText.length;
+      if (characterCount < 1 || characterCount > 200) {
+        Alert.alert(
+          `Your post is ${characterCount} characters long. It needs to be between 1 and 200 characters.`
+        );
+        return;
+      }
+      await mutateAsync({ postID: String(id), textContent: commentText });
+      setCommentText("");
+    } catch (e: any) {
+      console.log("Error creating tweet", e.message);
+    }
   };
 
   const useCommentsInfiniteQuery = (postId: string) => {
@@ -54,6 +71,45 @@ const TweetScreen = () => {
       },
     });
   };
+
+  const { isLoading: isLoadingCreateComment, mutateAsync } = useMutation({
+    mutationFn: createComment,
+    onSuccess: (newData) => {
+      queryClient.setQueryData(["comments", String(id)], (old: any) => {
+        if (!old) {
+          // If for some reason we don't have the pages, just return a new page structure
+          return {
+            pageParams: [],
+            pages: [
+              { data: [newData], lastLikesCount: null, lastCommentID: null },
+            ],
+          };
+        }
+
+        // Otherwise, add the new comment to the beginning of the first page
+        return {
+          ...old,
+          pages: [
+            {
+              ...old.pages[0],
+              data: [newData, ...old.pages[0].data],
+            },
+            ...old.pages.slice(1),
+          ],
+        };
+      });
+    },
+    onError: async (error: any) => {
+      // convert error to json
+      const err = await error.json();
+      if (err?.status === 400) {
+        Alert.alert(err?.body?.error);
+        return;
+      }
+      console.log(error);
+      Alert.alert("We had an issue publishing your comment. Try again.");
+    },
+  });
 
   const {
     data: commentsData,
@@ -117,13 +173,18 @@ const TweetScreen = () => {
     >
       <View style={{ flex: 1 }}>
         <Tweet tweet={data} />
+        <View style={styles.postSeperatorContainer}>
+          <View style={styles.seperatorTextContainer}>
+            <Text style={styles.seperatorText}>Top Comments</Text>
+          </View>
+        </View>
         <FlatList
           data={uniqueItems}
           renderItem={({ item }) => <Comment comment={item} />}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
-            isFetchingNextPage ? <ActivityIndicator size="large" /> : null
+            isFetchingNextPage ? <ActivityIndicator size="small" /> : null
           }
           contentContainerStyle={{ flexGrow: 1 }}
         />
@@ -132,6 +193,8 @@ const TweetScreen = () => {
         <TextInput
           placeholder="Add a comment..."
           style={styles.footerTextInput}
+          onChangeText={setCommentText}
+          value={commentText}
         />
         <View style={styles.buttonContainer}>
           <Pressable
@@ -147,6 +210,22 @@ const TweetScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  seperatorText: {
+    fontSize: 12,
+    color: "grey",
+  },
+  seperatorTextContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+  },
+  postSeperatorContainer: {
+    display: "flex",
+    height: 30,
+    backgroundColor: "white",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "lightgrey",
+  },
   buttonContainer: {
     backgroundColor: "white",
     borderRadius: 20,

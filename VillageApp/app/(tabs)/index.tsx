@@ -67,7 +67,7 @@ export default function FeedScreen() {
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={
-          isFetchingNextPage ? () => <ActivityIndicator size="large" /> : null
+          isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
         }
       />
 
