@@ -4,8 +4,15 @@ import {
   View,
   FlatList,
   KeyboardAvoidingView,
+  TextInput,
+  Button,
+  StyleSheet,
+  Platform,
+  Pressable,
 } from "react-native";
+import { useState, useRef } from "react";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { Entypo } from "@expo/vector-icons";
 import { useTweetsApi } from "../../lib/api/tweets";
 import Tweet from "../../components/Tweet";
 import { useGlobalSearchParams } from "expo-router";
@@ -16,10 +23,18 @@ const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
   const { getTweet, listComments } = useTweetsApi();
 
+  const [commentText, setCommentText] = useState("");
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["tweets", id],
     queryFn: () => getTweet(id as string),
   });
+
+  const handleAddComment = () => {
+    // Logic to add a comment goes here
+    console.log(commentText);
+    setCommentText("");
+  };
 
   const useCommentsInfiniteQuery = (postId: string) => {
     return useInfiniteQuery({
@@ -92,20 +107,74 @@ const TweetScreen = () => {
     }
   });
 
+  const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
+
   return (
-    <KeyboardAvoidingView>
-      <Tweet tweet={data} />
-      <FlatList
-        data={uniqueItems}
-        renderItem={({ item }) => <Comment comment={item} />}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          isFetchingNextPage ? () => <ActivityIndicator size="large" /> : null
-        }
-      />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={keyboardVerticalOffset}
+    >
+      <View style={{ flex: 1 }}>
+        <Tweet tweet={data} />
+        <FlatList
+          data={uniqueItems}
+          renderItem={({ item }) => <Comment comment={item} />}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isFetchingNextPage ? <ActivityIndicator size="large" /> : null
+          }
+          contentContainerStyle={{ flexGrow: 1 }}
+        />
+      </View>
+      <View style={styles.footer}>
+        <TextInput
+          placeholder="Add a comment..."
+          style={styles.footerTextInput}
+        />
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={styles.addCommentPressable}
+            onPress={handleAddComment}
+          >
+            <Entypo name="plus" size={18} color="white" />
+          </Pressable>
+        </View>
+      </View>
     </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+  },
+  addCommentPressable: {
+    backgroundColor: "#050A12",
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+  },
+  footer: {
+    flexDirection: "row",
+    height: 100,
+    backgroundColor: "white",
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  footerTextInput: {
+    flex: 1,
+    borderRadius: 10,
+    backgroundColor: "white",
+    paddingTop: 0,
+    padding: 20,
+  },
+});
 
 export default TweetScreen;

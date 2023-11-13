@@ -115,9 +115,6 @@ const Comment = ({ comment }: CommentProps) => {
             />
           </Pressable>
         </Link>
-        {/* <Link href={`/tweet/${tweet.id}`} asChild>
-          <Pressable style={{ flex: 1 }}></Pressable>
-        </Link> */}
       </View>
       <Pressable style={styles.container}>
         <View style={styles.mainContainer}>
@@ -136,12 +133,13 @@ const Comment = ({ comment }: CommentProps) => {
               />
             </Pressable>
           </View>
-
           <Text style={styles.content}> {comment.text_content}</Text>
           <View style={styles.footer}>
-            <Pressable style={styles.iconWrapper}>
-              <EvilIcon icon="comment" text={comment.replies_count} />
-            </Pressable>
+            {comment.parent_comment_id === null && (
+              <Pressable style={styles.iconWrapper}>
+                <EvilIcon icon="comment" text={comment.replies_count} />
+              </Pressable>
+            )}
             <Pressable
               style={styles.iconWrapper}
               onPress={() => handleToggleLike(comment.id)}
