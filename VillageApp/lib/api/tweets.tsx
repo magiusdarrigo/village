@@ -16,7 +16,9 @@ interface TweetsApiContextType {
   reportTweet: (id: string) => Promise<any>;
   deleteComment: (data: { id: string; postID: string }) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
+  likeComment: (id: string) => Promise<any>;
   likeTweet: (id: string) => Promise<any>;
+  unlikeComment: (id: string) => Promise<any>;
   unlikeTweet: (id: string) => Promise<any>;
   listComments: (
     postID: string,
@@ -53,7 +55,9 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   reportTweet: async () => {},
   deleteComment: async () => {},
   deleteTweet: async () => {},
+  likeComment: async () => {},
   likeTweet: async () => {},
+  unlikeComment: async () => {},
   unlikeTweet: async () => {},
   listComments: async () => {},
   listTweets: async () => {},
@@ -296,6 +300,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const likeComment = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/comments/${id}/likes`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error liking comment");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   const likeTweet = async (id: string) => {
     if (!authToken) {
       return {};
@@ -317,6 +348,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (res.status !== 200) {
       throw new Error("Error liking post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const unlikeComment = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/comments/${id}/likes`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error unliking comment");
     }
 
     const body = await res.json();
@@ -599,7 +657,9 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         reportTweet,
         deleteComment,
         deleteTweet,
+        likeComment,
         likeTweet,
+        unlikeComment,
         unlikeTweet,
         listComments,
         listTweets,

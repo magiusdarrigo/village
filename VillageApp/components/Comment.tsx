@@ -15,7 +15,8 @@ type CommentProps = {
 
 const Comment = ({ comment }: CommentProps) => {
   const { user } = useUser();
-  const { reportComment, deleteComment } = useTweetsApi();
+  const { reportComment, deleteComment, likeComment, unlikeComment } =
+    useTweetsApi();
   const queryClient = useQueryClient();
 
   const isReply = comment.parent_comment_id !== null;
@@ -24,15 +25,91 @@ const Comment = ({ comment }: CommentProps) => {
     return null;
   }
 
+  // like a tweet
+  const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
+    likeComment,
+    {
+      onSuccess: (data: any) => {
+        // update the list of comments in the cache
+        queryClient.setQueryData(
+          ["comments", String(comment.post_id)],
+          (old: any) => {
+            if (!old) return;
+            // Map over the pages
+            return {
+              ...old,
+              pages: old.pages.map((page: { data: any[] }) => {
+                // Map over the comments on the page
+                return {
+                  ...page,
+                  data: page.data.map((currentComment) =>
+                    currentComment.id === data.newLike.comment_id
+                      ? {
+                          ...currentComment,
+                          liked_by_user: true,
+                          likes_count: data.updatedComment.likes_count,
+                        }
+                      : currentComment
+                  ),
+                };
+              }),
+            };
+          }
+        );
+      },
+      onError: (error) => {
+        console.log(error);
+        Alert.alert("We couldn't like this comment. Try again.");
+      },
+    }
+  );
+
+  // unlike a comment
+  const { mutate: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
+    unlikeComment,
+    {
+      onSuccess: (data: any) => {
+        // update the list of comments in the cache
+        queryClient.setQueryData(
+          ["comments", String(comment.post_id)],
+          (old: any) => {
+            if (!old) return;
+            // Map over the pages
+            return {
+              ...old,
+              pages: old.pages.map((page: { data: any[] }) => {
+                // Map over the comments on the page
+                return {
+                  ...page,
+                  data: page.data.map((currentComment) =>
+                    currentComment.id === data.newUnlike.comment_id
+                      ? {
+                          ...currentComment,
+                          liked_by_user: false,
+                          likes_count: data.updatedComment.likes_count,
+                        }
+                      : currentComment
+                  ),
+                };
+              }),
+            };
+          }
+        );
+      },
+      onError: (error) => {
+        console.log(error);
+        Alert.alert("We couldn't like this comment. Try again.");
+      },
+    }
+  );
+
   // delete a comment
   const { mutate: mutateDelete } = useMutation(deleteComment, {
     onSuccess: (data: any) => {
-      console.log("data: ", data);
       // update the list of comments in the cache
       queryClient.setQueryData(
         ["comments", String(comment.post_id)],
         (old: any) => {
-          console.log("old: ", old);
           if (!old) return;
           // Map over the pages
           return {
@@ -99,16 +176,16 @@ const Comment = ({ comment }: CommentProps) => {
   };
 
   const handleToggleLike = async (commentID: number) => {
-    // try {
-    //   if (isLoadingLike || isLoadingUnlike) return;
-    //   if (tweet.liked_by_user) {
-    //     mutateUnlike(String(postID));
-    //   } else {
-    //     mutateLike(String(postID));
-    //   }
-    // } catch (error) {
-    //   Alert.alert("We couldn't like this post. Try again.");
-    // }
+    try {
+      if (isLoadingLike || isLoadingUnlike) return;
+      if (comment.liked_by_user) {
+        mutateUnlike(String(comment.id));
+      } else {
+        mutateLike(String(comment.id));
+      }
+    } catch (error) {
+      Alert.alert("We couldn't like this post. Try again.");
+    }
   };
 
   return (
