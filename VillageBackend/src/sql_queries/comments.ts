@@ -63,7 +63,7 @@ export const getTop10CommentsFromPostQuery = (
   WHERE 
       r.parent_comment_id IN (SELECT id FROM TopComments)
   
-  ORDER BY likes_count DESC, id DESC;
+  ORDER BY likes_count ASC, id DESC;
   `;
 };
 
