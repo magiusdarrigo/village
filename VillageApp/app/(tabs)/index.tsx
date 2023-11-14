@@ -73,7 +73,7 @@ export default function FeedScreen() {
 
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={24} color="black" />
+          <Entypo name="plus" size={24} color="white" />
         </Pressable>
       </Link>
     </View>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   floatingButton: {
-    backgroundColor: colors.light.tertiary,
+    backgroundColor: "black",
     position: "absolute",
     bottom: 20,
     right: 20,

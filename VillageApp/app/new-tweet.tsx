@@ -127,14 +127,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    backgroundColor: Colors.light.tertiary,
+    backgroundColor: "black",
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
   },
   buttonText: {
     fontWeight: "600",
-    color: "black",
+    color: "white",
     fontSize: 16,
   },
   inputContainer: {
