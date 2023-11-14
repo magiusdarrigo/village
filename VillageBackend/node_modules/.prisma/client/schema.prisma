@@ -36,6 +36,7 @@ model users {
   liked_comments  comment_likes[]
   tokens          tokens[]
   reported_posts  reported_posts[]
+  reported_comments reported_comments[]
 }
 
 model tokens {
@@ -136,11 +137,22 @@ model comments {
   parent_comment_id Int?
   replies         comments[]      @relation("replies")
   likedBy         comment_likes[]
+  reported_comments reported_comments[]
 
   @@index([post_id, likes_count], name: "idx_comment_post_likes")
   @@index([parent_comment_id], name: "idx_comment_parent_comment")
 }
 
+model reported_comments {
+  id             Int             @id @default(autoincrement())
+  comment           comments           @relation(fields: [comment_id], references: [id])
+  comment_id         Int
+  user           users           @relation(fields: [user_id_reporting], references: [id])
+  user_id_reporting         Int
+  reason         String?
+  created_at      DateTime        @default(now())
+  tags           Json?
+}
 model comment_likes {
   id          Int       @id @default(autoincrement())
   user_id      Int

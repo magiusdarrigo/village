@@ -12,7 +12,9 @@ interface TweetsApiContextType {
   followUser: (id: string) => Promise<any>;
   unFollowUser: (id: string) => Promise<any>;
   getUserProfile: (id: string) => Promise<any>;
+  reportComment: (id: string) => Promise<any>;
   reportTweet: (id: string) => Promise<any>;
+  deleteComment: (data: { id: string; postID: string }) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
   likeTweet: (id: string) => Promise<any>;
   unlikeTweet: (id: string) => Promise<any>;
@@ -47,7 +49,9 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   followUser: async () => {},
   unFollowUser: async () => {},
   getUserProfile: async () => {},
+  reportComment: async () => {},
   reportTweet: async () => {},
+  deleteComment: async () => {},
   deleteTweet: async () => {},
   likeTweet: async () => {},
   unlikeTweet: async () => {},
@@ -100,7 +104,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     const body = await res.json();
-    console.log("createComment body", body);
     return body;
   };
 
@@ -184,6 +187,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const reportComment = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/comments/${id}/report`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error reporting comment");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   const reportTweet = async (id: string) => {
     if (!authToken) {
       return {};
@@ -205,6 +235,34 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (res.status !== 200) {
       throw new Error("Error reporting post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const deleteComment = async (data: { id: string; postID: string }) => {
+    const { id, postID } = data;
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/comments/${id}?postID=${postID}`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error deleting comment");
     }
 
     const body = await res.json();
@@ -537,7 +595,9 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         followUser,
         unFollowUser,
         getUserProfile,
+        reportComment,
         reportTweet,
+        deleteComment,
         deleteTweet,
         likeTweet,
         unlikeTweet,

@@ -6,50 +6,97 @@ import { Entypo } from "@expo/vector-icons";
 import { EvilIcon, AntIcon } from "./Icons";
 import { useUser } from "../context/UserContext";
 import Colors from "../constants/Colors";
+import { useTweetsApi } from "../lib/api/tweets";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type CommentProps = {
   comment: CommentType;
 };
 
-const onReport = async (id: number) => {
-  // try {
-  //   await reportComment(String(id));
-  //   Alert.alert("Comment reported.");
-  // } catch (error) {
-  //   Alert.alert("We couldn't report this comment. Try again.");
-  // }
-};
-
-const handle3DotsPressed = (userID: number, comment: CommentType) => {
-  //   if (userID !== comment.user_id) {
-  //     Alert.alert("Report Comment?", "", [
-  //       {
-  //         text: "Cancel",
-  //         onPress: () => console.log("Cancel Pressed"),
-  //         style: "cancel",
-  //       },
-  //       { text: "Yes", onPress: () => onReport(comment.id) },
-  //     ]);
-  //   } else {
-  //     Alert.alert("Delete Post?", "Are you sure you want to delete this Comment?", [
-  //       {
-  //         text: "Cancel",
-  //         onPress: () => console.log("Cancel Pressed"),
-  //         style: "cancel",
-  //       },
-  //       { text: "Yes", onPress: () => mutateDelete(String(tweet.id)) },
-  //     ]);
-  //   }
-};
-
 const Comment = ({ comment }: CommentProps) => {
   const { user } = useUser();
+  const { reportComment, deleteComment } = useTweetsApi();
+  const queryClient = useQueryClient();
 
   const isReply = comment.parent_comment_id !== null;
 
   if (!user) {
     return null;
   }
+
+  // delete a comment
+  const { mutate: mutateDelete } = useMutation(deleteComment, {
+    onSuccess: (data: any) => {
+      console.log("data: ", data);
+      // update the list of comments in the cache
+      queryClient.setQueryData(
+        ["comments", String(comment.post_id)],
+        (old: any) => {
+          console.log("old: ", old);
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.filter(
+                  (currentComment) => currentComment.id !== data.id
+                ),
+              };
+            }),
+          };
+        }
+      );
+    },
+    onError: (error) => {
+      console.log(error);
+      Alert.alert("We couldn't delete this comment. Try again.");
+    },
+  });
+
+  const onReport = async (id: number) => {
+    try {
+      await reportComment(String(id));
+      Alert.alert("Comment reported.");
+    } catch (error) {
+      Alert.alert("We couldn't report this comment. Try again.");
+    }
+  };
+
+  const handle3DotsPressed = (userID: number, comment: CommentType) => {
+    if (userID !== comment.user_id) {
+      Alert.alert("Report Comment?", "", [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Yes", onPress: () => onReport(comment.id) },
+      ]);
+    } else {
+      Alert.alert(
+        "Delete Comment?",
+        "Are you sure you want to delete this Comment?",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          {
+            text: "Yes",
+            onPress: () =>
+              mutateDelete({
+                id: String(comment.id),
+                postID: String(comment.post_id),
+              }),
+          },
+        ]
+      );
+    }
+  };
 
   const handleToggleLike = async (commentID: number) => {
     // try {

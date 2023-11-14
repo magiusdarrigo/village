@@ -23,6 +23,7 @@ import Tweet from "../../components/Tweet";
 import { useGlobalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
+import Colors from "../../constants/Colors";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
   },
   postSeperatorContainer: {
     display: "flex",
-    height: 30,
+    height: 25,
     backgroundColor: "white",
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: "lightgrey",
