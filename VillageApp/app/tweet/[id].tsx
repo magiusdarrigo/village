@@ -23,7 +23,6 @@ import Tweet from "../../components/Tweet";
 import { useGlobalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
-import Colors from "../../constants/Colors";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();

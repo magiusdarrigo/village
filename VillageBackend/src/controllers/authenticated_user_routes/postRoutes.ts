@@ -173,10 +173,16 @@ router.get("/:id/comments", async (req, res) => {
       lastCommentID
     );
     const comments = (await prisma.$queryRaw(getCommentsQuery)) as any[];
+    // we need to make sure to only count comments and not replies for these
+    const parentComments = comments.filter(
+      (comment) => comment.parent_comment_id === null
+    );
     const newLastLikesCount =
-      comments.length === 10 ? String(comments[9].likes_count) : undefined;
+      parentComments.length === 10
+        ? String(parentComments[9].likes_count)
+        : undefined;
     const newLastCommentID =
-      comments.length === 10 ? String(comments[9].id) : undefined;
+      parentComments.length === 10 ? String(parentComments[9].id) : undefined;
     res.json({
       data: comments,
       lastLikesCount: newLastLikesCount,
