@@ -12,7 +12,7 @@ const router = Router();
  * paginate by 20 for infinite scroll on the frontend
  */
 router.get("/:id/posts", async (req, res) => {
-  console.log("get posts by neighborhood id called");
+  console.log("get posts by neighborhood id called, id: ", req.params.id);
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const neighborhoodID = getNumberFromQuery(id);
@@ -31,7 +31,7 @@ router.get("/:id/posts", async (req, res) => {
     const posts = (await prisma.$queryRaw(getPostsSqlQuery)) as any;
 
     const prevCursor = cursor - 20 < 0 ? 0 : cursor - 20;
-    const nextCursor = posts.length < 20 ? cursor : cursor + 20;
+    const nextCursor = posts.length < 20 ? undefined : cursor + 20;
 
     res.json({ data: posts, prevCursor, nextCursor });
   } catch (error) {
