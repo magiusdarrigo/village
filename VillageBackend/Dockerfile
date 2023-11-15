@@ -9,8 +9,16 @@ COPY package*.json ./
 COPY prisma ./prisma
 COPY tsconfig.json ./
 COPY src ./src
-# copy the .env file for now too
-COPY .env ./
+
+# set all args from .env
+ARG DATABASE_URL
+ARG DIRECT_URL
+ARG TWILIO_ACCOUNT_SID
+ARG TWILIO_AUTH_TOKEN
+ARG TWILIO_PHONE_NUMBER
+ARG JWT_SECRET
+ARG STREAM_CHAT_API_SECRET
+ARG STREAM_CHAT_API_KEY
 
 # Install app dependencies
 RUN npm install
