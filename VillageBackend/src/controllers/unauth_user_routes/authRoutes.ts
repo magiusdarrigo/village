@@ -64,12 +64,12 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // // Send OTP using Twilio
-    // await twilioClient.messages.create({
-    //   body: `Your Village OTP is: ${phoneToken}`,
-    //   from: process.env.TWILIO_PHONE_NUMBER,
-    //   to: phoneNumber,
-    // });
+    // Send OTP using Twilio
+    await twilioClient.messages.create({
+      body: `Your Village OTP is: ${phoneToken}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: phoneNumber,
+    });
 
     res.send(user);
   } catch (error) {
@@ -99,20 +99,20 @@ router.post("/authenticate", async (req, res) => {
     });
 
     // TODO: once i get twilio working, uncomment this
-    // if (!dbPhoneToken || !dbPhoneToken.valid) {
-    //   console.log("Invalid OTP");
-    //   return res.status(401).send("Invalid OTP.");
-    // }
+    if (!dbPhoneToken || !dbPhoneToken.valid) {
+      console.log("Invalid OTP");
+      return res.status(401).send("Invalid OTP.");
+    }
 
-    // if (dbPhoneToken.expiration && dbPhoneToken.expiration < new Date()) {
-    //   console.log("OTP expired");
-    //   return res.status(401).send("OTP expired.");
-    // }
+    if (dbPhoneToken.expiration && dbPhoneToken.expiration < new Date()) {
+      console.log("OTP expired");
+      return res.status(401).send("OTP expired.");
+    }
 
-    // if (dbPhoneToken?.user?.phone_number !== phoneNumber) {
-    //   console.log("Phone number mismatch");
-    //   return res.status(401);
-    // }
+    if (dbPhoneToken?.user?.phone_number !== phoneNumber) {
+      console.log("Phone number mismatch");
+      return res.status(401);
+    }
 
     // invalidate phone token
     const invalidToken = await prisma.tokens.update({
