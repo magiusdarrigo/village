@@ -11,9 +11,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type CommentProps = {
   comment: CommentType;
+  handleAddReply: (id: number, index: number | undefined) => void;
+  isSelected?: boolean;
+  index?: number;
 };
 
-const Comment = ({ comment }: CommentProps) => {
+const Comment = ({
+  comment,
+  handleAddReply,
+  isSelected,
+  index,
+}: CommentProps) => {
   const { user } = useUser();
   const { reportComment, deleteComment, likeComment, unlikeComment } =
     useTweetsApi();
@@ -175,7 +183,7 @@ const Comment = ({ comment }: CommentProps) => {
     }
   };
 
-  const handleToggleLike = async (commentID: number) => {
+  const handleToggleLike = async () => {
     try {
       if (isLoadingLike || isLoadingUnlike) return;
       if (comment.liked_by_user) {
@@ -192,12 +200,19 @@ const Comment = ({ comment }: CommentProps) => {
     <View
       style={
         !isReply
-          ? {
-              flexDirection: "row",
-              borderBottomWidth: StyleSheet.hairlineWidth,
-              borderColor: "lightgrey",
-              backgroundColor: "white",
-            }
+          ? !isSelected
+            ? {
+                flexDirection: "row",
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderColor: "lightgrey",
+                backgroundColor: "white",
+              }
+            : {
+                flexDirection: "row",
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderColor: "lightgrey",
+                backgroundColor: Colors.light.selectedCommentBackground,
+              }
           : {
               flexDirection: "row",
               borderBottomWidth: StyleSheet.hairlineWidth,
@@ -259,14 +274,14 @@ const Comment = ({ comment }: CommentProps) => {
           <Text style={styles.content}> {comment.text_content}</Text>
           <View style={styles.footer}>
             {comment.parent_comment_id === null && (
-              <Pressable style={styles.iconWrapper}>
+              <Pressable
+                style={styles.iconWrapper}
+                onPress={() => handleAddReply(comment.id, index)}
+              >
                 <EvilIcon icon="comment" text={comment.replies_count} />
               </Pressable>
             )}
-            <Pressable
-              style={styles.iconWrapper}
-              onPress={() => handleToggleLike(comment.id)}
-            >
+            <Pressable style={styles.iconWrapper} onPress={handleToggleLike}>
               {(comment.liked_by_user && (
                 <AntIcon
                   icon="heart"

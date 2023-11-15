@@ -9,8 +9,9 @@ import {
   StyleSheet,
   Platform,
   Pressable,
+  Keyboard,
 } from "react-native";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   useQuery,
   useInfiniteQuery,
@@ -28,8 +29,28 @@ const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
   const { getTweet, listComments, createComment } = useTweetsApi();
   const queryClient = useQueryClient();
+  const inputRef = useRef<TextInput>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   const [commentText, setCommentText] = useState("");
+  const [selectedCommentID, setSelectedCommentID] = useState<
+    number | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const keyboardHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      _handleKeyboardHide
+    );
+
+    return () => {
+      keyboardHideListener.remove();
+    };
+  }, []);
+
+  const _handleKeyboardHide = () => {
+    setSelectedCommentID(undefined);
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["tweets", id],
@@ -38,7 +59,6 @@ const TweetScreen = () => {
 
   const handleAddComment = async () => {
     try {
-      console.log("handleAddComment");
       const characterCount = commentText.length;
       if (characterCount < 1 || characterCount > 200) {
         Alert.alert(
@@ -46,7 +66,11 @@ const TweetScreen = () => {
         );
         return;
       }
-      await mutateAsync({ postID: String(id), textContent: commentText });
+      await mutateAsync({
+        postID: String(id),
+        textContent: commentText,
+        parentCommentID: String(selectedCommentID),
+      });
       setCommentText("");
     } catch (e: any) {
       console.log("Error creating tweet", e.message);
@@ -109,6 +133,9 @@ const TweetScreen = () => {
       console.log(error);
       Alert.alert("We had an issue publishing your comment. Try again.");
     },
+    onSettled: () => {
+      Keyboard.dismiss();
+    },
   });
 
   const {
@@ -165,6 +192,13 @@ const TweetScreen = () => {
 
   const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
 
+  const handleCreateReply = (commentID: number, index: number | undefined) => {
+    if (index === undefined) return;
+    inputRef.current?.focus();
+    flatListRef.current?.scrollToIndex({ animated: true, index });
+    setSelectedCommentID(commentID);
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -179,8 +213,17 @@ const TweetScreen = () => {
           </View>
         </View>
         <FlatList
+          keyExtractor={(item) => item.id.toString()}
+          ref={flatListRef}
           data={uniqueItems}
-          renderItem={({ item }) => <Comment comment={item} />}
+          renderItem={({ item, index }) => (
+            <Comment
+              comment={item}
+              index={index}
+              handleAddReply={handleCreateReply}
+              isSelected={item.id === selectedCommentID}
+            />
+          )}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
@@ -191,6 +234,7 @@ const TweetScreen = () => {
       </View>
       <View style={styles.footer}>
         <TextInput
+          ref={inputRef}
           placeholder="Add a comment..."
           style={styles.footerTextInput}
           onChangeText={setCommentText}
