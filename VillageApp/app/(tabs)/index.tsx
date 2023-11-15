@@ -26,7 +26,7 @@ export default function FeedScreen() {
   } = useInfiniteQuery({
     queryKey: ["tweets"],
     queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
-    getNextPageParam: (lastPage, _) => lastPage.nextCursor,
+    getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     getPreviousPageParam: (firstPage, _) => firstPage.prevCursor,
   });
 
@@ -67,13 +67,13 @@ export default function FeedScreen() {
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={
-          isFetchingNextPage ? () => <ActivityIndicator size="large" /> : null
+          isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
         }
       />
 
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={24} color="black" />
+          <Entypo name="plus" size={24} color="white" />
         </Pressable>
       </Link>
     </View>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   floatingButton: {
-    backgroundColor: colors.light.tertiary,
+    backgroundColor: "black",
     position: "absolute",
     bottom: 20,
     right: 20,

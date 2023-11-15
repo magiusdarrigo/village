@@ -157,10 +157,10 @@ router.get("/:id/comments", async (req, res) => {
     return res.status(400).json({ error: "id is required" });
   }
 
-  // If we have a lastLikesCount and lastCommentID, we'll use them for pagination.
-  lastLikesCount = lastLikesCount
-    ? Number(lastLikesCount)
-    : MAX_SIGNED_FOUR_BYTE_INT;
+  lastLikesCount =
+    lastLikesCount || lastLikesCount === 0
+      ? Number(lastLikesCount)
+      : MAX_SIGNED_FOUR_BYTE_INT;
   lastCommentID = lastCommentID
     ? Number(lastCommentID)
     : MAX_SIGNED_FOUR_BYTE_INT;
@@ -172,9 +172,22 @@ router.get("/:id/comments", async (req, res) => {
       lastLikesCount,
       lastCommentID
     );
-    const comments = await prisma.$queryRaw(getCommentsQuery);
-
-    res.json(comments);
+    const comments = (await prisma.$queryRaw(getCommentsQuery)) as any[];
+    // we need to make sure to only count comments and not replies for these
+    const parentComments = comments.filter(
+      (comment) => comment.parent_comment_id === null
+    );
+    const newLastLikesCount =
+      parentComments.length === 10
+        ? String(parentComments[9].likes_count)
+        : undefined;
+    const newLastCommentID =
+      parentComments.length === 10 ? String(parentComments[9].id) : undefined;
+    res.json({
+      data: comments,
+      lastLikesCount: newLastLikesCount,
+      lastCommentID: newLastCommentID,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({

@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   followButton: {
-    backgroundColor: Colors.light.tertiary,
+    backgroundColor: "black",
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   followButtonText: {
     fontWeight: "600",
-    color: "black",
+    color: "white",
     fontSize: 14,
   },
   unfollowButton: {

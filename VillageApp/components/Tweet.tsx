@@ -7,33 +7,10 @@ import { Link, useNavigation, useSegments } from "expo-router";
 import { useTweetsApi } from "../lib/api/tweets";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../context/UserContext";
+import { calculateHoursAgo } from "../lib/helpers";
 
 type TweetProps = {
   tweet: TweetType;
-};
-
-const calculateHoursAgo = (time: string) => {
-  const now = new Date();
-  const date = new Date(time);
-  const diff = now.getTime() - date.getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor(diff / (1000 * 60));
-  const seconds = Math.floor(diff / 1000);
-
-  if (seconds < 60) {
-    return <Text style={styles.time}>· {seconds}s</Text>;
-  } else if (minutes < 60) {
-    return <Text style={styles.time}>· {minutes}m</Text>;
-  } else if (hours < 24) {
-    return <Text style={styles.time}>· {hours}h</Text>;
-  } else {
-    const dateWithoutYear = date
-      .toDateString()
-      .split(" ")
-      .slice(0, 3)
-      .join(" ");
-    return <Text style={styles.time}>· {dateWithoutYear}</Text>;
-  }
 };
 
 const Tweet = ({ tweet }: TweetProps) => {
@@ -290,14 +267,11 @@ const Tweet = ({ tweet }: TweetProps) => {
 
             <View style={styles.footer}>
               <Link href={`/tweet/${tweet.id}`} asChild>
-                <Pressable style={styles.iconWrapper}>
+                <Pressable>
                   <EvilIcon icon="comment" text={tweet.comments_count} />
                 </Pressable>
               </Link>
-              <Pressable
-                style={styles.iconWrapper}
-                onPress={() => handleToggleLike(tweet.id)}
-              >
+              <Pressable onPress={() => handleToggleLike(tweet.id)}>
                 {(tweet.liked_by_user && (
                   <AntIcon
                     icon="heart"
@@ -323,8 +297,8 @@ const Tweet = ({ tweet }: TweetProps) => {
 
 const styles = StyleSheet.create({
   imagePressable: {
-    padding: 5, // give some touchable space around the image
-    justifyContent: "center", // to vertically center the image if the main content is taller
+    padding: 5,
+    justifyContent: "center",
   },
   container: {
     flexDirection: "row",
@@ -344,10 +318,6 @@ const styles = StyleSheet.create({
   username: {
     fontWeight: "bold",
   },
-  time: {
-    color: "grey",
-    marginLeft: 5,
-  },
   content: {
     lineHeight: 20,
     marginTop: 5,
@@ -364,7 +334,6 @@ const styles = StyleSheet.create({
     width: 120,
     justifyContent: "space-between",
   },
-  iconWrapper: {},
 });
 
 export default Tweet;

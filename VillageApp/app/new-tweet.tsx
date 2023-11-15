@@ -56,17 +56,13 @@ const NewTweet = () => {
         return;
       }
       console.log(error);
-      Alert.alert("We had an issue your post. Try again.");
+      Alert.alert("We had an issue publishing your post. Try again.");
     },
   });
 
-  const getCharCount = (tweet: string) => {
-    return tweet.length;
-  };
-
   const onTweetPress = async () => {
     try {
-      const characterCount = getCharCount(text);
+      const characterCount = text.length;
       if (characterCount < 1 || characterCount > 400) {
         Alert.alert(
           `Your post is ${characterCount} characters long. It needs to be between 1 and 400 characters.`
@@ -131,14 +127,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    backgroundColor: Colors.light.tertiary,
+    backgroundColor: "black",
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
   },
   buttonText: {
     fontWeight: "600",
-    color: "black",
+    color: "white",
     fontSize: 16,
   },
   inputContainer: {
