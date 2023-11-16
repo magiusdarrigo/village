@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { router, useGlobalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
-import { useTweetsApi } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 

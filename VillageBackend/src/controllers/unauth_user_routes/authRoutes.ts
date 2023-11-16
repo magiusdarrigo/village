@@ -46,7 +46,29 @@ router.post("/login", async (req, res) => {
         },
       },
       include: {
-        user: true, // This tells Prisma to include the user data in the result
+        user: {
+          select: {
+            id: true,
+            username: true,
+            image: true,
+            is_verified: true,
+            followers_count: true,
+            following_count: true,
+            neighborhood_id: true,
+            building_id: true,
+            chat_token: true,
+            neighborhood: {
+              select: {
+                name: true,
+              },
+            },
+            building: {
+              select: {
+                address: true,
+              },
+            },
+          },
+        }, // This tells Prisma to include the user data in the result
       },
     });
 

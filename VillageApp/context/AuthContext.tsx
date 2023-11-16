@@ -51,8 +51,8 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    console.log("authToken", authToken);
-    console.log("segments", segments);
+    console.log("segments: ", segments);
+    console.log("has authToken: ", !!authToken);
     if (!authToken && segments[0] !== "(auth)") {
       router.replace("/signIn");
       return;
@@ -74,7 +74,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
             // check if we have the necessary ids from the user
             if (currentUser?.neighborhood_id && currentUser?.building_id) {
               // Redirect to home if the user has both ids
-              console.log("currentUser set to:", currentUser);
+              console.log("currentUser has been set.");
               updateUser(currentUser);
               router.replace("/");
             } else {

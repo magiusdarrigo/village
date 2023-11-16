@@ -15,7 +15,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useUser } from "../../context/UserContext";
-import { useTweetsApi } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 

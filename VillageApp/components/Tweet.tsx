@@ -4,7 +4,7 @@ import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import { EvilIcon, AntIcon } from "./Icons";
 import { Link, useNavigation, useSegments } from "expo-router";
-import { useTweetsApi } from "../lib/api/tweets";
+import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../context/UserContext";
 import { calculateHoursAgo } from "../lib/helpers";
@@ -29,6 +29,54 @@ const Tweet = ({ tweet }: TweetProps) => {
   const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
     likeTweet,
     {
+      onMutate: async (postID: string) => {
+        // cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await Promise.all([
+          queryClient.cancelQueries(["tweets", postID]),
+          queryClient.cancelQueries(["tweets"]),
+        ]);
+
+        // snapshot the previous value
+        const previousTweets = queryClient.getQueryData(["tweets"]);
+        const previousTweet = queryClient.getQueryData([
+          "tweets",
+          String(tweet.id),
+        ]);
+
+        // optimistic update
+        queryClient.setQueryData(["tweets", postID], (old: any) => {
+          return {
+            ...old,
+            liked_by_user: true,
+            likes_count: old?.likes_count + 1,
+          };
+        });
+        queryClient.setQueryData(["tweets"], (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.map((tweet) =>
+                  tweet.id === Number(postID)
+                    ? {
+                        ...tweet,
+                        liked_by_user: true,
+                        likes_count: tweet.likes_count + 1,
+                      }
+                    : tweet
+                ),
+              };
+            }),
+          };
+        });
+
+        // return a context object with the snapshotted values
+        return { previousTweets, previousTweet };
+      },
       onSuccess: (data) => {
         // update the single tweet in the cache
         queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
@@ -62,9 +110,20 @@ const Tweet = ({ tweet }: TweetProps) => {
           };
         });
       },
-      onError: (error) => {
+      onError: (error, _, context) => {
         console.log(error);
         Alert.alert("We couldn't like this post. Try again.");
+
+        // revert to the previous value
+        if (context?.previousTweets) {
+          queryClient.setQueryData(["tweets"], context.previousTweets);
+        }
+        if (context?.previousTweet) {
+          queryClient.setQueryData(
+            ["tweets", String(tweet.id)],
+            context.previousTweet
+          );
+        }
       },
     }
   );
@@ -73,6 +132,54 @@ const Tweet = ({ tweet }: TweetProps) => {
   const { mutate: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
     unlikeTweet,
     {
+      onMutate: async (postID: string) => {
+        await Promise.all([
+          queryClient.cancelQueries(["tweets", postID]),
+          queryClient.cancelQueries(["tweets"]),
+        ]);
+
+        // snapshot the previous values
+        const previousTweets = queryClient.getQueryData(["tweets"]);
+        const previousTweet = queryClient.getQueryData([
+          "tweets",
+          String(tweet.id),
+        ]);
+
+        // optimistic updates
+        queryClient.setQueryData(["tweets", postID], (old: any) => {
+          return {
+            ...old,
+            liked_by_user: false,
+            likes_count: old?.likes_count - 1,
+          };
+        });
+
+        queryClient.setQueryData(["tweets"], (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.map((tweet) =>
+                  tweet.id === Number(postID)
+                    ? {
+                        ...tweet,
+                        liked_by_user: false,
+                        likes_count: tweet.likes_count - 1,
+                      }
+                    : tweet
+                ),
+              };
+            }),
+          };
+        });
+
+        // return a context object with the snapshotted values
+        return { previousTweets, previousTweet };
+      },
       onSuccess: (data) => {
         // update the single tweet in the cache
         queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
@@ -106,9 +213,19 @@ const Tweet = ({ tweet }: TweetProps) => {
           };
         });
       },
-      onError: (error) => {
+      onError: (error, _, context) => {
         console.log(error);
         Alert.alert("We couldn't like this post. Try again.");
+        // revert to the previous value
+        if (context?.previousTweets) {
+          queryClient.setQueryData(["tweets"], context.previousTweets);
+        }
+        if (context?.previousTweet) {
+          queryClient.setQueryData(
+            ["tweets", String(tweet.id)],
+            context.previousTweet
+          );
+        }
       },
     }
   );
@@ -195,6 +312,10 @@ const Tweet = ({ tweet }: TweetProps) => {
     }
   };
 
+  const handleCommentIconPressed = () => {
+    console.log("comment icon pressed");
+  };
+
   return (
     <View
       style={{
@@ -267,7 +388,7 @@ const Tweet = ({ tweet }: TweetProps) => {
 
             <View style={styles.footer}>
               <Link href={`/tweet/${tweet.id}`} asChild>
-                <Pressable>
+                <Pressable onPress={handleCommentIconPressed}>
                   <EvilIcon icon="comment" text={tweet.comments_count} />
                 </Pressable>
               </Link>

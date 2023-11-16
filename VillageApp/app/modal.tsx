@@ -11,7 +11,7 @@ import {
 import { User } from "../context/UserContext";
 import Colors from "../constants/Colors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTweetsApi } from "../lib/api/tweets";
+import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
 import { useAuth } from "../context/AuthContext";
 import { router } from "expo-router";

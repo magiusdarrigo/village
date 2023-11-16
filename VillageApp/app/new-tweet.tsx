@@ -8,11 +8,12 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Alert,
+  Keyboard,
 } from "react-native";
 import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTweetsApi } from "../lib/api/tweets";
+import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
 import Colors from "../constants/Colors";
 
@@ -69,6 +70,7 @@ const NewTweet = () => {
         );
         return;
       }
+      Keyboard.dismiss();
       await mutateAsync({
         neighborhoodID: 1,
         textContent: text,
