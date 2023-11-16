@@ -14,6 +14,7 @@ import { authenticate } from "../../lib/api/auth";
 import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
+import onboardingStyles from "../../lib/styles/onboarding";
 
 const Authenticate = () => {
   const [code, setCode] = useState("");
@@ -31,7 +32,6 @@ const Authenticate = () => {
     }
     try {
       const res = await authenticate({ phoneNumber, phoneToken: code });
-      console.log(res);
       updateAuthToken(res.token);
       if (continueOnboarding()) {
         router.push("/createProfile");
@@ -48,7 +48,7 @@ const Authenticate = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <Text style={styles.label}>Paste the code we texted you.</Text>
+      <Text style={onboardingStyles.label}>Paste the code we texted you.</Text>
       <View style={{ flex: 1, justifyContent: "space-between" }}>
         <TextInput
           placeholder=""
@@ -58,8 +58,8 @@ const Authenticate = () => {
           keyboardType="phone-pad"
           autoFocus={true}
         />
-        <Pressable style={styles.button} onPress={onConfirm}>
-          <Text style={styles.buttonText}>Confirm</Text>
+        <Pressable style={onboardingStyles.button} onPress={onConfirm}>
+          <Text style={onboardingStyles.buttonText}>Confirm</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -77,33 +77,12 @@ const styles = StyleSheet.create({
     paddingTop: 24, // for top space
     paddingHorizontal: 24,
   },
-  label: {
-    marginTop: 36, // space above the label
-    fontSize: 24,
-    marginBottom: 8, // space below the label
-    color: "black",
-    fontWeight: "bold",
-    alignSelf: "flex-start", // align to top-left
-  },
   input: {
     borderColor: "transparent", // no border
     borderWidth: 0,
     paddingTop: 10,
     fontSize: 20,
     color: "black",
-  },
-  button: {
-    backgroundColor: "#050A12",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    marginTop: 5, // space above the button
-    marginBottom: 50, // space below the button
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
 });
 

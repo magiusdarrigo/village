@@ -5,6 +5,7 @@ import { router, useGlobalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../lib/api/tweets";
 import Colors from "../../constants/Colors";
+import onboardingStyles from "../../lib/styles/onboarding";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
@@ -94,15 +95,15 @@ const PickNeighborhood = () => {
             <Text style={styles.welcomeLabel}>
               Welcome to {neighborhoodName} on Village.
             </Text>
-            <Pressable style={styles.button} onPress={onEnter}>
-              <Text style={styles.buttonText}>Enter</Text>
+            <Pressable style={onboardingStyles.button} onPress={onEnter}>
+              <Text style={onboardingStyles.buttonText}>Enter</Text>
             </Pressable>
           </View>
         </View>
       ) : (
         <View style={styles.container}>
           <View style={{ flex: 1, justifyContent: "space-between" }}>
-            <Text style={styles.label}>
+            <Text style={onboardingStyles.label}>
               What neighborhood is your building in?
             </Text>
             <Picker
@@ -119,8 +120,8 @@ const PickNeighborhood = () => {
                 />
               ))}
             </Picker>
-            <Pressable style={styles.button} onPress={onSubmit}>
-              <Text style={styles.buttonText}>Submit</Text>
+            <Pressable style={onboardingStyles.button} onPress={onSubmit}>
+              <Text style={onboardingStyles.buttonText}>Submit</Text>
             </Pressable>
           </View>
         </View>
@@ -144,33 +145,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "flex-start", // align to top-left
   },
-  label: {
-    marginTop: 36, // space above the label
-    fontSize: 24,
-    marginBottom: 8, // space below the label
-    color: "black",
-    fontWeight: "bold",
-    alignSelf: "flex-start", // align to top-left
-  },
   input: {
     borderColor: "transparent", // no border
     borderWidth: 0,
     paddingTop: 10,
     fontSize: 20,
     color: "black",
-  },
-  button: {
-    backgroundColor: "#050A12",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    marginTop: 5, // space above the button
-    marginBottom: 50, // space below the button
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
 });
 

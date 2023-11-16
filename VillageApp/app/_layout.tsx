@@ -15,8 +15,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TweetsApiContextProvider from "../lib/api/tweets";
 import { CURRENT_APP_VERSION } from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
+import { StreamChat, Channel as ChannelType } from "stream-chat";
+import { STREAM_CHAT_API_KEY } from "../lib/api/config";
 
-const client = new QueryClient();
+const queryClient = new QueryClient();
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -30,6 +32,9 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+// create the stream chat client
+const streamChatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -69,12 +74,13 @@ function RootLayoutNav() {
 
   return (
     <>
-      <UserContextProvider>
+      <UserContextProvider streamChatClient={streamChatClient}>
         <AuthContextProvider>
           <TweetsApiContextProvider>
-            <QueryClientProvider client={client}>
+            <QueryClientProvider client={queryClient}>
               <ThemeProvider
-                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+                // value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+                value={DefaultTheme}
               >
                 <Stack>
                   <Stack.Screen

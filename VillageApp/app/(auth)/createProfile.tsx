@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../lib/api/tweets";
 import Colors from "../../constants/Colors";
+import onboardingStyles from "../../lib/styles/onboarding";
 
 const CreateProfile = () => {
   const { user, updateUser } = useUser();
@@ -201,8 +202,8 @@ const CreateProfile = () => {
             {renderColorOptions()}
           </View>
         </View>
-        <Pressable style={styles.button} onPress={onSave}>
-          <Text style={styles.buttonText}>Save</Text>
+        <Pressable style={onboardingStyles.button} onPress={onSave}>
+          <Text style={onboardingStyles.buttonText}>Save</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -250,19 +251,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     fontSize: 20,
     color: "black",
-  },
-  button: {
-    backgroundColor: "#050A12",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    marginTop: 5,
-    marginBottom: 50,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
   colorPickerContainer: {
     flexDirection: "row",

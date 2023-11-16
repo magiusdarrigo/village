@@ -4,6 +4,7 @@ import React, {
   useState,
   PropsWithChildren,
 } from "react";
+import { StreamChat, Channel as ChannelType } from "stream-chat";
 
 export type User = {
   neighborhood_id?: number;
@@ -31,12 +32,21 @@ interface UserContextType {
   user: User | null;
   updateUser: (user: User) => void;
   removeUser: () => void;
+  getStreamChatClient: () => StreamChat<any>;
+}
+
+interface UserContextProviderProps {
+  children: React.ReactNode;
+  streamChatClient: StreamChat<any>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // A component that provides the user context
-const UserContextProvider = ({ children }: PropsWithChildren) => {
+const UserContextProvider = ({
+  children,
+  streamChatClient,
+}: UserContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
 
   const updateUser = (newUser: User) => {
@@ -47,9 +57,15 @@ const UserContextProvider = ({ children }: PropsWithChildren) => {
     setUser(null);
   };
 
+  const getStreamChatClient = () => {
+    return streamChatClient;
+  };
+
   // Provide the user object to any descendants of this component
   return (
-    <UserContext.Provider value={{ user, updateUser, removeUser }}>
+    <UserContext.Provider
+      value={{ user, updateUser, removeUser, getStreamChatClient }}
+    >
       {children}
     </UserContext.Provider>
   );
