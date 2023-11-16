@@ -14,17 +14,16 @@ import {
   useChatContext,
 } from "stream-chat-expo";
 
-const client = StreamChat.getInstance(STREAM_CHAT_API_KEY);
-
 const ChatScreen = () => {
   const [channel, setChannel] = useState<ChannelType | null>(null);
-  const { user } = useUser();
+  const { user, getStreamChatClient } = useUser();
   const { authToken } = useAuth();
+  const streamChatClient = getStreamChatClient();
 
   useEffect(() => {
     const connectUserAndFetchChannel = async () => {
       try {
-        await client.connectUser(
+        await streamChatClient.connectUser(
           {
             id: String(user?.id),
             name: user?.username,
@@ -35,7 +34,9 @@ const ChatScreen = () => {
 
         const _id = String(user?.building_id);
 
-        const channels = await client.queryChannels({ id: { $eq: _id } });
+        const channels = await streamChatClient.queryChannels({
+          id: { $eq: _id },
+        });
         const channel = channels[0];
         setChannel(channel);
         await channel.watch();
@@ -50,7 +51,7 @@ const ChatScreen = () => {
     connectUserAndFetchChannel();
 
     return () => {
-      client.disconnectUser();
+      streamChatClient.disconnectUser();
     };
   }, [authToken, user]);
 
@@ -60,7 +61,7 @@ const ChatScreen = () => {
 
   return (
     <OverlayProvider>
-      <Chat client={client}>
+      <Chat client={streamChatClient}>
         {/* <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >

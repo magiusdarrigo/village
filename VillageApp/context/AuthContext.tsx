@@ -104,7 +104,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
     loadAuthToken();
   }, []);
 
-  // set a timeout to go off in 3 seconds
+  // set a timeout to go off in 1 second
   useEffect(() => {
     const timeout = setTimeout(() => {
       SplashScreen.hideAsync();

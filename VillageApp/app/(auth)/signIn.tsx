@@ -13,6 +13,7 @@ import { useRouter } from "expo-router";
 import { login } from "../../lib/api/auth";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
+import onboardingStyles from "../../lib/styles/onboarding";
 
 const formatPhoneNumber = (input: string, currentPhoneNumber: string) => {
   // Remove all non-digit characters from the phone number
@@ -69,7 +70,7 @@ const SignIn = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <Text style={styles.label}>Enter your phone number.</Text>
+      <Text style={onboardingStyles.label}>Enter your phone number.</Text>
       <View style={{ flex: 1, justifyContent: "space-between" }}>
         <TextInput
           placeholder=""
@@ -79,8 +80,8 @@ const SignIn = () => {
           keyboardType="phone-pad"
           autoFocus={true}
         />
-        <Pressable style={styles.button} onPress={onSignIn}>
-          <Text style={styles.buttonText}>Get Code</Text>
+        <Pressable style={onboardingStyles.button} onPress={onSignIn}>
+          <Text style={onboardingStyles.buttonText}>Get Code</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -94,33 +95,12 @@ const styles = StyleSheet.create({
     paddingTop: 24, // for top space
     paddingHorizontal: 24,
   },
-  label: {
-    marginTop: 36, // space above the label
-    fontSize: 24,
-    marginBottom: 8, // space below the label
-    color: "black",
-    fontWeight: "bold",
-    alignSelf: "flex-start", // align to top-left
-  },
   input: {
     borderColor: "transparent", // no border
     borderWidth: 0,
     paddingTop: 10,
     fontSize: 20,
     color: "black",
-  },
-  button: {
-    backgroundColor: "#050A12",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    marginTop: 5, // space above the button
-    marginBottom: 50, // space below the button
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
 });
 

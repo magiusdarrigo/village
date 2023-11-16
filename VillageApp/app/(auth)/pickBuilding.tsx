@@ -14,6 +14,7 @@ import { useTweetsApi } from "../../lib/api/tweets";
 import { useUser } from "../../context/UserContext";
 import { router } from "expo-router";
 import Colors from "../../constants/Colors";
+import onboardingStyles from "../../lib/styles/onboarding";
 
 const PickBuilding = () => {
   const [address, setAddress] = useState("");
@@ -47,7 +48,7 @@ const PickBuilding = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <Text style={styles.label}>Add your building address.</Text>
+      <Text style={onboardingStyles.label}>Add your building address.</Text>
       <View style={{ flex: 1, justifyContent: "space-between" }}>
         <GooglePlacesAutocomplete
           placeholder="Enter Building Address"
@@ -93,8 +94,8 @@ const PickBuilding = () => {
           nearbyPlacesAPI="GooglePlacesSearch"
           debounce={200}
         />
-        <Pressable style={styles.button} onPress={onSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
+        <Pressable style={onboardingStyles.button} onPress={onSubmit}>
+          <Text style={onboardingStyles.buttonText}>Submit</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -132,33 +133,12 @@ const styles = StyleSheet.create({
     paddingTop: 24, // for top space
     paddingHorizontal: 24,
   },
-  label: {
-    marginTop: 36, // space above the label
-    fontSize: 24,
-    marginBottom: 8, // space below the label
-    color: "black",
-    fontWeight: "bold",
-    alignSelf: "flex-start", // align to top-left
-  },
   input: {
     borderColor: "transparent", // no border
     borderWidth: 0,
     paddingTop: 10,
     fontSize: 20,
     color: "black",
-  },
-  button: {
-    backgroundColor: "#050A12",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    marginTop: 5, // space above the button
-    marginBottom: 50, // space below the button
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
 });
 
