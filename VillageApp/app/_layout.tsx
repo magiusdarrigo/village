@@ -12,7 +12,7 @@ import { useColorScheme, Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import TweetsApiContextProvider from "../lib/api/tweets";
+import TweetsApiContextProvider from "../context/TweetContext";
 import { CURRENT_APP_VERSION } from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
 import { StreamChat, Channel as ChannelType } from "stream-chat";

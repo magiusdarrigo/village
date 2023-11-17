@@ -9,12 +9,10 @@ import {
   Alert,
 } from "react-native";
 import { User } from "../context/UserContext";
-import Colors from "../constants/Colors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTweetsApi } from "../lib/api/tweets";
+import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
 import { useAuth } from "../context/AuthContext";
-import { router } from "expo-router";
 
 type ProfileProps = {
   user: User;
@@ -25,7 +23,6 @@ const ModalScreen = ({ user }: ProfileProps) => {
   const { followUser, unFollowUser } = useTweetsApi();
   const { user: currentUser, getStreamChatClient } = useUser();
   const { removeAuthToken } = useAuth();
-
   const streamChatClient = getStreamChatClient();
 
   const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
@@ -86,9 +83,8 @@ const ModalScreen = ({ user }: ProfileProps) => {
       {
         text: "Log out",
         onPress: async () => {
-          await streamChatClient.disconnectUser();
+          streamChatClient.disconnectUser();
           removeAuthToken();
-          router.replace("/signIn");
         },
       },
     ]);

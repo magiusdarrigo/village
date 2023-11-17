@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import ModalScreen from "../modal";
 import { useUser, User } from "../../context/UserContext";
-import { useTweetsApi } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
 
 const ProfileScreen = () => {

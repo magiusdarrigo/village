@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { router, useGlobalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
-import { useTweetsApi } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 
@@ -55,7 +55,6 @@ const PickNeighborhood = () => {
       });
       // assign returned user to user context
       updateUser(updatedUser);
-      router.replace("/");
     } catch (error) {
       console.log(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
@@ -79,8 +78,6 @@ const PickNeighborhood = () => {
         buildingID: buildingID,
       });
       updateUser(updatedUser);
-      // TODO: await for user to be added to building chat instance
-      router.replace("/");
     } catch (error) {
       console.log(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
@@ -92,7 +89,7 @@ const PickNeighborhood = () => {
       {neighborhoodName ? (
         <View style={styles.container}>
           <View style={{ flex: 1, justifyContent: "space-between" }}>
-            <Text style={styles.welcomeLabel}>
+            <Text style={onboardingStyles.label}>
               Welcome to {neighborhoodName} on Village.
             </Text>
             <Pressable style={onboardingStyles.button} onPress={onEnter}>
@@ -136,14 +133,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 24, // for top space
     paddingHorizontal: 24,
-  },
-  welcomeLabel: {
-    marginTop: 36, // space above the label
-    fontSize: 36,
-    marginBottom: 8, // space below the label
-    color: "black",
-    fontWeight: "bold",
-    alignSelf: "flex-start", // align to top-left
   },
   input: {
     borderColor: "transparent", // no border

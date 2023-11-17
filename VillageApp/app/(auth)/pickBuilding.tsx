@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { GOOGLE_MAPS_API_KEY } from "../../lib/api/config";
-import { useTweetsApi } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../context/TweetContext";
 import { useUser } from "../../context/UserContext";
 import { router } from "expo-router";
 import Colors from "../../constants/Colors";
