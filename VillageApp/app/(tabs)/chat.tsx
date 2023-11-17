@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert } from "react-native";
+import { ActivityIndicator, Alert, ImageStyle, StyleProp } from "react-native";
 import { Channel as ChannelType } from "stream-chat";
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
@@ -10,13 +10,15 @@ import {
   Channel,
   MessageInput,
   MessageList,
-  useChatContext,
 } from "stream-chat-expo";
+
+interface CustomImageProps {
+  style?: StyleProp<ImageStyle>;
+}
 
 const ChatScreen = () => {
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const { user, getStreamChatClient } = useUser();
-  const { authToken } = useAuth();
   const streamChatClient = getStreamChatClient();
 
   useEffect(() => {
@@ -50,9 +52,11 @@ const ChatScreen = () => {
     connectUserAndFetchChannel();
 
     return () => {
-      streamChatClient.disconnectUser();
+      if (streamChatClient.userID) {
+        streamChatClient.disconnectUser();
+      }
     };
-  }, [authToken, user]);
+  }, []);
 
   if (!channel) {
     return <ActivityIndicator />;
