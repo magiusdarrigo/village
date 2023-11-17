@@ -19,7 +19,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Entypo } from "@expo/vector-icons";
-import { useTweetsApi } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../context/TweetContext";
 import Tweet from "../../components/Tweet";
 import { useGlobalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
@@ -66,6 +66,7 @@ const TweetScreen = () => {
         );
         return;
       }
+      Keyboard.dismiss();
       await mutateAsync({
         postID: String(id),
         textContent: commentText,
@@ -132,9 +133,6 @@ const TweetScreen = () => {
       }
       console.log(error);
       Alert.alert("We had an issue publishing your comment. Try again.");
-    },
-    onSettled: () => {
-      Keyboard.dismiss();
     },
   });
 
@@ -227,7 +225,9 @@ const TweetScreen = () => {
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
-            isFetchingNextPage ? <ActivityIndicator size="small" /> : null
+            isFetchingNextPage || isFetching || isLoadingCreateComment ? (
+              <ActivityIndicator size="small" />
+            ) : null
           }
           contentContainerStyle={{ flexGrow: 1 }}
         />

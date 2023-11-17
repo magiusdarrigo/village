@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, useContext } from "react";
-import { API_URL } from "./config";
-import { useAuth } from "../../context/AuthContext";
-import { useUser } from "../../context/UserContext";
+import { API_URL } from "../lib/api/config";
+import { useAuth } from "./AuthContext";
+import { useUser } from "./UserContext";
 
 interface TweetsApiContextType {
   createComment: (data: {

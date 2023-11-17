@@ -1,4 +1,9 @@
-import { useRouter, useSegments, SplashScreen } from "expo-router";
+import {
+  useRouter,
+  useSegments,
+  SplashScreen,
+  useNavigation,
+} from "expo-router";
 import {
   PropsWithChildren,
   createContext,
@@ -22,6 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const { user, updateUser } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const navigation = useNavigation();
   const segments = useSegments();
   const router = useRouter();
 
@@ -51,46 +57,33 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    console.log("authToken", authToken);
-    console.log("segments", segments);
-    if (!authToken && segments[0] !== "(auth)") {
+    console.log("segments: ", segments);
+    console.log("has authToken: ", !!authToken);
+    console.log("has user: ", !!user);
+
+    if (authToken && !user) {
+      const getCurrentUser = async () => {
+        try {
+          const currentUser = await getUser();
+          updateUser(currentUser);
+        } catch (error) {
+          console.error("Failed to fetch current user:", error);
+          Alert.alert("We couldn't sign you in. Try again.");
+        }
+      };
+
+      getCurrentUser();
+      return;
+    }
+
+    if ((!authToken || !user?.neighborhood?.name) && segments[0] !== "(auth)") {
       router.replace("/signIn");
       return;
     }
 
-    // If there is an auth token, check if the user has neighborhood and building ids
-    if (authToken) {
-      if (user?.neighborhood_id && user?.building_id) {
-        // If the user has both ids, redirect to home if they're not already there
-        if (segments[0] === "(auth)") {
-          // router.replace("/(tabs)/chat");
-          router.replace("/");
-        }
-      } else {
-        // If the user does not have both ids, fetch the user data
-        const getCurrentUser = async () => {
-          try {
-            const currentUser = await getUser();
-            // check if we have the necessary ids from the user
-            if (currentUser?.neighborhood_id && currentUser?.building_id) {
-              // Redirect to home if the user has both ids
-              console.log("currentUser set to:", currentUser);
-              updateUser(currentUser);
-              router.replace("/");
-            } else {
-              // Otherwise, let's create a new user if they're not already on an auth-related route
-              if (segments[0] !== "(auth)") {
-                router.replace("/signIn");
-              }
-            }
-          } catch (error) {
-            console.error("Failed to fetch current user:", error);
-            Alert.alert("We couldn't sign you in. Try again.");
-          }
-        };
-
-        getCurrentUser();
-      }
+    if (authToken && user?.neighborhood?.name && segments[0] === "(auth)") {
+      router.replace("/");
+      return;
     }
   }, [segments, authToken, user]);
 

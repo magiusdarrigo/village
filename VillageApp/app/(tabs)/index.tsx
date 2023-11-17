@@ -9,7 +9,7 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
 import { Link } from "expo-router";
-import { useTweetsApi } from "../../lib/api/tweets";
+import { useTweetsApi } from "../../context/TweetContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import colors from "../../constants/Colors";
 

@@ -6,7 +6,7 @@ import { Entypo } from "@expo/vector-icons";
 import { EvilIcon, AntIcon } from "./Icons";
 import { useUser } from "../context/UserContext";
 import Colors from "../constants/Colors";
-import { useTweetsApi } from "../lib/api/tweets";
+import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type CommentProps = {
@@ -33,10 +33,49 @@ const Comment = ({
     return null;
   }
 
-  // like a tweet
+  // like a comment
   const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
     likeComment,
     {
+      onMutate: async (commentID: string) => {
+        // cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await queryClient.cancelQueries(["comments", String(comment.post_id)]);
+        // snapshot the previous value
+        const previousComments = queryClient.getQueryData([
+          "comments",
+          String(comment.post_id),
+        ]);
+        // optimistically update to the new value
+        if (previousComments) {
+          queryClient.setQueryData(
+            ["comments", String(comment.post_id)],
+            (old: any) => {
+              if (!old) return;
+              // Map over the pages
+              return {
+                ...old,
+                pages: old.pages.map((page: { data: any[] }) => {
+                  // Map over the comments on the page
+                  return {
+                    ...page,
+                    data: page.data.map((currentComment) =>
+                      currentComment.id === Number(commentID)
+                        ? {
+                            ...currentComment,
+                            liked_by_user: true,
+                            likes_count: currentComment.likes_count + 1,
+                          }
+                        : currentComment
+                    ),
+                  };
+                }),
+              };
+            }
+          );
+        }
+        // return a context object with the snapshotted value
+        return { previousComments };
+      },
       onSuccess: (data: any) => {
         // update the list of comments in the cache
         queryClient.setQueryData(
@@ -65,9 +104,16 @@ const Comment = ({
           }
         );
       },
-      onError: (error) => {
+      onError: (error, _, context) => {
         console.log(error);
         Alert.alert("We couldn't like this comment. Try again.");
+        // revert to the previous value
+        if (context?.previousComments) {
+          queryClient.setQueryData(
+            ["comments", String(comment.post_id)],
+            context.previousComments
+          );
+        }
       },
     }
   );
@@ -76,6 +122,45 @@ const Comment = ({
   const { mutate: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
     unlikeComment,
     {
+      onMutate: async (commentID: string) => {
+        // cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await queryClient.cancelQueries(["comments", String(comment.post_id)]);
+        // snapshot the previous value
+        const previousComments = queryClient.getQueryData([
+          "comments",
+          String(comment.post_id),
+        ]);
+        // optimistically update to the new value
+        if (previousComments) {
+          queryClient.setQueryData(
+            ["comments", String(comment.post_id)],
+            (old: any) => {
+              if (!old) return;
+              // Map over the pages
+              return {
+                ...old,
+                pages: old.pages.map((page: { data: any[] }) => {
+                  // Map over the comments on the page
+                  return {
+                    ...page,
+                    data: page.data.map((currentComment) =>
+                      currentComment.id === Number(commentID)
+                        ? {
+                            ...currentComment,
+                            liked_by_user: false,
+                            likes_count: currentComment.likes_count - 1,
+                          }
+                        : currentComment
+                    ),
+                  };
+                }),
+              };
+            }
+          );
+        }
+        // return a context object with the snapshotted value
+        return { previousComments };
+      },
       onSuccess: (data: any) => {
         // update the list of comments in the cache
         queryClient.setQueryData(
@@ -104,9 +189,16 @@ const Comment = ({
           }
         );
       },
-      onError: (error) => {
+      onError: (error, _, context) => {
         console.log(error);
         Alert.alert("We couldn't like this comment. Try again.");
+        // revert to the previous value
+        if (context?.previousComments) {
+          queryClient.setQueryData(
+            ["comments", String(comment.post_id)],
+            context.previousComments
+          );
+        }
       },
     }
   );

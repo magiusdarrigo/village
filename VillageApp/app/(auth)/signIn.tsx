@@ -54,7 +54,7 @@ const SignIn = () => {
     try {
       const user = await login({ phoneNumber });
       updateUser(user);
-      router.push({ pathname: "/authenticate", params: { phoneNumber } });
+      router.replace({ pathname: "/authenticate", params: { phoneNumber } });
     } catch (e) {
       Alert.alert("We had an issue signing you in. Try again.");
     }
