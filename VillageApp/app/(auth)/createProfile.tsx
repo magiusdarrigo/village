@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   View,
-  Image,
-  Button,
   TextInput,
   Pressable,
   Text,
   Alert,
   Platform,
+  Keyboard,
   KeyboardAvoidingView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -182,31 +182,35 @@ const CreateProfile = () => {
   // );
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <Text style={styles.label}>Create your anonymous profile.</Text>
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <View>
-          <Text style={styles.inputLabel}>Username</Text>
-          <TextInput
-            autoCapitalize="none"
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            style={styles.input}
-          />
-          <Text style={styles.inputLabel}>Color</Text>
-          <View style={styles.colorPickerContainer}>
-            {renderColorOptions()}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <Text style={onboardingStyles.label}>
+          Create your anonymous profile.
+        </Text>
+        <View style={{ flex: 1, justifyContent: "space-between" }}>
+          <View>
+            <Text style={styles.inputLabel}>Username</Text>
+            <TextInput
+              autoCapitalize="none"
+              placeholder="Username"
+              value={username}
+              onChangeText={setUsername}
+              style={styles.input}
+            />
+            <Text style={styles.inputLabel}>Color</Text>
+            <View style={styles.colorPickerContainer}>
+              {renderColorOptions()}
+            </View>
           </View>
+          <Pressable style={onboardingStyles.button} onPress={onSave}>
+            <Text style={onboardingStyles.buttonText}>Save</Text>
+          </Pressable>
         </View>
-        <Pressable style={onboardingStyles.button} onPress={onSave}>
-          <Text style={onboardingStyles.buttonText}>Save</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 

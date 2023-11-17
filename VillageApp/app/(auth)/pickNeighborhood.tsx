@@ -89,7 +89,7 @@ const PickNeighborhood = () => {
       {neighborhoodName ? (
         <View style={styles.container}>
           <View style={{ flex: 1, justifyContent: "space-between" }}>
-            <Text style={styles.welcomeLabel}>
+            <Text style={onboardingStyles.label}>
               Welcome to {neighborhoodName} on Village.
             </Text>
             <Pressable style={onboardingStyles.button} onPress={onEnter}>
@@ -133,14 +133,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 24, // for top space
     paddingHorizontal: 24,
-  },
-  welcomeLabel: {
-    marginTop: 36, // space above the label
-    fontSize: 36,
-    marginBottom: 8, // space below the label
-    color: "black",
-    fontWeight: "bold",
-    alignSelf: "flex-start", // align to top-left
   },
   input: {
     borderColor: "transparent", // no border
