@@ -9,7 +9,7 @@ export default {
     tabIconDefault: "#cccccc",
     tabIconSelected: tintColorLight,
     tertiary: "#F4EBD0",
-    replyBackground: "#EBEAEA",
+    replyBackground: "#EEECEC",
     selectedCommentBackground: "#FCFCCF",
   },
   dark: {

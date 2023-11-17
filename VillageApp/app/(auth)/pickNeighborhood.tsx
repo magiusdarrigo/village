@@ -55,7 +55,6 @@ const PickNeighborhood = () => {
       });
       // assign returned user to user context
       updateUser(updatedUser);
-      router.replace("/");
     } catch (error) {
       console.log(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
@@ -79,8 +78,6 @@ const PickNeighborhood = () => {
         buildingID: buildingID,
       });
       updateUser(updatedUser);
-      // TODO: await for user to be added to building chat instance
-      router.replace("/");
     } catch (error) {
       console.log(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");

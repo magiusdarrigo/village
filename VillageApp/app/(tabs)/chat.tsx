@@ -1,6 +1,5 @@
 import { ActivityIndicator, Alert } from "react-native";
-import { StreamChat, Channel as ChannelType } from "stream-chat";
-import { STREAM_CHAT_API_KEY } from "../../lib/api/config";
+import { Channel as ChannelType } from "stream-chat";
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
 import { useAuth } from "../../context/AuthContext";
@@ -62,11 +61,6 @@ const ChatScreen = () => {
   return (
     <OverlayProvider>
       <Chat client={streamChatClient}>
-        {/* <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <Text>Chat Screen</Text>
-        </View> */}
         <Channel channel={channel}>
           <MessageList />
           <MessageInput />

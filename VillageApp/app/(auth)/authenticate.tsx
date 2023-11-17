@@ -34,9 +34,7 @@ const Authenticate = () => {
       const res = await authenticate({ phoneNumber, phoneToken: code });
       updateAuthToken(res.token);
       if (continueOnboarding()) {
-        router.push("/createProfile");
-      } else {
-        router.replace("/");
+        router.replace("/createProfile");
       }
     } catch (e) {
       Alert.alert("Your OTP code doesn't match. Try again.");
