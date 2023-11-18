@@ -2,7 +2,7 @@ import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
 import { useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
-import { EvilIcon, AntIcon } from "./Icons";
+import { AntIcon, MaterialCommunityIcon } from "./Icons";
 import { Link, useNavigation, useSegments } from "expo-router";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -386,19 +386,23 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             <View style={styles.footer}>
               <Link href={`/tweet/${tweet.id}`} asChild>
                 <Pressable onPress={handleCommentIconClicked}>
-                  <EvilIcon icon="comment" text={tweet.comments_count} />
+                  <MaterialCommunityIcon
+                    icon="comment-outline"
+                    text={tweet.comments_count}
+                    iconColor="#b2b2b2"
+                  />
                 </Pressable>
               </Link>
               <Pressable onPress={() => handleToggleLike(tweet.id)}>
                 {(tweet.liked_by_user && (
                   <AntIcon
-                    icon="heart"
+                    icon="like1"
                     text={tweet.likes_count}
                     iconColor="red"
                   />
                 )) || (
                   <AntIcon
-                    icon="hearto"
+                    icon="like2"
                     text={tweet.likes_count}
                     iconColor="#b2b2b2"
                   />
