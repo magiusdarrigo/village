@@ -86,12 +86,12 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // // Send OTP using Twilio
-    // await twilioClient.messages.create({
-    //   body: `Your Village OTP is: ${phoneToken}`,
-    //   from: process.env.TWILIO_PHONE_NUMBER,
-    //   to: phoneNumber,
-    // });
+    // Send OTP using Twilio
+    await twilioClient.messages.create({
+      body: `Your Village OTP is: ${phoneToken}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: phoneNumber,
+    });
 
     res.send(user);
   } catch (error) {

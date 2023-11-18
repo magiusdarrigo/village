@@ -1,6 +1,8 @@
 import prisma from "../src/clients/prismaClient";
 
 async function main() {
+  // disable seeding with this return
+  return;
   const sleep = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
