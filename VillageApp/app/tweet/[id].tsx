@@ -197,6 +197,11 @@ const TweetScreen = () => {
     setSelectedCommentID(commentID);
   };
 
+  const handleCommentIconPressed = () => {
+    setSelectedCommentID(undefined);
+    inputRef.current?.focus();
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -204,7 +209,10 @@ const TweetScreen = () => {
       keyboardVerticalOffset={keyboardVerticalOffset}
     >
       <View style={{ flex: 1 }}>
-        <Tweet tweet={data} />
+        <Tweet
+          tweet={data}
+          handleCommentIconClicked={handleCommentIconPressed}
+        />
         <View style={styles.postSeperatorContainer}>
           <View style={styles.seperatorTextContainer}>
             <Text style={styles.seperatorText}>Top Comments</Text>

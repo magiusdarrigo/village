@@ -11,9 +11,10 @@ import { calculateHoursAgo } from "../lib/helpers";
 
 type TweetProps = {
   tweet: TweetType;
+  handleCommentIconClicked: () => void;
 };
 
-const Tweet = ({ tweet }: TweetProps) => {
+const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { likeTweet, unlikeTweet, deleteTweet, reportTweet } = useTweetsApi();
   const queryClient = useQueryClient();
@@ -312,10 +313,6 @@ const Tweet = ({ tweet }: TweetProps) => {
     }
   };
 
-  const handleCommentIconPressed = () => {
-    console.log("comment icon pressed");
-  };
-
   return (
     <View
       style={{
@@ -388,7 +385,7 @@ const Tweet = ({ tweet }: TweetProps) => {
 
             <View style={styles.footer}>
               <Link href={`/tweet/${tweet.id}`} asChild>
-                <Pressable onPress={handleCommentIconPressed}>
+                <Pressable onPress={handleCommentIconClicked}>
                   <EvilIcon icon="comment" text={tweet.comments_count} />
                 </Pressable>
               </Link>

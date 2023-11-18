@@ -15,7 +15,6 @@ import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
-import Colors from "../constants/Colors";
 
 const NewTweet = () => {
   const [text, setText] = useState("");
@@ -57,7 +56,7 @@ const NewTweet = () => {
         return;
       }
       console.log(error);
-      Alert.alert("We had an issue publishing your post. Try again.");
+      Alert.alert("We had an issue making your post. Try again.");
     },
   });
 
@@ -71,8 +70,13 @@ const NewTweet = () => {
         return;
       }
       Keyboard.dismiss();
+      if (user?.neighborhood_id === undefined) {
+        Alert.alert("We had an issue making your post. Try again.");
+        return;
+      }
+
       await mutateAsync({
-        neighborhoodID: 1,
+        neighborhoodID: user?.neighborhood_id,
         textContent: text,
         // imageURL: "https://picsum.photos/400/800",
       });
