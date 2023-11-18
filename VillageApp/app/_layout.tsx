@@ -116,6 +116,10 @@ function RootLayoutNav() {
                     name="(auth)/pickNeighborhood"
                     options={{ headerShown: false }}
                   />
+                  <Stack.Screen
+                    name="(auth)/showNeighborhood"
+                    options={{ headerShown: false }}
+                  />
                 </Stack>
               </ThemeProvider>
             </QueryClientProvider>

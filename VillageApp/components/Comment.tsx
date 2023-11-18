@@ -3,7 +3,7 @@ import { CommentType } from "../types";
 import { Link } from "expo-router";
 import { calculateHoursAgo } from "../lib/helpers";
 import { Entypo } from "@expo/vector-icons";
-import { EvilIcon, AntIcon } from "./Icons";
+import { MaterialCommunityIcon, AntIcon } from "./Icons";
 import { useUser } from "../context/UserContext";
 import Colors from "../constants/Colors";
 import { useTweetsApi } from "../context/TweetContext";
@@ -370,19 +370,23 @@ const Comment = ({
                 style={styles.iconWrapper}
                 onPress={() => handleAddReply(comment.id, index)}
               >
-                <EvilIcon icon="comment" text={comment.replies_count} />
+                <MaterialCommunityIcon
+                  icon="comment-outline"
+                  text={comment.replies_count}
+                  iconColor="#b2b2b2"
+                />
               </Pressable>
             )}
             <Pressable style={styles.iconWrapper} onPress={handleToggleLike}>
               {(comment.liked_by_user && (
                 <AntIcon
-                  icon="heart"
+                  icon="like1"
                   text={comment.likes_count}
                   iconColor="red"
                 />
               )) || (
                 <AntIcon
-                  icon="hearto"
+                  icon="like2"
                   text={comment.likes_count}
                   iconColor="#b2b2b2"
                 />

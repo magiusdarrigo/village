@@ -28,13 +28,21 @@ const PickBuilding = () => {
       if (user === null) {
         throw new Error("User is null");
       }
-      router.push({
+      if (neighborhoodName) {
+        router.replace({
+          pathname: "/showNeighborhood",
+          params: {
+            neighborhoodName,
+            buildingID: building.id,
+            neighborhoodID: building.neighborhood_id,
+          },
+        });
+        return;
+      }
+      router.replace({
         pathname: "/pickNeighborhood",
         params: {
           buildingAddress: address,
-          neighborhoodName,
-          buildingID: building?.id,
-          neighborhoodID: building?.neighborhood?.id,
         },
       });
     } catch (error) {
