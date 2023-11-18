@@ -80,15 +80,27 @@ const SignIn = () => {
           keyboardType="phone-pad"
           autoFocus={true}
         />
-        <Pressable style={onboardingStyles.button} onPress={onSignIn}>
-          <Text style={onboardingStyles.buttonText}>Get Code</Text>
-        </Pressable>
+
+        <View>
+          <Text style={styles.optInText}>
+            By selecting Get Code, you agree to receiving SMS verification
+            messages from Village.
+          </Text>
+          <Pressable style={onboardingStyles.button} onPress={onSignIn}>
+            <Text style={onboardingStyles.buttonText}>Get Code</Text>
+          </Pressable>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  optInText: {
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 12,
+  },
   container: {
     backgroundColor: Colors.light.tertiary,
     flex: 1,
