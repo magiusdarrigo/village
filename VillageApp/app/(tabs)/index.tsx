@@ -71,7 +71,12 @@ export default function FeedScreen() {
     <View style={styles.page}>
       <FlatList
         data={uniqueItems}
-        renderItem={({ item }) => <Tweet tweet={item} />}
+        renderItem={({ item }) => (
+          <Tweet
+            tweet={item}
+            handleCommentIconClicked={() => console.log("comment clicked")}
+          />
+        )}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={
