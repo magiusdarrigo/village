@@ -62,10 +62,19 @@ const NewTweet = () => {
 
   const onTweetPress = async () => {
     try {
+      // check character count
       const characterCount = text.length;
       if (characterCount < 1 || characterCount > 400) {
         Alert.alert(
           `Your post is ${characterCount} characters long. It needs to be between 1 and 400 characters.`
+        );
+        return;
+      }
+      // check new line count
+      const newLineCount = text.split("\n").length;
+      if (newLineCount > 19) {
+        Alert.alert(
+          `Your post has ${newLineCount} lines. It needs to be less than 20 lines.`
         );
         return;
       }
@@ -107,7 +116,7 @@ const NewTweet = () => {
             placeholder={`What's going on in ${user?.neighborhood?.name}?`}
             multiline
             numberOfLines={5}
-            style={{ flex: 1 }}
+            style={{ flex: 1, lineHeight: 22, fontSize: 18 }}
           />
         </View>
       </View>
