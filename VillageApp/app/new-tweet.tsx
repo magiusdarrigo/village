@@ -15,7 +15,6 @@ import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
-import Colors from "../constants/Colors";
 
 const NewTweet = () => {
   const [text, setText] = useState("");
@@ -57,12 +56,13 @@ const NewTweet = () => {
         return;
       }
       console.log(error);
-      Alert.alert("We had an issue publishing your post. Try again.");
+      Alert.alert("We had an issue making your post. Try again.");
     },
   });
 
   const onTweetPress = async () => {
     try {
+      // check character count
       const characterCount = text.length;
       if (characterCount < 1 || characterCount > 400) {
         Alert.alert(
@@ -70,9 +70,22 @@ const NewTweet = () => {
         );
         return;
       }
+      // check new line count
+      const newLineCount = text.split("\n").length;
+      if (newLineCount > 19) {
+        Alert.alert(
+          `Your post has ${newLineCount} lines. It needs to be less than 20 lines.`
+        );
+        return;
+      }
       Keyboard.dismiss();
+      if (user?.neighborhood_id === undefined) {
+        Alert.alert("We had an issue making your post. Try again.");
+        return;
+      }
+
       await mutateAsync({
-        neighborhoodID: 1,
+        neighborhoodID: user?.neighborhood_id,
         textContent: text,
         // imageURL: "https://picsum.photos/400/800",
       });
@@ -103,7 +116,7 @@ const NewTweet = () => {
             placeholder={`What's going on in ${user?.neighborhood?.name}?`}
             multiline
             numberOfLines={5}
-            style={{ flex: 1 }}
+            style={{ flex: 1, lineHeight: 22, fontSize: 18 }}
           />
         </View>
       </View>

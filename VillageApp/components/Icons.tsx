@@ -1,6 +1,10 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { EvilIcons, AntDesign } from "@expo/vector-icons";
+import {
+  EvilIcons,
+  AntDesign,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 
 type EvilIconProps = {
   icon: React.ComponentProps<typeof EvilIcons>["name"];
@@ -26,8 +30,6 @@ export const EvilIcon = ({ icon, text, iconColor }: EvilIconProps) => {
   );
 };
 
-// add
-
 type AntIconProps = {
   icon: React.ComponentProps<typeof AntDesign>["name"];
   text?: string | number;
@@ -38,6 +40,25 @@ export const AntIcon = ({ icon, text, iconColor }: AntIconProps) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <AntDesign name={icon} size={18} color={iconColor} />
+      <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>{text}</Text>
+    </View>
+  );
+};
+
+type MaterialCommunityIconsProps = {
+  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  text?: string | number;
+  iconColor?: string;
+};
+
+export const MaterialCommunityIcon = ({
+  icon,
+  text,
+  iconColor,
+}: MaterialCommunityIconsProps) => {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <MaterialCommunityIcons name={icon} size={18} color={iconColor} />
       <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>{text}</Text>
     </View>
   );

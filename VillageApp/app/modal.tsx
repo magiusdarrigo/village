@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   followButton: {
+    marginVertical: 8,
     backgroundColor: "black",
     borderRadius: 50,
     padding: 5,

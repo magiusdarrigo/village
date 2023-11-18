@@ -115,7 +115,7 @@ const CreateProfile = () => {
         profileImage: selectedColor,
       });
       updateUser(updatedUser);
-      router.push("/pickBuilding");
+      router.replace("/pickBuilding");
     } catch (error: any) {
       // convert error to json
       const err = await error.json();
@@ -156,7 +156,7 @@ const CreateProfile = () => {
   //       updatedUser = await uploadProfileWithCustomPic(formData);
   //     }
   //     updateUser(updatedUser);
-  //     router.push("/pickBuilding");
+  //     router.replace("/pickBuilding");
   //   } catch (err) {
   //     Alert.alert("We had an issue uploading your profile. Try again.");
   //   }
@@ -194,6 +194,8 @@ const CreateProfile = () => {
           <View>
             <Text style={styles.inputLabel}>Username</Text>
             <TextInput
+              autoComplete="off"
+              autoCorrect={false}
               autoCapitalize="none"
               placeholder="Username"
               value={username}

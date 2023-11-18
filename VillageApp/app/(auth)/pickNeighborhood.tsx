@@ -9,10 +9,9 @@ import onboardingStyles from "../../lib/styles/onboarding";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
-  const { buildingAddress, neighborhoodName, buildingID, neighborhoodID } =
-    useGlobalSearchParams();
-  const { createBuilding, updateUserAttributes } = useTweetsApi();
-  const { user, updateUser } = useUser();
+  const { buildingAddress } = useGlobalSearchParams();
+  const { createBuilding } = useTweetsApi();
+  const { user } = useUser();
 
   const neighborhoods = [
     "Chelsea",
@@ -49,35 +48,14 @@ const PickNeighborhood = () => {
       if (user === null) {
         throw new Error("User is null");
       }
-      const updatedUser = await updateUserAttributes({
-        neighborhoodID: building.neighborhood_id,
-        buildingID: building.id,
+      router.replace({
+        pathname: "/showNeighborhood",
+        params: {
+          neighborhoodName: selectedNeighborhood,
+          buildingID: building.id,
+          neighborhoodID: building.neighborhood_id,
+        },
       });
-      // assign returned user to user context
-      updateUser(updatedUser);
-    } catch (error) {
-      console.log(error);
-      Alert.alert("We had an issue adding you to the neighborhood. Try again.");
-    }
-  };
-
-  const onEnter = async () => {
-    try {
-      if (user === null) {
-        throw new Error("User is null");
-      }
-      // validate that neighborhoodID and buildingID are strings
-      if (typeof neighborhoodID !== "string") {
-        throw new Error("Neighborhood ID is not a string");
-      }
-      if (typeof buildingID !== "string") {
-        throw new Error("Building ID is not a string");
-      }
-      const updatedUser = await updateUserAttributes({
-        neighborhoodID: neighborhoodID,
-        buildingID: buildingID,
-      });
-      updateUser(updatedUser);
     } catch (error) {
       console.log(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
@@ -85,45 +63,30 @@ const PickNeighborhood = () => {
   };
 
   return (
-    <>
-      {neighborhoodName ? (
-        <View style={styles.container}>
-          <View style={{ flex: 1, justifyContent: "space-between" }}>
-            <Text style={onboardingStyles.label}>
-              Welcome to {neighborhoodName} on Village.
-            </Text>
-            <Pressable style={onboardingStyles.button} onPress={onEnter}>
-              <Text style={onboardingStyles.buttonText}>Enter</Text>
-            </Pressable>
-          </View>
-        </View>
-      ) : (
-        <View style={styles.container}>
-          <View style={{ flex: 1, justifyContent: "space-between" }}>
-            <Text style={onboardingStyles.label}>
-              What neighborhood is your building in?
-            </Text>
-            <Picker
-              selectedValue={selectedNeighborhood}
-              onValueChange={(itemValue: string) =>
-                setSelectedNeighborhood(itemValue)
-              }
-            >
-              {neighborhoods.map((neighborhood) => (
-                <Picker.Item
-                  key={neighborhood}
-                  label={neighborhood}
-                  value={neighborhood}
-                />
-              ))}
-            </Picker>
-            <Pressable style={onboardingStyles.button} onPress={onSubmit}>
-              <Text style={onboardingStyles.buttonText}>Submit</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
-    </>
+    <View style={styles.container}>
+      <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <Text style={onboardingStyles.label}>
+          What neighborhood is your building in?
+        </Text>
+        <Picker
+          selectedValue={selectedNeighborhood}
+          onValueChange={(itemValue: string) =>
+            setSelectedNeighborhood(itemValue)
+          }
+        >
+          {neighborhoods.map((neighborhood) => (
+            <Picker.Item
+              key={neighborhood}
+              label={neighborhood}
+              value={neighborhood}
+            />
+          ))}
+        </Picker>
+        <Pressable style={onboardingStyles.button} onPress={onSubmit}>
+          <Text style={onboardingStyles.buttonText}>Submit</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 };
 

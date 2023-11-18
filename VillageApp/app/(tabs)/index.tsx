@@ -11,7 +11,8 @@ import Tweet from "../../components/Tweet";
 import { Link } from "expo-router";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import colors from "../../constants/Colors";
+import { DynaPuffText } from "../../components/StyledText";
+import Colors from "../../constants/Colors";
 
 export default function FeedScreen() {
   const { listTweets } = useTweetsApi();
@@ -59,6 +60,14 @@ export default function FeedScreen() {
     return false;
   });
 
+  const renderEmptyListComponent = () => (
+    <View style={styles.emptyContainer}>
+      <DynaPuffText style={styles.emptyText}>
+        Post something that’s on your mind.
+      </DynaPuffText>
+    </View>
+  );
+
   return (
     <View style={styles.page}>
       <FlatList
@@ -69,6 +78,8 @@ export default function FeedScreen() {
         ListFooterComponent={
           isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
         }
+        ListEmptyComponent={renderEmptyListComponent}
+        contentContainerStyle={{ flexGrow: 1 }}
       />
 
       <Link href="/new-tweet" asChild>
@@ -81,6 +92,18 @@ export default function FeedScreen() {
 }
 
 const styles = StyleSheet.create({
+  emptyText: {
+    paddingHorizontal: 20,
+    fontSize: 36,
+    textAlign: "center",
+    color: "lightgrey",
+  },
+  emptyContainer: {
+    flex: 1,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   page: {
     flex: 1,
     backgroundColor: "white",
