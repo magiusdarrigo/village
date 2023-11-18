@@ -1,14 +1,10 @@
 import "react-native-gesture-handler";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
-import { useColorScheme, Alert } from "react-native";
+import { Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -70,18 +66,13 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
     <>
       <UserContextProvider streamChatClient={streamChatClient}>
         <AuthContextProvider>
           <TweetsApiContextProvider>
             <QueryClientProvider client={queryClient}>
-              <ThemeProvider
-                // value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-                value={DefaultTheme}
-              >
+              <ThemeProvider value={DefaultTheme}>
                 <Stack>
                   <Stack.Screen
                     name="(tabs)"

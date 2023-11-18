@@ -1,8 +1,6 @@
 import prisma from "../src/clients/prismaClient";
 
 async function main() {
-  // disable seeding with this return
-  return;
   const sleep = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
@@ -47,6 +45,9 @@ async function main() {
   });
 
   await Promise.all(neighborhoodPromises);
+
+  // disable the rest of the seed for now
+  return;
 
   // seed the buildings table with 25 buildings (5 buildings per neighborhood)
   const randomBuildings = Array.from({ length: 25 }).map((_, index) => {

@@ -1,6 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable, useColorScheme } from "react-native";
+import { Pressable } from "react-native";
 import { useUser } from "../../context/UserContext";
 
 import Colors from "../../constants/Colors";
@@ -16,13 +16,13 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const { user } = useUser();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors.light.tint,
+        tabBarInactiveTintColor: Colors.light.tabIconDefault,
       }}
     >
       <Tabs.Screen
@@ -47,7 +47,7 @@ export default function TabLayout() {
                   <FontAwesome
                     name="user"
                     size={25}
-                    color={Colors[colorScheme ?? "light"].text}
+                    color={Colors.light.text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
