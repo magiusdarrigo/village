@@ -12,7 +12,6 @@ import { Link } from "expo-router";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DynaPuffText } from "../../components/StyledText";
-import Colors from "../../constants/Colors";
 
 export default function FeedScreen() {
   const { listTweets } = useTweetsApi();
