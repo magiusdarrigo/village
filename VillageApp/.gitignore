@@ -1,5 +1,7 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
+.DS_Store
+
 # dependencies
 node_modules/
 
@@ -75,9 +77,6 @@ yarn-error.*
 
 # @end expo-cli
 
-# .DS_Store
-
-
 # Firebase
-# google-services.json
-# GoogleService-Info.plist
+google-services.json
+GoogleService-Info.plist
