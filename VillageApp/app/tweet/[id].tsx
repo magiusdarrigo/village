@@ -244,6 +244,7 @@ const TweetScreen = () => {
         <TextInput
           ref={inputRef}
           placeholder="Add a comment..."
+          placeholderTextColor={"lightgrey"}
           style={styles.footerTextInput}
           onChangeText={setCommentText}
           value={commentText}

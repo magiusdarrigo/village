@@ -7,6 +7,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
@@ -15,40 +17,15 @@ import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 
-const formatPhoneNumber = (input: string, currentPhoneNumber: string) => {
-  // Remove all non-digit characters from the phone number
-  let cleaned = input.replace(/\D/g, "");
-
-  // Start with the cleaned input if it's shorter than the current number, likely a delete action
-  if (input.length < currentPhoneNumber.length) {
-    return cleaned;
-  }
-
-  // Begin with the formatted number as the cleaned input
-  let formattedNumber = cleaned;
-
-  // Only if we have enough digits, start to format
-  if (cleaned.length >= 6) {
-    // We have enough for the first two groups
-    formattedNumber = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}`;
-    // If we have more than 6 digits, add the last part
-    if (cleaned.length > 6) {
-      formattedNumber += `-${cleaned.slice(6, 10)}`;
-    }
-  } else if (cleaned.length >= 3) {
-    // Only enough for the area code part
-    formattedNumber = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
-  }
-
-  // If not enough for any formatting, just return the cleaned input
-  return formattedNumber;
-};
-
 const SignIn = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [lastKeyPressed, setLastKeyPressed] = useState("");
   const router = useRouter();
-
   const { updateUser } = useUser();
+
+  const onKeyPress = ({ nativeEvent }: { nativeEvent: any }) => {
+    setLastKeyPressed(nativeEvent.key);
+  };
 
   const onSignIn = async () => {
     try {
@@ -61,37 +38,57 @@ const SignIn = () => {
   };
 
   const handlePhoneChange = (input: string) => {
-    const formattedInput = formatPhoneNumber(input, phoneNumber);
-    setPhoneNumber(formattedInput); // Assuming setPhoneNumber is your state setter
+    // First, remove all non-digit characters
+    const digitsOnly = input.replace(/\D/g, "");
+
+    // Then, format the digits
+    let formattedInput = "";
+    if (digitsOnly.length >= 1) {
+      formattedInput += `(${digitsOnly.slice(0, 3)}`;
+    }
+    if (digitsOnly.length >= 4) {
+      formattedInput += `) ${digitsOnly.slice(3, 6)}`;
+    }
+    if (digitsOnly.length >= 7) {
+      formattedInput += `-${digitsOnly.slice(6, 10)}`;
+    }
+
+    // Update the state with the newly formatted input
+    setPhoneNumber(formattedInput);
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <Text style={onboardingStyles.label}>Enter your phone number.</Text>
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <TextInput
-          placeholder=""
-          value={phoneNumber}
-          onChangeText={handlePhoneChange}
-          style={styles.input}
-          keyboardType="phone-pad"
-          autoFocus={true}
-        />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <Text style={onboardingStyles.label}>Enter your phone number.</Text>
+        <View style={{ flex: 1, justifyContent: "space-between" }}>
+          <TextInput
+            placeholder=""
+            value={phoneNumber}
+            onChangeText={handlePhoneChange}
+            onKeyPress={onKeyPress}
+            style={styles.input}
+            keyboardType="phone-pad"
+            autoFocus={false}
+            multiline={true}
+            numberOfLines={1}
+          />
 
-        <View>
-          <Text style={styles.optInText}>
-            By selecting Get Code, you agree to receiving SMS verification
-            messages from Village.
-          </Text>
-          <Pressable style={onboardingStyles.button} onPress={onSignIn}>
-            <Text style={onboardingStyles.buttonText}>Get Code</Text>
-          </Pressable>
+          <View>
+            <Text style={styles.optInText}>
+              By selecting Get Code, you agree to receiving SMS verification
+              messages from Village.
+            </Text>
+            <Pressable style={onboardingStyles.button} onPress={onSignIn}>
+              <Text style={onboardingStyles.buttonText}>Get Code</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -108,11 +105,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   input: {
+    textAlignVertical: "top",
     borderColor: "transparent", // no border
     borderWidth: 0,
     paddingTop: 10,
     fontSize: 20,
     color: "black",
+    flex: 1,
   },
 });
 

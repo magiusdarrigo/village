@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
@@ -97,30 +98,38 @@ const NewTweet = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={styles.container}>
-        <View style={styles.buttonContainer}>
-          <Link href="../" style={{ fontSize: 16 }}>
-            Cancel
-          </Link>
-          {isLoading && <ActivityIndicator />}
-          <Pressable onPress={onTweetPress} style={styles.button}>
-            <Text style={styles.buttonText}>Post</Text>
-          </Pressable>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+        <View style={styles.container}>
+          <View style={styles.buttonContainer}>
+            <Link href="../" style={{ fontSize: 16 }}>
+              Cancel
+            </Link>
+            {isLoading && <ActivityIndicator />}
+            <Pressable onPress={onTweetPress} style={styles.button}>
+              <Text style={styles.buttonText}>Post</Text>
+            </Pressable>
+          </View>
+          <View style={styles.inputContainer}>
+            <View style={[styles.image, { backgroundColor: user?.image }]} />
+            <TextInput
+              value={text}
+              onChangeText={(value) => setText(value)}
+              placeholder={`What's going on in ${user?.neighborhood?.name}?`}
+              multiline
+              numberOfLines={5}
+              style={{
+                marginTop: 8,
+                flex: 1,
+                lineHeight: 22,
+                fontSize: 18,
+                textAlignVertical: "top",
+              }}
+            />
+          </View>
         </View>
-        <View style={styles.inputContainer}>
-          <View style={[styles.image, { backgroundColor: user?.image }]} />
-          <TextInput
-            value={text}
-            onChangeText={(value) => setText(value)}
-            placeholder={`What's going on in ${user?.neighborhood?.name}?`}
-            multiline
-            numberOfLines={5}
-            style={{ flex: 1, lineHeight: 22, fontSize: 18 }}
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
