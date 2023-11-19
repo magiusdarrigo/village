@@ -13,6 +13,7 @@ import { CURRENT_APP_VERSION } from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { STREAM_CHAT_API_KEY } from "../lib/api/config";
+import messaging from "@react-native-firebase/messaging";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,14 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
+    // call register device for push notifications here
+    const registerDeviceForPushNotifications = async () => {
+      try {
+        await messaging().registerDeviceForRemoteMessages();
+      } catch (error) {
+        console.log("register device for push notifications ERROR: ", error);
+      }
+    };
     // call version check here
     const checkVersion = async () => {
       const { mandatoryUpdate, latestVersion } = await checkAppVersion();
@@ -55,6 +64,7 @@ export default function RootLayout() {
         );
       }
     };
+    // registerDeviceForPushNotifications();
     checkVersion();
   }, [loaded]);
 
