@@ -12,6 +12,7 @@ import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
 import notifee from "@notifee/react-native";
+import { isIOSSimulator } from "../../lib/helpers";
 
 import {
   OverlayProvider,
@@ -28,6 +29,9 @@ const setBackgroundMessageHandlerIfAndroid = async (
   userChatToken: string | undefined,
   streamChatClient: StreamChat<any>
 ) => {
+  if (isIOSSimulator()) {
+    return;
+  }
   if (Platform.OS !== "android") {
     return;
   }
@@ -64,7 +68,6 @@ const setBackgroundMessageHandlerIfAndroid = async (
         data,
         android: {
           channelId,
-          // add a press action to open the app on press
           pressAction: {
             id: "default",
           },
@@ -78,6 +81,9 @@ const setBackgroundMessageHandlerIfAndroid = async (
 
 // Request Push Notification permission from device.
 const requestPermission = async () => {
+  if (isIOSSimulator()) {
+    return;
+  }
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -97,6 +103,9 @@ const ChatScreen = () => {
   useEffect(() => {
     // Register FCM token with stream chat server.
     const registerPushToken = async () => {
+      if (isIOSSimulator()) {
+        return;
+      }
       // unsubscribe any previous listener
       unsubscribeTokenRefreshListenerRef.current?.();
       const token = await messaging().getToken();

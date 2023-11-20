@@ -14,6 +14,7 @@ import { checkAppVersion } from "../lib/api/auth";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { STREAM_CHAT_API_KEY } from "../lib/api/config";
 import messaging from "@react-native-firebase/messaging";
+import { isIOSSimulator } from "../lib/helpers";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,9 @@ export default function RootLayout() {
   useEffect(() => {
     // call register device for push notifications here
     const registerDeviceForPushNotifications = async () => {
+      if (isIOSSimulator()) {
+        return;
+      }
       try {
         await messaging().registerDeviceForRemoteMessages();
       } catch (error) {

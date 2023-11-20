@@ -16,8 +16,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.magius18.village",
-      "buildNumber": "4",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "buildNumber": "5",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.magius18.village",
@@ -35,12 +38,25 @@
     "plugins": [
       "expo-router",
       "@react-native-firebase/app",
+      "expo-document-picker",
       [
         "expo-build-properties",
         {
           "ios": {
             "useFrameworks": "static"
           }
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Village to access your camera."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Village accesses your photos to let you share them."
         }
       ]
     ],
