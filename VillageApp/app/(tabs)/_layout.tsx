@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable, Platform } from "react-native";
-import React, { useEffect } from "react";
+import { Pressable } from "react-native";
+import React, { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
@@ -26,6 +26,9 @@ notifee.onBackgroundEvent(async ({ detail, type }) => {
 
 export default function TabLayout() {
   const { user } = useUser();
+  const [chatTabBadgeCount, setChatTabBadgeCount] = useState<
+    string | undefined
+  >(undefined);
 
   useEffect(() => {
     const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
@@ -34,6 +37,10 @@ export default function TabLayout() {
           "[iOS] When the application is running, but in the background. Notification: ",
           remoteMessage
         );
+        // set the chat tab badge count
+        if (remoteMessage?.notification?.ios?.badge) {
+          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
+        }
       }
     );
 
@@ -51,6 +58,10 @@ export default function TabLayout() {
           "[iOS] When the application is opened from a quit state. Notification: ",
           remoteMessage
         );
+        // set the chat tab badge count
+        if (remoteMessage?.notification?.ios?.badge) {
+          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
+        }
       });
 
     return () => {
@@ -100,9 +111,20 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: user?.building?.address ?? "Chat",
+          tabBarBadge: chatTabBadgeCount,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="comments" color={color} />
           ),
+        }}
+        listeners={{
+          tabPress: (_) => {
+            try {
+              setChatTabBadgeCount(undefined);
+              notifee.setBadgeCount(0);
+            } catch (error) {
+              console.log("setBadgeCount error: ", error);
+            }
+          },
         }}
       />
     </Tabs>

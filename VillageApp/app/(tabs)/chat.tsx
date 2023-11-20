@@ -29,9 +29,6 @@ const setBackgroundMessageHandlerIfAndroid = async (
   userChatToken: string | undefined,
   streamChatClient: StreamChat<any>
 ) => {
-  if (isIOSSimulator()) {
-    return;
-  }
   if (Platform.OS !== "android") {
     return;
   }
