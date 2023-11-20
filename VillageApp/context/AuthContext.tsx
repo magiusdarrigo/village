@@ -27,7 +27,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const { user, updateUser } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
-  const navigation = useNavigation();
   const segments = useSegments();
   const router = useRouter();
 

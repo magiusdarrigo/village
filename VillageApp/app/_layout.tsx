@@ -30,6 +30,8 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+console.log("main layout file run");
+
 // create the stream chat client
 const streamChatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
 
@@ -64,7 +66,7 @@ export default function RootLayout() {
         );
       }
     };
-    // registerDeviceForPushNotifications();
+    registerDeviceForPushNotifications();
     checkVersion();
   }, [loaded]);
 

@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.magius18.village",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {

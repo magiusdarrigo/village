@@ -83,7 +83,8 @@ const ModalScreen = ({ user }: ProfileProps) => {
       {
         text: "Log out",
         onPress: async () => {
-          streamChatClient.disconnectUser();
+          // TODO: can i remove this disconnectUser call?
+          // streamChatClient.disconnectUser();
           removeAuthToken();
         },
       },
