@@ -10,6 +10,8 @@ import { useUser } from "../context/UserContext";
 import { calculateHoursAgo } from "../lib/helpers";
 import * as Sentry from "sentry-expo";
 import postStyles from "../lib/styles/post";
+import Hyperlink from "react-native-hyperlink";
+import { handlePressButtonAsync } from "../lib/helpers";
 
 type TweetProps = {
   tweet: TweetType;
@@ -380,9 +382,12 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                 />
               </Pressable>
             </View>
-
-            <Text style={postStyles.textContent}> {tweet.text_content}</Text>
-
+            <Hyperlink
+              linkStyle={{ color: "#2980b9" }}
+              onPress={handlePressButtonAsync}
+            >
+              <Text style={postStyles.textContent}> {tweet.text_content}</Text>
+            </Hyperlink>
             {tweet.image_url && (
               <Image source={{ uri: tweet.image_url }} style={styles.image} />
             )}

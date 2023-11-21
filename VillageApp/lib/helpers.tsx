@@ -1,6 +1,8 @@
-import { Text, StyleSheet, Platform } from "react-native";
+import { Text, Platform, Alert } from "react-native";
 import postStyles from "./styles/post";
 import * as Device from "expo-device";
+import * as WebBrowser from "expo-web-browser";
+import * as Sentry from "sentry-expo";
 
 export const calculateHoursAgo = (time: string) => {
   const now = new Date();
@@ -28,4 +30,13 @@ export const calculateHoursAgo = (time: string) => {
 
 export const isIOSSimulator = () => {
   return Platform.OS === "ios" && !Device.isDevice;
+};
+
+export const handlePressButtonAsync = async (url: string) => {
+  try {
+    await WebBrowser.openBrowserAsync(url);
+  } catch (error) {
+    Sentry.Native.captureException(error);
+    Alert.alert("Sorry, this link is invalid");
+  }
 };
