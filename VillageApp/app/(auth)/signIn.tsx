@@ -10,7 +10,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { login } from "../../lib/api/auth";
 import { useUser } from "../../context/UserContext";
@@ -22,13 +22,26 @@ const SignIn = () => {
   const [lastKeyPressed, setLastKeyPressed] = useState("");
   const router = useRouter();
   const { updateUser } = useUser();
+  const phoneNumberInputRef = useRef<TextInput>(null);
+
+  const isButtonDisabled = phoneNumber.length < 14;
 
   const onKeyPress = ({ nativeEvent }: { nativeEvent: any }) => {
     setLastKeyPressed(nativeEvent.key);
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Check if the input is currently mounted before calling focus
+      phoneNumberInputRef.current?.focus();
+    }, 1000); // 1000 milliseconds delay
+
+    return () => clearTimeout(timer); // Clear timeout if component unmounts
+  }, []);
+
   const onSignIn = async () => {
     try {
+      Keyboard.dismiss();
       const user = await login({ phoneNumber });
       updateUser(user);
       router.replace({ pathname: "/authenticate", params: { phoneNumber } });
@@ -40,7 +53,6 @@ const SignIn = () => {
   const handlePhoneChange = (input: string) => {
     // First, remove all non-digit characters
     const digitsOnly = input.replace(/\D/g, "");
-
     // Then, format the digits
     let formattedInput = "";
     if (digitsOnly.length >= 1) {
@@ -66,6 +78,7 @@ const SignIn = () => {
         <Text style={onboardingStyles.label}>Enter your phone number.</Text>
         <View style={{ flex: 1, justifyContent: "space-between" }}>
           <TextInput
+            ref={phoneNumberInputRef}
             placeholder=""
             value={phoneNumber}
             onChangeText={handlePhoneChange}
@@ -82,7 +95,14 @@ const SignIn = () => {
               By selecting Get Code, you agree to receiving SMS verification
               messages from Village.
             </Text>
-            <Pressable style={onboardingStyles.button} onPress={onSignIn}>
+            <Pressable
+              style={[
+                onboardingStyles.button,
+                isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+              ]}
+              onPress={onSignIn}
+              disabled={isButtonDisabled}
+            >
               <Text style={onboardingStyles.buttonText}>Get Code</Text>
             </Pressable>
           </View>

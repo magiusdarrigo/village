@@ -21,9 +21,8 @@ type ProfileProps = {
 const ModalScreen = ({ user }: ProfileProps) => {
   const queryClient = useQueryClient();
   const { followUser, unFollowUser } = useTweetsApi();
-  const { user: currentUser, getStreamChatClient } = useUser();
+  const { user: currentUser } = useUser();
   const { removeAuthToken } = useAuth();
-  const streamChatClient = getStreamChatClient();
 
   const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
     followUser,

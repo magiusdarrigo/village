@@ -22,6 +22,8 @@ import {
   MessageList,
 } from "stream-chat-expo";
 
+let areNotificationsEnabled = false;
+
 // TODO: This should probably happen in the app's entrypoint file. Reason:
 // https://stackoverflow.com/questions/66998305/warn-no-task-registered-for-key-reactnativefirebasemessagingheadlesstask-in-reac#:~:text=without%20mounting%20your
 const setBackgroundMessageHandlerIfAndroid = async (
@@ -85,9 +87,7 @@ const requestPermission = async () => {
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  if (enabled) {
-    console.log("Authorization status:", authStatus);
-  }
+  areNotificationsEnabled = enabled;
 };
 
 const ChatScreen = () => {
@@ -143,8 +143,10 @@ const ChatScreen = () => {
       try {
         // ask for push notification permission
         await requestPermission();
-        // register push token
-        await registerPushToken();
+        if (areNotificationsEnabled) {
+          // register push token
+          await registerPushToken();
+        }
         // set background message handler for android
         await setBackgroundMessageHandlerIfAndroid(
           String(user?.id),

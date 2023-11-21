@@ -83,6 +83,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerRight: () => (
             <Link
+              // TODO: I notice that logging out will keep the home page in the history stack. If I
+              // add the replace={true} prop, then the home page will not be in the history stack when I log out,
+              // but then I can't go back to the home page when I'm logged in.
               href={{
                 pathname: `/profile/you`,
                 params: {

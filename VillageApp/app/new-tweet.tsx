@@ -11,7 +11,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
@@ -23,6 +23,18 @@ const NewTweet = () => {
   const { createTweet } = useTweetsApi();
   const { user } = useUser();
   const queryClient = useQueryClient();
+  const tweetTextRef = useRef<TextInput>(null);
+
+  const isPostButtonDisabled = text.length < 1;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Check if the input is currently mounted before calling focus
+      tweetTextRef.current?.focus();
+    }, 1000); // 1000 milliseconds delay
+
+    return () => clearTimeout(timer); // Clear timeout if component unmounts
+  }, []);
 
   const { isLoading, mutateAsync } = useMutation({
     mutationFn: createTweet,
@@ -106,13 +118,22 @@ const NewTweet = () => {
               Cancel
             </Link>
             {isLoading && <ActivityIndicator />}
-            <Pressable onPress={onTweetPress} style={styles.button}>
+            <Pressable
+              onPress={onTweetPress}
+              style={[
+                styles.button,
+                isPostButtonDisabled ? styles.buttonDisabled : {},
+              ]}
+              disabled={isPostButtonDisabled}
+            >
               <Text style={styles.buttonText}>Post</Text>
             </Pressable>
           </View>
           <View style={styles.inputContainer}>
             <View style={[styles.image, { backgroundColor: user?.image }]} />
             <TextInput
+              ref={tweetTextRef}
+              autoFocus={false}
               value={text}
               onChangeText={(value) => setText(value)}
               placeholder={`What's going on in ${user?.neighborhood?.name}?`}
@@ -160,6 +181,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "white",
     fontSize: 16,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   inputContainer: {
     flexDirection: "row",
