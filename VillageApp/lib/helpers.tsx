@@ -1,4 +1,5 @@
-import { Text, StyleSheet } from "react-native";
+import { Text, StyleSheet, Platform } from "react-native";
+import * as Device from "expo-device";
 
 export const calculateHoursAgo = (time: string) => {
   const now = new Date();
@@ -30,3 +31,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 });
+
+export const isIOSSimulator = () => {
+  return Platform.OS === "ios" && !Device.isDevice;
+};

@@ -12,30 +12,6 @@ const ShowNeighborhood = () => {
   const { updateUserAttributes } = useTweetsApi();
   const { user, updateUser } = useUser();
 
-  const neighborhoods = [
-    "Chelsea",
-    "Chinatown",
-    "East Village",
-    "Fidi",
-    "Flatiron",
-    "Gramercy",
-    "Greenwich Village",
-    "Harlem",
-    "Hell's Kitchen",
-    "Hudson Yards",
-    "Little Italy",
-    "Lower East Side",
-    "Midtown",
-    "Midtown East",
-    "Nolita",
-    "SoHo",
-    "Tribeca",
-    "Upper East Side",
-    "Upper West Side",
-    "West Village",
-    "Williamsburg",
-  ];
-
   const onEnter = async () => {
     try {
       if (user === null) {
@@ -62,7 +38,7 @@ const ShowNeighborhood = () => {
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <Text style={onboardingStyles.label}>
+        <Text style={styles.welcomeLabel}>
           Welcome to {neighborhoodName} on Village.
         </Text>
         <Pressable style={onboardingStyles.button} onPress={onEnter}>
@@ -74,6 +50,14 @@ const ShowNeighborhood = () => {
 };
 
 const styles = StyleSheet.create({
+  welcomeLabel: {
+    marginTop: 36, // space above the label
+    fontSize: 60,
+    marginBottom: 8, // space below the label
+    color: "black",
+    fontWeight: "bold",
+    alignSelf: "flex-start", // align to top-left
+  },
   container: {
     backgroundColor: Colors.light.tertiary,
     flex: 1,

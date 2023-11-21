@@ -104,7 +104,7 @@ model posts {
 
 model reported_posts {
   id             Int             @id @default(autoincrement())
-  post           posts           @relation(fields: [post_id], references: [id])
+  post           posts           @relation(fields: [post_id], references: [id], onDelete: Cascade)
   post_id         Int
   user           users           @relation(fields: [user_id_reporting], references: [id])
   user_id_reporting         Int
@@ -118,14 +118,14 @@ model post_likes {
   user_id   Int
   post_id   Int
   user     users   @relation(fields: [user_id], references: [id])
-  post     posts   @relation(fields: [post_id], references: [id])
+  post     posts   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, post_id])
 }
 
 model comments {
   id              Int             @id @default(autoincrement())
-  post            posts           @relation(fields: [post_id], references: [id])
+  post            posts           @relation(fields: [post_id], references: [id], onDelete: Cascade)
   post_id          Int
   user            users           @relation(fields: [user_id], references: [id])
   user_id          Int
@@ -145,7 +145,7 @@ model comments {
 
 model reported_comments {
   id             Int             @id @default(autoincrement())
-  comment           comments           @relation(fields: [comment_id], references: [id])
+  comment        comments        @relation(fields: [comment_id], references: [id], onDelete: Cascade)
   comment_id         Int
   user           users           @relation(fields: [user_id_reporting], references: [id])
   user_id_reporting         Int
@@ -154,11 +154,11 @@ model reported_comments {
   tags           Json?
 }
 model comment_likes {
-  id          Int       @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   user_id      Int
   comment_id   Int
-  user        users     @relation(fields: [user_id], references: [id])
-  comment     comments  @relation(fields: [comment_id], references: [id])
+  user         users      @relation(fields: [user_id], references: [id])
+  comment      comments   @relation(fields: [comment_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, comment_id])
 }

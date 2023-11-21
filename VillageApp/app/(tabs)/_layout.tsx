@@ -1,13 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable, useColorScheme } from "react-native";
+import { Pressable } from "react-native";
+import React, { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
-
 import Colors from "../../constants/Colors";
+import notifee, { EventType } from "@notifee/react-native";
+import messaging from "@react-native-firebase/messaging";
+import * as Sentry from "sentry-expo";
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
@@ -15,14 +15,74 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+notifee.onBackgroundEvent(async ({ detail, type }) => {
+  if (type === EventType.PRESS) {
+    if (detail.notification) {
+      console.log(
+        "[Android] When the application is running but in the background. Notification: ",
+        detail.notification
+      );
+    }
+    await Promise.resolve();
+  }
+});
+
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const { user } = useUser();
+  const [chatTabBadgeCount, setChatTabBadgeCount] = useState<
+    string | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
+      (remoteMessage) => {
+        if (remoteMessage?.notification) {
+          Sentry.Native.captureMessage(
+            "[iOS] When the application is running, but in the background. Notification: " +
+              JSON.stringify(remoteMessage?.notification)
+          );
+        }
+        // set the chat tab badge count
+        if (remoteMessage?.notification?.ios?.badge) {
+          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
+        }
+      }
+    );
+
+    notifee.getInitialNotification().then((initialNotification) => {
+      if (initialNotification?.notification) {
+        console.log(
+          "[Android] When the application is opened from a quit state. Notification: ",
+          initialNotification
+        );
+      }
+    });
+
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
+        if (remoteMessage?.notification) {
+          Sentry.Native.captureMessage(
+            "[iOS] When the application is opened from a quit state. Notification: " +
+              JSON.stringify(remoteMessage?.notification)
+          );
+        }
+        // set the chat tab badge count
+        if (remoteMessage?.notification?.ios?.badge) {
+          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
+        }
+      });
+
+    return () => {
+      unsubscribeOnNotificationOpen();
+    };
+  }, []);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors.light.tint,
+        tabBarInactiveTintColor: Colors.light.tabIconDefault,
       }}
     >
       <Tabs.Screen
@@ -32,6 +92,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerRight: () => (
             <Link
+              // TODO: I notice that logging out will keep the home page in the history stack. If I
+              // add the replace={true} prop, then the home page will not be in the history stack when I log out,
+              // but then I can't go back to the home page when I'm logged in.
               href={{
                 pathname: `/profile/you`,
                 params: {
@@ -47,7 +110,7 @@ export default function TabLayout() {
                   <FontAwesome
                     name="user"
                     size={25}
-                    color={Colors[colorScheme ?? "light"].text}
+                    color={Colors.light.text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -60,9 +123,20 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: user?.building?.address ?? "Chat",
+          tabBarBadge: chatTabBadgeCount,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="comments" color={color} />
           ),
+        }}
+        listeners={{
+          tabPress: (_) => {
+            try {
+              setChatTabBadgeCount(undefined);
+              notifee.setBadgeCount(0);
+            } catch (error) {
+              console.log("setBadgeCount error: ", error);
+            }
+          },
         }}
       />
     </Tabs>

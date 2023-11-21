@@ -1,24 +1,30 @@
 import "react-native-gesture-handler";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
-import { useColorScheme, Alert } from "react-native";
+import { Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TweetsApiContextProvider from "../context/TweetContext";
-import { CURRENT_APP_VERSION } from "../lib/api/config";
+import { CURRENT_APP_VERSION, SENTRY_DSN } from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { STREAM_CHAT_API_KEY } from "../lib/api/config";
+import messaging from "@react-native-firebase/messaging";
+import { isIOSSimulator } from "../lib/helpers";
+import * as Sentry from "sentry-expo";
 
 const queryClient = new QueryClient();
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  enableInExpoDevelopment: true,
+  enableNative: true,
+  debug: false,
+});
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -49,6 +55,17 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
+    // call register device for push notifications here
+    const registerDeviceForPushNotifications = async () => {
+      if (isIOSSimulator()) {
+        return;
+      }
+      try {
+        await messaging().registerDeviceForRemoteMessages();
+      } catch (error) {
+        Sentry.Native.captureException(error);
+      }
+    };
     // call version check here
     const checkVersion = async () => {
       const { mandatoryUpdate, latestVersion } = await checkAppVersion();
@@ -59,6 +76,7 @@ export default function RootLayout() {
         );
       }
     };
+    registerDeviceForPushNotifications();
     checkVersion();
   }, [loaded]);
 
@@ -70,18 +88,13 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
     <>
       <UserContextProvider streamChatClient={streamChatClient}>
         <AuthContextProvider>
           <TweetsApiContextProvider>
             <QueryClientProvider client={queryClient}>
-              <ThemeProvider
-                // value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-                value={DefaultTheme}
-              >
+              <ThemeProvider value={DefaultTheme}>
                 <Stack>
                   <Stack.Screen
                     name="(tabs)"
@@ -94,7 +107,7 @@ function RootLayoutNav() {
                   <Stack.Screen name="tweet/[id]" options={{ title: "Post" }} />
                   <Stack.Screen
                     name="new-tweet"
-                    options={{ title: "New Tweet", headerShown: false }}
+                    options={{ title: "New Post", headerShown: true }}
                   />
                   <Stack.Screen
                     name="(auth)/signIn"

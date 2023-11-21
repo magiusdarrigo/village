@@ -8,6 +8,7 @@ import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../context/UserContext";
 import { calculateHoursAgo } from "../lib/helpers";
+import * as Sentry from "sentry-expo";
 
 type TweetProps = {
   tweet: TweetType;
@@ -112,7 +113,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         });
       },
       onError: (error, _, context) => {
-        console.log(error);
+        Sentry.Native.captureException(error);
         Alert.alert("We couldn't like this post. Try again.");
 
         // revert to the previous value
@@ -215,7 +216,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         });
       },
       onError: (error, _, context) => {
-        console.log(error);
+        Sentry.Native.captureException(error);
         Alert.alert("We couldn't like this post. Try again.");
         // revert to the previous value
         if (context?.previousTweets) {
@@ -260,7 +261,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
       }
     },
     onError: (error) => {
-      console.log(error);
+      Sentry.Native.captureException(error);
       Alert.alert("We couldn't delete this post. Try again.");
     },
   });
@@ -270,6 +271,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
       await reportTweet(String(id));
       Alert.alert("Post reported.");
     } catch (error) {
+      Sentry.Native.captureException(error);
       Alert.alert("We couldn't report this post. Try again.");
     }
   };
@@ -309,6 +311,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         mutateLike(String(postID));
       }
     } catch (error) {
+      Sentry.Native.captureException(error);
       Alert.alert("We couldn't like this post. Try again.");
     }
   };

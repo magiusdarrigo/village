@@ -51,24 +51,6 @@ router.delete("/:id", async (req, res) => {
     if (post && post.user_id !== currentUser.id) {
       return res.status(400).json({ error: "Unauthorized" });
     }
-    // we have to delete the foreign key constraints first
-    await prisma.post_likes.deleteMany({
-      where: {
-        post_id: Number(id),
-      },
-    });
-
-    await prisma.comments.deleteMany({
-      where: {
-        post_id: Number(id),
-      },
-    });
-
-    await prisma.reported_posts.deleteMany({
-      where: {
-        post_id: Number(id),
-      },
-    });
 
     const deletePost = await prisma.posts.delete({
       where: {
