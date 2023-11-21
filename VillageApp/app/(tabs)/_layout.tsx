@@ -6,6 +6,7 @@ import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import messaging from "@react-native-firebase/messaging";
+import * as Sentry from "sentry-expo";
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -16,10 +17,12 @@ function TabBarIcon(props: {
 
 notifee.onBackgroundEvent(async ({ detail, type }) => {
   if (type === EventType.PRESS) {
-    console.log(
-      "[Android] When the application is running but in the background. Notification: ",
-      detail.notification
-    );
+    if (detail.notification) {
+      console.log(
+        "[Android] When the application is running but in the background. Notification: ",
+        detail.notification
+      );
+    }
     await Promise.resolve();
   }
 });
@@ -33,10 +36,12 @@ export default function TabLayout() {
   useEffect(() => {
     const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
       (remoteMessage) => {
-        console.log(
-          "[iOS] When the application is running, but in the background. Notification: ",
-          remoteMessage
-        );
+        if (remoteMessage?.notification) {
+          Sentry.Native.captureMessage(
+            "[iOS] When the application is running, but in the background. Notification: " +
+              JSON.stringify(remoteMessage?.notification)
+          );
+        }
         // set the chat tab badge count
         if (remoteMessage?.notification?.ios?.badge) {
           setChatTabBadgeCount(remoteMessage.notification.ios.badge);
@@ -45,19 +50,23 @@ export default function TabLayout() {
     );
 
     notifee.getInitialNotification().then((initialNotification) => {
-      console.log(
-        "[Android] When the application is opened from a quit state. Notification: ",
-        initialNotification
-      );
+      if (initialNotification?.notification) {
+        console.log(
+          "[Android] When the application is opened from a quit state. Notification: ",
+          initialNotification
+        );
+      }
     });
 
     messaging()
       .getInitialNotification()
       .then((remoteMessage) => {
-        console.log(
-          "[iOS] When the application is opened from a quit state. Notification: ",
-          remoteMessage
-        );
+        if (remoteMessage?.notification) {
+          Sentry.Native.captureMessage(
+            "[iOS] When the application is opened from a quit state. Notification: " +
+              JSON.stringify(remoteMessage?.notification)
+          );
+        }
         // set the chat tab badge count
         if (remoteMessage?.notification?.ios?.badge) {
           setChatTabBadgeCount(remoteMessage.notification.ios.badge);

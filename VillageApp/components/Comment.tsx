@@ -8,6 +8,7 @@ import { useUser } from "../context/UserContext";
 import Colors from "../constants/Colors";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import * as Sentry from "sentry-expo";
 
 type CommentProps = {
   comment: CommentType;
@@ -105,7 +106,7 @@ const Comment = ({
         );
       },
       onError: (error, _, context) => {
-        console.log(error);
+        Sentry.Native.captureException(error);
         Alert.alert("We couldn't like this comment. Try again.");
         // revert to the previous value
         if (context?.previousComments) {
@@ -190,7 +191,7 @@ const Comment = ({
         );
       },
       onError: (error, _, context) => {
-        console.log(error);
+        Sentry.Native.captureException(error);
         Alert.alert("We couldn't like this comment. Try again.");
         // revert to the previous value
         if (context?.previousComments) {
@@ -228,7 +229,7 @@ const Comment = ({
       );
     },
     onError: (error) => {
-      console.log(error);
+      Sentry.Native.captureException(error);
       Alert.alert("We couldn't delete this comment. Try again.");
     },
   });
@@ -238,6 +239,7 @@ const Comment = ({
       await reportComment(String(id));
       Alert.alert("Comment reported.");
     } catch (error) {
+      Sentry.Native.captureException(error);
       Alert.alert("We couldn't report this comment. Try again.");
     }
   };
@@ -284,6 +286,7 @@ const Comment = ({
         mutateLike(String(comment.id));
       }
     } catch (error) {
+      Sentry.Native.captureException(error);
       Alert.alert("We couldn't like this post. Try again.");
     }
   };
