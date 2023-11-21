@@ -9,14 +9,21 @@ import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TweetsApiContextProvider from "../context/TweetContext";
-import { CURRENT_APP_VERSION } from "../lib/api/config";
+import { CURRENT_APP_VERSION, SENTRY_DSN } from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { STREAM_CHAT_API_KEY } from "../lib/api/config";
 import messaging from "@react-native-firebase/messaging";
 import { isIOSSimulator } from "../lib/helpers";
+import * as Sentry from "sentry-expo";
 
 const queryClient = new QueryClient();
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  enableInExpoDevelopment: true,
+  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+});
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -30,8 +37,6 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
-console.log("main layout file run");
 
 // create the stream chat client
 const streamChatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
@@ -57,7 +62,7 @@ export default function RootLayout() {
       try {
         await messaging().registerDeviceForRemoteMessages();
       } catch (error) {
-        console.log("register device for push notifications ERROR: ", error);
+        Sentry.Native.captureException(error);
       }
     };
     // call version check here

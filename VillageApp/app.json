@@ -39,6 +39,7 @@
       "expo-router",
       "@react-native-firebase/app",
       "expo-document-picker",
+      "sentry-expo",
       [
         "expo-build-properties",
         {
@@ -58,7 +59,8 @@
         {
           "photosPermission": "Village accesses your photos to let you share them."
         }
-      ]
+      ],
+      "sentry-expo"
     ],
     "experiments": {
       "typedRoutes": true
@@ -77,6 +79,13 @@
     },
     "updates": {
       "url": "https://u.expo.dev/4afab4b0-0ef5-4fcf-a04a-a3d696d42439"
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps"
+        }
+      ]
     }
   }
 }
