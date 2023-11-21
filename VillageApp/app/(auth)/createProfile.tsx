@@ -18,6 +18,7 @@ import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
+import * as Sentry from "sentry-expo";
 
 const CreateProfile = () => {
   const { user, updateUser } = useUser();
@@ -123,7 +124,7 @@ const CreateProfile = () => {
         Alert.alert(err?.body?.error);
         return;
       }
-
+      Sentry.Native.captureException(error);
       Alert.alert("We had an issue uploading your profile. Try again.");
     }
   };

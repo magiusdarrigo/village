@@ -13,6 +13,7 @@ import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
 import notifee from "@notifee/react-native";
 import { isIOSSimulator } from "../../lib/helpers";
+import * as Sentry from "sentry-expo";
 
 import {
   OverlayProvider,
@@ -73,7 +74,7 @@ const setBackgroundMessageHandlerIfAndroid = async (
         },
       });
     } catch (error) {
-      console.log("setBackgroundMessageHandler error: ", error);
+      Sentry.Native.captureException(error);
     }
   });
 };
@@ -173,7 +174,7 @@ const ChatScreen = () => {
         // ready to render
         setIsReady(true);
       } catch (error) {
-        console.log("ERROR: ", error);
+        Sentry.Native.captureException(error);
         Alert.alert(
           "We had an issue adding you to your building chat. Try again."
         );

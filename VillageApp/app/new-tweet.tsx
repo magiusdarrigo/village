@@ -16,6 +16,7 @@ import { Link, useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
+import * as Sentry from "sentry-expo";
 
 const NewTweet = () => {
   const [text, setText] = useState("");
@@ -104,8 +105,9 @@ const NewTweet = () => {
       });
       setText("");
       router.back();
-    } catch (e: any) {
-      console.log("Error creating tweet", e.message);
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We had an issue making your post.");
     }
   };
 
@@ -144,6 +146,7 @@ const NewTweet = () => {
                 flex: 1,
                 lineHeight: 22,
                 fontSize: 18,
+                fontWeight: "500",
                 textAlignVertical: "top",
               }}
             />

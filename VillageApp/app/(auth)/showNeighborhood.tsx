@@ -5,6 +5,7 @@ import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
+import * as Sentry from "sentry-expo";
 
 const ShowNeighborhood = () => {
   const { neighborhoodName, buildingID, neighborhoodID } =
@@ -30,7 +31,7 @@ const ShowNeighborhood = () => {
       });
       updateUser(updatedUser);
     } catch (error) {
-      console.log(error);
+      Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
     }
   };

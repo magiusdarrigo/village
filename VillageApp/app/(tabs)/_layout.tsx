@@ -134,7 +134,7 @@ export default function TabLayout() {
               setChatTabBadgeCount(undefined);
               notifee.setBadgeCount(0);
             } catch (error) {
-              console.log("setBadgeCount error: ", error);
+              Sentry.Native.captureException(error);
             }
           },
         }}

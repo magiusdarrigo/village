@@ -24,6 +24,7 @@ import Tweet from "../../components/Tweet";
 import { useGlobalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
+import * as Sentry from "sentry-expo";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -75,8 +76,9 @@ const TweetScreen = () => {
         parentCommentID: String(selectedCommentID),
       });
       setCommentText("");
-    } catch (e: any) {
-      console.log("Error creating tweet", e.message);
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We had an issue publishing your comment.");
     }
   };
 
