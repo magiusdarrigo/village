@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../context/UserContext";
 import { calculateHoursAgo } from "../lib/helpers";
 import * as Sentry from "sentry-expo";
+import postStyles from "../lib/styles/post";
 
 type TweetProps = {
   tweet: TweetType;
@@ -365,7 +366,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         <Pressable style={styles.container}>
           <View style={styles.mainContainer}>
             <View style={{ flexDirection: "row" }}>
-              <Text style={styles.username}>@{tweet.username}</Text>
+              <Text style={postStyles.username}>@{tweet.username}</Text>
               {calculateHoursAgo(tweet.created_at)}
               <Pressable
                 style={{ marginLeft: "auto" }}
@@ -380,13 +381,13 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               </Pressable>
             </View>
 
-            <Text style={styles.content}> {tweet.text_content}</Text>
+            <Text style={postStyles.textContent}> {tweet.text_content}</Text>
 
             {tweet.image_url && (
               <Image source={{ uri: tweet.image_url }} style={styles.image} />
             )}
 
-            <View style={styles.footer}>
+            <View style={postStyles.footer}>
               <Link href={`/tweet/${tweet.id}`} asChild>
                 <Pressable onPress={handleCommentIconClicked}>
                   <MaterialCommunityIcon
@@ -440,24 +441,11 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 50,
   },
-  username: {
-    fontWeight: "bold",
-  },
-  content: {
-    lineHeight: 20,
-    marginTop: 5,
-  },
   image: {
     width: "100%",
     aspectRatio: 16 / 9,
     marginVertical: 10,
     borderRadius: 15,
-  },
-  footer: {
-    flexDirection: "row",
-    marginVertical: 5,
-    width: 120,
-    justifyContent: "space-between",
   },
 });
 

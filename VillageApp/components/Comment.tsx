@@ -9,6 +9,7 @@ import Colors from "../constants/Colors";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Sentry from "sentry-expo";
+import postStyles from "../lib/styles/post";
 
 type CommentProps = {
   comment: CommentType;
@@ -352,7 +353,7 @@ const Comment = ({
       <Pressable style={styles.container}>
         <View style={styles.mainContainer}>
           <View style={{ flexDirection: "row" }}>
-            <Text style={styles.username}>@{comment.username}</Text>
+            <Text style={postStyles.username}>@{comment.username}</Text>
             {calculateHoursAgo(comment.created_at)}
             <Pressable
               style={{ marginLeft: "auto" }}
@@ -366,8 +367,8 @@ const Comment = ({
               />
             </Pressable>
           </View>
-          <Text style={styles.content}> {comment.text_content}</Text>
-          <View style={styles.footer}>
+          <Text style={postStyles.textContent}> {comment.text_content}</Text>
+          <View style={postStyles.footer}>
             {comment.parent_comment_id === null && (
               <Pressable
                 style={styles.iconWrapper}
@@ -428,24 +429,11 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 30,
   },
-  username: {
-    fontWeight: "bold",
-  },
-  content: {
-    lineHeight: 20,
-    marginTop: 5,
-  },
   image: {
     width: "100%",
     aspectRatio: 16 / 9,
     marginVertical: 10,
     borderRadius: 15,
-  },
-  footer: {
-    flexDirection: "row",
-    marginVertical: 5,
-    width: 120,
-    justifyContent: "space-between",
   },
   iconWrapper: {},
 });
