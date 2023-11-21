@@ -15,6 +15,7 @@ import { Alert } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useUser } from "./UserContext";
 import { API_URL } from "../lib/api/config";
+import * as Sentry from "sentry-expo";
 
 interface AuthContextType {
   authToken: string | null;
@@ -27,7 +28,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const { user, updateUser } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
-  const navigation = useNavigation();
   const segments = useSegments();
   const router = useRouter();
 
@@ -57,9 +57,9 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    console.log("segments: ", segments);
-    console.log("has authToken: ", !!authToken);
-    console.log("has user: ", !!user);
+    // console.log("segments: ", segments);
+    // console.log("has authToken: ", !!authToken);
+    // console.log("has user: ", !!user);
 
     if (authToken && !user) {
       const getCurrentUser = async () => {
@@ -67,7 +67,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
           const currentUser = await getUser();
           updateUser(currentUser);
         } catch (error) {
-          console.error("Failed to fetch current user:", error);
+          Sentry.Native.captureException(error);
           Alert.alert("We couldn't sign you in. Try again.");
         }
       };

@@ -37,6 +37,8 @@ const TweetScreen = () => {
     number | undefined
   >(undefined);
 
+  const isPostButtonDisabled = commentText.length < 1;
+
   useEffect(() => {
     const keyboardHideListener = Keyboard.addListener(
       "keyboardDidHide",
@@ -244,14 +246,19 @@ const TweetScreen = () => {
         <TextInput
           ref={inputRef}
           placeholder="Add a comment..."
+          placeholderTextColor={"lightgrey"}
           style={styles.footerTextInput}
           onChangeText={setCommentText}
           value={commentText}
         />
         <View style={styles.buttonContainer}>
           <Pressable
-            style={styles.addCommentPressable}
+            style={[
+              styles.addCommentPressable,
+              isPostButtonDisabled ? styles.buttonDisabled : {},
+            ]}
             onPress={handleAddComment}
+            disabled={isPostButtonDisabled}
           >
             <Entypo name="plus" size={18} color="white" />
           </Pressable>
@@ -290,6 +297,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 20,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   footer: {
     flexDirection: "row",

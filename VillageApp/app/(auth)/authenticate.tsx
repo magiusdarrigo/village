@@ -7,8 +7,10 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { authenticate } from "../../lib/api/auth";
 import { useAuth } from "../../context/AuthContext";
@@ -22,6 +24,18 @@ const Authenticate = () => {
   const router = useRouter();
   const { updateAuthToken } = useAuth();
   const { user } = useUser();
+  const otpCodeRef = useRef<TextInput>(null);
+
+  const isButtonDisabled = code.length < 6;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Check if the input is currently mounted before calling focus
+      otpCodeRef.current?.focus();
+    }, 1000); // 1000 milliseconds delay
+
+    return () => clearTimeout(timer); // Clear timeout if component unmounts
+  }, []);
 
   // if the user context does not have a neighborhood and building return true
   const continueOnboarding = () => !user?.neighborhood_id || !user.building_id;
@@ -31,6 +45,7 @@ const Authenticate = () => {
       return;
     }
     try {
+      Keyboard.dismiss();
       const res = await authenticate({ phoneNumber, phoneToken: code });
       updateAuthToken(res.token);
       if (continueOnboarding()) {
@@ -42,25 +57,37 @@ const Authenticate = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <Text style={onboardingStyles.label}>Paste the code we texted you.</Text>
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <TextInput
-          placeholder=""
-          value={code}
-          onChangeText={setCode}
-          style={styles.input}
-          keyboardType="phone-pad"
-          autoFocus={true}
-        />
-        <Pressable style={onboardingStyles.button} onPress={onConfirm}>
-          <Text style={onboardingStyles.buttonText}>Confirm</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <Text style={onboardingStyles.label}>
+          Paste the code we texted you.
+        </Text>
+        <View style={{ flex: 1, justifyContent: "space-between" }}>
+          <TextInput
+            ref={otpCodeRef}
+            placeholder=""
+            value={code}
+            onChangeText={setCode}
+            style={styles.input}
+            keyboardType="phone-pad"
+            autoFocus={false}
+          />
+          <Pressable
+            style={[
+              onboardingStyles.button,
+              isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+            ]}
+            onPress={onConfirm}
+            disabled={isButtonDisabled}
+          >
+            <Text style={onboardingStyles.buttonText}>Confirm</Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 

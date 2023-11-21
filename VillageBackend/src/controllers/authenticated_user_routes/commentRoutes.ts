@@ -114,19 +114,6 @@ router.delete("/:id", async (req, res) => {
       return res.status(400).json({ error: "Unauthorized" });
     }
 
-    // we have to delete the foreign key constraints first
-    await prisma.comment_likes.deleteMany({
-      where: {
-        comment_id: Number(id),
-      },
-    });
-
-    await prisma.reported_comments.deleteMany({
-      where: {
-        comment_id: Number(id),
-      },
-    });
-
     const [_, deletedComment] = await prisma.$transaction([
       prisma.posts.update({
         where: { id: Number(postID) },

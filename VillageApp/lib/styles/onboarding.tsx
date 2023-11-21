@@ -23,6 +23,9 @@ const onboardingStyles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
 });
 
 export default onboardingStyles;

@@ -7,6 +7,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { GOOGLE_MAPS_API_KEY } from "../../lib/api/config";
@@ -52,61 +54,74 @@ const PickBuilding = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <Text style={onboardingStyles.label}>Add your building address.</Text>
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <GooglePlacesAutocomplete
-          placeholder="Enter Building Address"
-          fetchDetails={true}
-          GooglePlacesSearchQuery={{
-            rankby: "distance",
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <Text style={onboardingStyles.label}>Add your building address.</Text>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "space-between",
           }}
-          onPress={(data, details = null) => {
-            setAddress(data.structured_formatting.main_text);
-          }}
-          query={{
-            key: GOOGLE_MAPS_API_KEY,
-            language: "en",
-            components: "country:us",
-            types: "address",
-            location: `${40.7128},${-74.006}`, // New York City latitude and longitude
-            radius: "30000", // Limit search to 30km radius
-          }}
-          styles={{
-            textInput: {
-              backgroundColor: "transparent",
-              color: "black",
-              fontSize: 20,
-            },
-            description: {
-              color: "black",
-            },
-            row: {
-              backgroundColor: "transparent",
-            },
-            separator: {
-              backgroundColor: "transparent",
-            },
-            poweredContainer: {
-              backgroundColor: "transparent",
-              maxHeight: 0,
-              borderColor: "transparent",
-            },
-            powered: {
-              maxHeight: 0,
-            },
-          }}
-          nearbyPlacesAPI="GooglePlacesSearch"
-          debounce={200}
-        />
-        <Pressable style={onboardingStyles.button} onPress={onSubmit}>
-          <Text style={onboardingStyles.buttonText}>Submit</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+        >
+          <GooglePlacesAutocomplete
+            placeholder="Enter Building Address"
+            fetchDetails={true}
+            GooglePlacesSearchQuery={{
+              rankby: "distance",
+            }}
+            onPress={(data, details = null) => {
+              setAddress(data.structured_formatting.main_text);
+            }}
+            query={{
+              key: GOOGLE_MAPS_API_KEY,
+              language: "en",
+              components: "country:us",
+              types: "address",
+              location: `${40.7128},${-74.006}`, // New York City latitude and longitude
+              radius: "30000", // Limit search to 30km radius
+            }}
+            textInputProps={{
+              autoFocus: true,
+            }}
+            styles={{
+              textInput: {
+                flex: 1,
+                backgroundColor: "transparent",
+                textAlignVertical: "top",
+                color: "black",
+                fontSize: 20,
+              },
+              description: {
+                color: "black",
+              },
+              row: {
+                backgroundColor: "transparent",
+              },
+              separator: {
+                backgroundColor: "transparent",
+              },
+              poweredContainer: {
+                flex: 1,
+                backgroundColor: "transparent",
+                maxHeight: 0,
+                borderColor: "transparent",
+              },
+              powered: {
+                maxHeight: 0,
+              },
+            }}
+            nearbyPlacesAPI="GooglePlacesSearch"
+            debounce={200}
+          />
+          <Pressable style={onboardingStyles.button} onPress={onSubmit}>
+            <Text style={onboardingStyles.buttonText}>Submit</Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
