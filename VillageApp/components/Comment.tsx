@@ -208,6 +208,38 @@ const Comment = ({
   // delete a comment
   const { mutate: mutateDelete } = useMutation(deleteComment, {
     onSuccess: (data: any) => {
+      // update the single tweet cache with a +1 total comments count
+      queryClient.setQueryData(
+        ["tweets", String(comment.post_id)],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            comments_count: old.comments_count - 1,
+          };
+        }
+      );
+      // update the tweet list cache with a +1 total comments count for the tweet
+      queryClient.setQueryData(["tweets"], (old: any) => {
+        if (!old) return;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => {
+            return {
+              ...page,
+              data: page.data.map((tweet: any) => {
+                if (tweet.id === comment.post_id) {
+                  return {
+                    ...tweet,
+                    comments_count: tweet.comments_count - 1,
+                  };
+                }
+                return tweet;
+              }),
+            };
+          }),
+        };
+      });
       // update the list of comments in the cache
       queryClient.setQueryData(
         ["comments", String(comment.post_id)],

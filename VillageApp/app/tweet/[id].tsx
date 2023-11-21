@@ -104,9 +104,38 @@ const TweetScreen = () => {
   const { isLoading: isLoadingCreateComment, mutateAsync } = useMutation({
     mutationFn: createComment,
     onSuccess: (newData) => {
+      // update the single tweet cache with a +1 total comments count
+      queryClient.setQueryData(["tweets", String(id)], (old: any) => {
+        if (!old) return;
+        return {
+          ...old,
+          comments_count: old.comments_count + 1,
+        };
+      });
+      // update the tweet list cache with a +1 total comments count for the tweet
+      queryClient.setQueryData(["tweets"], (old: any) => {
+        if (!old) return;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => {
+            return {
+              ...page,
+              data: page.data.map((tweet: any) => {
+                if (tweet.id === Number(id)) {
+                  return {
+                    ...tweet,
+                    comments_count: tweet.comments_count + 1,
+                  };
+                }
+                return tweet;
+              }),
+            };
+          }),
+        };
+      });
+      // update the comments cache with the new comment
       queryClient.setQueryData(["comments", String(id)], (old: any) => {
         if (!old) {
-          // If for some reason we don't have the pages, just return a new page structure
           return {
             pageParams: [],
             pages: [
@@ -114,8 +143,6 @@ const TweetScreen = () => {
             ],
           };
         }
-
-        // Otherwise, add the new comment to the beginning of the first page
         return {
           ...old,
           pages: [
@@ -129,7 +156,6 @@ const TweetScreen = () => {
       });
     },
     onError: async (error: any) => {
-      // convert error to json
       const err = await error.json();
       if (err?.status === 400) {
         Alert.alert(err?.body?.error);

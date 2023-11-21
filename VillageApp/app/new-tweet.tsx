@@ -42,14 +42,12 @@ const NewTweet = () => {
     onSuccess: (newData) => {
       queryClient.setQueryData(["tweets"], (old: any) => {
         if (!old) {
-          // If for some reason we don't have the pages, just return a new page structure
           return {
             pageParams: [],
             pages: [{ data: [newData], nextCursor: null, prevCursor: null }],
           };
         }
 
-        // Otherwise, add the new tweet to the beginning of the first page
         return {
           ...old,
           pages: [
@@ -63,7 +61,6 @@ const NewTweet = () => {
       });
     },
     onError: async (error: any) => {
-      // convert error to json
       const err = await error.json();
       if (err?.status === 400) {
         Alert.alert(err?.body?.error);
