@@ -5,11 +5,11 @@ import {
   Image,
   TextInput,
   Pressable,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
   Keyboard,
-  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
@@ -17,6 +17,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
 import * as Sentry from "sentry-expo";
+import { IoniconsIcon } from "../components/Icons";
 
 const NewTweet = () => {
   const [text, setText] = useState("");
@@ -30,9 +31,8 @@ const NewTweet = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Check if the input is currently mounted before calling focus
       tweetTextRef.current?.focus();
-    }, 1000); // 1000 milliseconds delay
+    }, 750);
 
     return () => clearTimeout(timer); // Clear timeout if component unmounts
   }, []);
@@ -75,9 +75,9 @@ const NewTweet = () => {
     try {
       // check character count
       const characterCount = text.length;
-      if (characterCount < 1 || characterCount > 400) {
+      if (characterCount < 1 || characterCount > 250) {
         Alert.alert(
-          `Your post is ${characterCount} characters long. It needs to be between 1 and 400 characters.`
+          `Your post is ${characterCount} characters long. It needs to be between 1 and 250 characters.`
         );
         return;
       }
@@ -108,56 +108,83 @@ const NewTweet = () => {
     }
   };
 
+  const handleUploadImageIconClicked = () => {
+    Alert.alert("Upload image clicked");
+  };
+
+  const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
+
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-        <View style={styles.container}>
-          <View style={styles.buttonContainer}>
-            <Link href="../" style={{ fontSize: 16 }}>
-              Cancel
-            </Link>
-            {isLoading && <ActivityIndicator />}
-            <Pressable
-              onPress={onTweetPress}
-              style={[
-                styles.button,
-                isPostButtonDisabled ? styles.buttonDisabled : {},
-              ]}
-              disabled={isPostButtonDisabled}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={keyboardVerticalOffset}
+    >
+      <View style={styles.container}>
+        <View style={styles.buttonContainer}>
+          <Link href="../" style={{ fontSize: 16 }}>
+            Cancel
+          </Link>
+          {isLoading && <ActivityIndicator />}
+          <Pressable
+            onPress={onTweetPress}
+            style={[
+              styles.button,
+              isPostButtonDisabled ? styles.buttonDisabled : {},
+            ]}
+            disabled={isPostButtonDisabled}
+          >
+            <Text style={styles.buttonText}>Post</Text>
+          </Pressable>
+        </View>
+        <View style={styles.inputContainer}>
+          <View style={[styles.image, { backgroundColor: user?.image }]} />
+          <TextInput
+            ref={tweetTextRef}
+            autoFocus={false}
+            value={text}
+            onChangeText={(value) => setText(value)}
+            placeholder={`What's going on in ${user?.neighborhood?.name}?`}
+            multiline
+            numberOfLines={5}
+            style={{
+              marginTop: 8,
+              flex: 1,
+              lineHeight: 24,
+              fontSize: 20,
+              fontWeight: "500",
+              textAlignVertical: "top",
+            }}
+          />
+        </View>
+        <View style={styles.multiMediaContainer}>
+          <Pressable
+            style={styles.uploadImageContainer}
+            onPress={handleUploadImageIconClicked}
+          >
+            <IoniconsIcon icon="image-outline" iconColor="black" size={32} />
+          </Pressable>
+          <View style={styles.charCountContainer}>
+            <Text
+              style={
+                text.length > 250
+                  ? styles.charCounterNegative
+                  : styles.charCounterPositive
+              }
             >
-              <Text style={styles.buttonText}>Post</Text>
-            </Pressable>
-          </View>
-          <View style={styles.inputContainer}>
-            <View style={[styles.image, { backgroundColor: user?.image }]} />
-            <TextInput
-              ref={tweetTextRef}
-              autoFocus={false}
-              value={text}
-              onChangeText={(value) => setText(value)}
-              placeholder={`What's going on in ${user?.neighborhood?.name}?`}
-              multiline
-              numberOfLines={5}
-              style={{
-                marginTop: 8,
-                flex: 1,
-                lineHeight: 22,
-                fontSize: 18,
-                fontWeight: "500",
-                textAlignVertical: "top",
-              }}
-            />
+              {250 - text.length}
+            </Text>
           </View>
         </View>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
     flex: 1,
+    backgroundColor: "white",
   },
   image: {
     width: 50,
@@ -166,6 +193,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   buttonContainer: {
+    paddingHorizontal: 10,
     flexDirection: "row",
     marginVertical: 10,
     justifyContent: "space-between",
@@ -186,7 +214,34 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   inputContainer: {
+    paddingHorizontal: 10,
     flexDirection: "row",
+    flex: 1,
+  },
+  multiMediaContainer: {
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    height: 75,
+    backgroundColor: "white",
+    borderColor: "lightgrey",
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  uploadImageContainer: {
+    paddingTop: 8,
+  },
+  charCountContainer: {
+    paddingTop: 16,
+  },
+  charCounterPositive: {
+    fontSize: 16,
+    color: "black",
+    fontWeight: "bold",
+  },
+  charCounterNegative: {
+    fontSize: 16,
+    color: "red",
+    fontWeight: "bold",
   },
 });
 

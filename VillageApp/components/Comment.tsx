@@ -399,7 +399,7 @@ const Comment = ({
               />
             </Pressable>
           </View>
-          <Text style={postStyles.textContent}> {comment.text_content}</Text>
+          <Text style={postStyles.textContent}>{comment.text_content}</Text>
           <View style={postStyles.footer}>
             {comment.parent_comment_id === null && (
               <Pressable

@@ -22,7 +22,7 @@ const queryClient = new QueryClient();
 Sentry.init({
   dsn: SENTRY_DSN,
   enableInExpoDevelopment: true,
-  enableNative: true,
+  enableNative: isIOSSimulator() ? false : true,
   debug: false,
 });
 

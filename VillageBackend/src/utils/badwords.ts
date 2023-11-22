@@ -20,7 +20,7 @@ export const postTextContentAllowed = (content: string) => {
     return false;
   }
   // ensure content is not too long
-  if (content.length > 400) {
+  if (content.length > 250) {
     return false;
   }
   // ensure content is not racist with regex

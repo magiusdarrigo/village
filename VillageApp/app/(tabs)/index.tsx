@@ -88,7 +88,7 @@ export default function FeedScreen() {
 
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={24} color="white" />
+          <Entypo name="plus" size={32} color="white" />
         </Pressable>
       </Link>
     </View>

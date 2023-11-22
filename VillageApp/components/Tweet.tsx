@@ -386,7 +386,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               linkStyle={{ color: "#2980b9" }}
               onPress={handlePressButtonAsync}
             >
-              <Text style={postStyles.textContent}> {tweet.text_content}</Text>
+              <Text style={postStyles.textContent}>{tweet.text_content}</Text>
             </Hyperlink>
             {tweet.image_url && (
               <Image source={{ uri: tweet.image_url }} style={styles.image} />
@@ -440,6 +440,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     marginLeft: 5,
+    // backgroundColor: "green",
   },
   userImage: {
     width: 50,

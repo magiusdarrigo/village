@@ -6,9 +6,9 @@ const postStyles = StyleSheet.create({
     fontWeight: "bold",
   },
   textContent: {
-    lineHeight: 20,
+    lineHeight: 24,
     marginTop: 5,
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: "500",
   },
   timeContent: {
