@@ -28,10 +28,10 @@ const NewTweet = () => {
   const { user } = useUser();
   const queryClient = useQueryClient();
   const tweetTextRef = useRef<TextInput>(null);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string | undefined>(undefined);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
-  const isPostButtonDisabled = text.length < 1;
+  const isPostButtonDisabled = !image && text.length < 1;
   const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
 
   useEffect(() => {
@@ -97,12 +97,13 @@ const NewTweet = () => {
 
   const onTweetPress = async () => {
     try {
-      // check character count
       const characterCount = text.length;
-      if (characterCount < 1 || characterCount > 250) {
-        Alert.alert(
-          `Your post is ${characterCount} characters long. It needs to be between 1 and 250 characters.`
-        );
+      if (!image && characterCount === 0) {
+        Alert.alert("Your post is empty.");
+        return;
+      }
+      if (characterCount > 250) {
+        Alert.alert(`Your post is too long.`);
         return;
       }
       // check new line count
@@ -122,7 +123,7 @@ const NewTweet = () => {
       await mutateAsync({
         neighborhoodID: user?.neighborhood_id,
         textContent: text,
-        // imageURL: "https://picsum.photos/400/800",
+        imageURL: image,
       });
       setText("");
       router.back();
@@ -217,7 +218,7 @@ const NewTweet = () => {
               />
               <TouchableOpacity
                 style={styles.removeImageButton}
-                onPress={() => setImage(null)}
+                onPress={() => setImage(undefined)}
               >
                 <Text style={styles.removeImageText}>×</Text>
               </TouchableOpacity>
@@ -254,10 +255,10 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   removeImageButton: {
-    opacity: 0.8,
+    opacity: 0.7,
     position: "absolute",
-    top: 10,
-    right: 10,
+    top: 5,
+    right: 5,
     backgroundColor: "black",
     borderRadius: 15,
     width: 30,

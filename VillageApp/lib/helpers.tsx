@@ -40,3 +40,25 @@ export const handlePressButtonAsync = async (url: string) => {
     Alert.alert("Sorry, this link is invalid");
   }
 };
+export const getFileType = (uri?: string) => {
+  if (!uri) {
+    return "";
+  }
+  const extension = uri.split(".").pop();
+  if (!extension) {
+    throw new Error("Unsupported file type");
+  }
+  switch (extension.toLowerCase()) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "gif":
+      return "image/gif";
+    case "heic":
+      return "image/heic";
+    default:
+      throw new Error("Unsupported file type");
+  }
+};

@@ -8,9 +8,14 @@ import {
   createPostOnlyTextQuery,
 } from "../../sql_queries/posts";
 import { postTextContentAllowed } from "../../utils/badwords";
+import { upload } from "../../middleware/upload";
+import {
+  uploadImageToSupabase,
+  convertFileIfNecessary,
+  deleteFileFromFS,
+} from "../../utils/uploads";
 
 const router = Router();
-
 const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
 
 // report a post
@@ -66,9 +71,9 @@ router.delete("/:id", async (req, res) => {
 });
 
 // create post
-router.post("/", async (req, res) => {
+router.post("/", upload.single("image"), async (req, res) => {
   console.log("create post called");
-  const { neighborhoodID, textContent, imageURL } = req.body;
+  const { neighborhoodID, textContent } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 
   if (textContent && !postTextContentAllowed(textContent)) {
@@ -77,25 +82,49 @@ router.post("/", async (req, res) => {
       .json({ error: "That post's content is not allowed." });
   }
 
+  // first try-catch is for image upload handling
+  let uploadedFileData = null;
   try {
-    const newPostQuery = createPostOnlyTextQuery(
-      currentUser.id,
-      neighborhoodID,
-      textContent
-    );
-    const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
-
-    if (newPost.length !== 1) {
-      return res.status(500).json({ error: "error creating post" });
+    if (req.file) {
+      await convertFileIfNecessary(req.file);
+      // upload file to supabase
+      uploadedFileData = await uploadImageToSupabase(
+        req.file,
+        String(currentUser.id)
+      );
+      // delete the file from the local filesystem
+      await deleteFileFromFS(req.file.path);
     }
-
-    res.json(newPost[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: `error creating post for user`,
+      error: `error uploading image for user`,
     });
   }
+
+  // send a temp response to the client
+  res.json({ temp: "temp" });
+
+  // // second try-catch is for post creation
+  // try {
+  //   const newPostQuery = createPostOnlyTextQuery(
+  //     currentUser.id,
+  //     neighborhoodID,
+  //     textContent
+  //   );
+  //   const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
+
+  //   if (newPost.length !== 1) {
+  //     return res.status(500).json({ error: "error creating post" });
+  //   }
+
+  //   res.json(newPost[0]);
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({
+  //     error: `error creating post for user`,
+  //   });
+  // }
 });
 
 // get post
