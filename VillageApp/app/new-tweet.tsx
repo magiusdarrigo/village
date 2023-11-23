@@ -10,9 +10,11 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
@@ -26,8 +28,30 @@ const NewTweet = () => {
   const { user } = useUser();
   const queryClient = useQueryClient();
   const tweetTextRef = useRef<TextInput>(null);
+  const [image, setImage] = useState<string | null>(null);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
   const isPostButtonDisabled = text.length < 1;
+  const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
+
+  useEffect(() => {
+    if (!image) {
+      return;
+    }
+    Image.getSize(
+      image,
+      (width, height) => {
+        // Calculate aspect ratio
+        const aspectRatio = width / height;
+        // Set width and height based on aspect ratio
+        const scaledHeight = 150 / aspectRatio;
+        setImageSize({ width: 150, height: scaledHeight });
+      },
+      (error) => {
+        console.error(`Couldn't get the image size: ${error.message}`);
+      }
+    );
+  }, [image]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -108,11 +132,35 @@ const NewTweet = () => {
     }
   };
 
-  const handleUploadImageIconClicked = () => {
-    Alert.alert("Upload image clicked");
-  };
+  const handleUploadImageIconClicked = async () => {
+    try {
+      // Ask for permission
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert("Permission to access camera roll is required. Try again.");
+        return;
+      }
 
-  const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
+      // Pick image
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: false,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (pickerResult.canceled === true) {
+        return;
+      }
+      if (pickerResult.assets.length === 0) {
+        return;
+      }
+      setImage(pickerResult.assets[0].uri);
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We had an issue uploading your image. Try again.");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -146,16 +194,35 @@ const NewTweet = () => {
             onChangeText={(value) => setText(value)}
             placeholder={`What's going on in ${user?.neighborhood?.name}?`}
             multiline
-            numberOfLines={5}
             style={{
               marginTop: 8,
-              flex: 1,
               lineHeight: 24,
               fontSize: 20,
               fontWeight: "500",
               textAlignVertical: "top",
+              backgroundColor: "white",
+              flex: 1,
             }}
           />
+        </View>
+        <View style={styles.imageContainer}>
+          {image && (
+            <View style={styles.imagePreviewContainer}>
+              <Image
+                source={{ uri: image }}
+                style={[
+                  { width: imageSize.width, height: imageSize.height },
+                  styles.libraryImage,
+                ]}
+              />
+              <TouchableOpacity
+                style={styles.removeImageButton}
+                onPress={() => setImage(null)}
+              >
+                <Text style={styles.removeImageText}>×</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
         <View style={styles.multiMediaContainer}>
           <Pressable
@@ -182,6 +249,43 @@ const NewTweet = () => {
 };
 
 const styles = StyleSheet.create({
+  imagePreviewContainer: {
+    position: "relative",
+    alignSelf: "flex-start",
+  },
+  removeImageButton: {
+    opacity: 0.8,
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "black",
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 2,
+    paddingLeft: 1,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  removeImageText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "white",
+  },
+  imageContainer: {
+    flex: 1,
+    backgroundColor: "white",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: "white",
@@ -191,6 +295,9 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: 50,
     marginRight: 10,
+  },
+  libraryImage: {
+    borderRadius: 8,
   },
   buttonContainer: {
     paddingHorizontal: 10,
@@ -216,7 +323,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     paddingHorizontal: 10,
     flexDirection: "row",
-    flex: 1,
+    backgroundColor: "white",
   },
   multiMediaContainer: {
     paddingHorizontal: 15,
