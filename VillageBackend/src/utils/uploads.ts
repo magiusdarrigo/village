@@ -3,6 +3,8 @@ import * as fs from "fs";
 import convert from "heic-convert";
 import { promisify } from "util";
 
+const SUPABASE_BUCKET_URL = `${process.env.SUPABASE_URL}/storage/v1/object/public/post_images/`;
+
 export const uploadImageToSupabase = async (
   file: Express.Multer.File,
   userID: string
@@ -27,7 +29,7 @@ export const uploadImageToSupabase = async (
   if (error) {
     throw error;
   }
-  return data;
+  return SUPABASE_BUCKET_URL + data.path;
 };
 
 export const convertFileIfNecessary = async (file: Express.Multer.File) => {

@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import { AntIcon, MaterialCommunityIcon } from "./Icons";
@@ -19,7 +19,8 @@ type TweetProps = {
 };
 
 const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [postWidth, setPostWidth] = useState(0);
   const { likeTweet, unlikeTweet, deleteTweet, reportTweet } = useTweetsApi();
   const queryClient = useQueryClient();
   const navigation = useNavigation();
@@ -29,6 +30,30 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     Alert.alert("Something went wrong. Try again.");
     return null;
   }
+
+  const onLayout = (event: any) => {
+    const { width } = event.nativeEvent.layout;
+    setPostWidth(width);
+  };
+
+  useEffect(() => {
+    if (!tweet.image_url || !postWidth) {
+      return;
+    }
+    Image.getSize(
+      tweet.image_url,
+      (width, height) => {
+        // Calculate aspect ratio
+        const aspectRatio = width / height;
+        // Set width and height based on aspect ratio
+        const scaledHeight = postWidth / aspectRatio;
+        setImageSize({ width: postWidth, height: scaledHeight });
+      },
+      (error) => {
+        console.error(`Couldn't get the image size: ${error.message}`);
+      }
+    );
+  }, [tweet.image_url, postWidth]);
 
   // like a tweet
   const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
@@ -366,7 +391,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
       </View>
       <Link href={`/tweet/${tweet.id}`} asChild>
         <Pressable style={styles.container}>
-          <View style={styles.mainContainer}>
+          <View style={styles.mainContainer} onLayout={onLayout}>
             <View style={{ flexDirection: "row" }}>
               <Text style={postStyles.username}>@{tweet.username}</Text>
               {calculateHoursAgo(tweet.created_at)}
@@ -389,7 +414,13 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               <Text style={postStyles.textContent}>{tweet.text_content}</Text>
             </Hyperlink>
             {tweet.image_url && (
-              <Image source={{ uri: tweet.image_url }} style={styles.image} />
+              <Image
+                source={{ uri: tweet.image_url }}
+                style={[
+                  { width: imageSize.width, height: imageSize.height },
+                  styles.libraryImage,
+                ]}
+              />
             )}
 
             <View style={postStyles.footer}>
@@ -440,18 +471,20 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     marginLeft: 5,
-    // backgroundColor: "green",
   },
   userImage: {
     width: 50,
     height: 50,
     borderRadius: 50,
   },
-  image: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-    marginVertical: 10,
-    borderRadius: 15,
+  // image: {
+  //   width: "100%",
+  //   aspectRatio: 1,
+  //   marginVertical: 10,
+  //   borderRadius: 8,
+  // },
+  libraryImage: {
+    borderRadius: 8,
   },
 });
 

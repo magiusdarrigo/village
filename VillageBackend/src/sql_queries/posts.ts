@@ -44,15 +44,16 @@ export const getSinglePostQuery = (userID: number, postID: number) => {
 };
 
 // return the post as well as the user's username and profile image
-export const createPostOnlyTextQuery = (
+export const createPostQuery = (
   userID: number,
   neighborhoodID: number,
-  textContent: string
+  textContent: string,
+  imageURL: string
 ) => {
   return Prisma.sql`
                 WITH new_post AS (
-                    INSERT INTO posts (user_id, neighborhood_id, text_content)
-                    VALUES (${userID}, ${neighborhoodID}, ${textContent})
+                    INSERT INTO posts (user_id, neighborhood_id, text_content, image_url)
+                    VALUES (${userID}, ${neighborhoodID}, ${textContent}, ${imageURL})
                     RETURNING *
                 )
                 SELECT 

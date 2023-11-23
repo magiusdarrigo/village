@@ -3,10 +3,7 @@ import prisma from "../../clients/prismaClient";
 import { getTop10CommentsFromPostQuery } from "../../sql_queries/comments";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
-import {
-  getSinglePostQuery,
-  createPostOnlyTextQuery,
-} from "../../sql_queries/posts";
+import { getSinglePostQuery, createPostQuery } from "../../sql_queries/posts";
 import { postTextContentAllowed } from "../../utils/badwords";
 import { upload } from "../../middleware/upload";
 import {
@@ -83,12 +80,12 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 
   // first try-catch is for image upload handling
-  let uploadedFileData = null;
+  let uploadedFilePath = "";
   try {
     if (req.file) {
       await convertFileIfNecessary(req.file);
       // upload file to supabase
-      uploadedFileData = await uploadImageToSupabase(
+      uploadedFilePath = await uploadImageToSupabase(
         req.file,
         String(currentUser.id)
       );
@@ -101,30 +98,27 @@ router.post("/", upload.single("image"), async (req, res) => {
       error: `error uploading image for user`,
     });
   }
+  // second try-catch is for post creation
+  try {
+    const newPostQuery = createPostQuery(
+      currentUser.id,
+      Number(neighborhoodID),
+      textContent,
+      uploadedFilePath
+    );
+    const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
 
-  // send a temp response to the client
-  res.json({ temp: "temp" });
+    if (newPost.length !== 1) {
+      return res.status(500).json({ error: "error creating post" });
+    }
 
-  // // second try-catch is for post creation
-  // try {
-  //   const newPostQuery = createPostOnlyTextQuery(
-  //     currentUser.id,
-  //     neighborhoodID,
-  //     textContent
-  //   );
-  //   const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
-
-  //   if (newPost.length !== 1) {
-  //     return res.status(500).json({ error: "error creating post" });
-  //   }
-
-  //   res.json(newPost[0]);
-  // } catch (error) {
-  //   console.error(error);
-  //   res.status(500).json({
-  //     error: `error creating post for user`,
-  //   });
-  // }
+    res.json(newPost[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error creating post for user`,
+    });
+  }
 });
 
 // get post
