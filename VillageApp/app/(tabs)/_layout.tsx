@@ -23,7 +23,8 @@ notifee.onBackgroundEvent(async ({ detail, type }) => {
 });
 
 export default function TabLayout() {
-  const { user, chatTabBadgeCount, updateChatTabBadgeCount } = useUser();
+  const { user, chatTabBadgeCount, updateChatTabBadgeCount, scrollToTop } =
+    useUser();
 
   // this useEffect holds the logic for when a user TAPS on a notification.
   useEffect(() => {
@@ -93,6 +94,15 @@ export default function TabLayout() {
               </Pressable>
             </Link>
           ),
+        }}
+        listeners={{
+          tabPress: (_) => {
+            try {
+              scrollToTop();
+            } catch (error) {
+              Sentry.Native.captureException(error);
+            }
+          },
         }}
       />
       <Tabs.Screen

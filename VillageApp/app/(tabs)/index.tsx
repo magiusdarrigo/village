@@ -5,17 +5,22 @@ import {
   Pressable,
   ActivityIndicator,
   Text,
+  RefreshControl,
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
 import { Link } from "expo-router";
 import { useTweetsApi } from "../../context/TweetContext";
+import { useUser } from "../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
+import { useState } from "react";
 
 export default function FeedScreen() {
   const { listTweets } = useTweetsApi();
+  const [refreshing, setRefreshing] = useState(false);
+  const { flatListRef } = useUser();
 
   const {
     data,
@@ -24,12 +29,19 @@ export default function FeedScreen() {
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ["tweets"],
     queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
     getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     getPreviousPageParam: (firstPage, _) => firstPage.prevCursor,
   });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   const handleLoadMore = () => {
     if (hasNextPage) fetchNextPage();
@@ -71,6 +83,7 @@ export default function FeedScreen() {
   return (
     <View style={styles.page}>
       <FlatList
+        ref={flatListRef}
         data={uniqueItems}
         renderItem={({ item }) => (
           <Tweet
@@ -82,6 +95,9 @@ export default function FeedScreen() {
         onEndReachedThreshold={0.5}
         ListFooterComponent={
           isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
+        }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={renderEmptyListComponent}
         contentContainerStyle={{ flexGrow: 1 }}

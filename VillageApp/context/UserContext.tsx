@@ -3,8 +3,10 @@ import React, {
   useContext,
   useState,
   PropsWithChildren,
+  useRef,
 } from "react";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
+import { FlatList } from "react-native";
 import notifee from "@notifee/react-native";
 
 export type User = {
@@ -36,6 +38,8 @@ interface UserContextType {
   getStreamChatClient: () => StreamChat<any>;
   chatTabBadgeCount: number;
   updateChatTabBadgeCount: (count: number) => void;
+  flatListRef?: React.RefObject<any>;
+  scrollToTop: () => void;
 }
 
 interface UserContextProviderProps {
@@ -52,6 +56,7 @@ const UserContextProvider = ({
 }: UserContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
+  const flatListRef = useRef<FlatList>(null);
 
   const updateUser = (newUser: User) => {
     setUser(newUser);
@@ -70,6 +75,10 @@ const UserContextProvider = ({
     setChatTabBadgeCount(count);
   };
 
+  const scrollToTop = () => {
+    flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+  };
+
   // Provide the user object to any descendants of this component
   return (
     <UserContext.Provider
@@ -80,6 +89,8 @@ const UserContextProvider = ({
         getStreamChatClient,
         chatTabBadgeCount,
         updateChatTabBadgeCount,
+        flatListRef,
+        scrollToTop,
       }}
     >
       {children}

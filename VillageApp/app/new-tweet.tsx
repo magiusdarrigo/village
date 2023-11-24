@@ -25,7 +25,7 @@ const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
   const { createTweet } = useTweetsApi();
-  const { user } = useUser();
+  const { user, scrollToTop } = useUser();
   const queryClient = useQueryClient();
   const tweetTextRef = useRef<TextInput>(null);
   const [image, setImage] = useState<string | undefined>(undefined);
@@ -127,6 +127,7 @@ const NewTweet = () => {
       });
       setText("");
       router.back();
+      scrollToTop();
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue making your post.");
