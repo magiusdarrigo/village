@@ -1,6 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { Link, Tabs, useSegments } from "expo-router";
+import { Pressable, AppState } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
@@ -25,6 +25,27 @@ notifee.onBackgroundEvent(async ({ detail, type }) => {
 export default function TabLayout() {
   const { user, chatTabBadgeCount, updateChatTabBadgeCount, scrollToTop } =
     useUser();
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener(
+      "change",
+      async (nextAppState) => {
+        if (
+          appState.match(/inactive|background/) &&
+          nextAppState === "active"
+        ) {
+          const count = await notifee.getBadgeCount();
+          updateChatTabBadgeCount(count);
+        }
+        setAppState(nextAppState);
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [appState]);
 
   // this useEffect holds the logic for when a user TAPS on a notification.
   useEffect(() => {
