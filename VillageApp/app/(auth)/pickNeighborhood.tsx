@@ -6,6 +6,7 @@ import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
+import * as Sentry from "sentry-expo";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
@@ -57,7 +58,7 @@ const PickNeighborhood = () => {
         },
       });
     } catch (error) {
-      console.log(error);
+      Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
     }
   };

@@ -9,6 +9,7 @@ import Colors from "../constants/Colors";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Sentry from "sentry-expo";
+import postStyles from "../lib/styles/post";
 
 type CommentProps = {
   comment: CommentType;
@@ -207,6 +208,38 @@ const Comment = ({
   // delete a comment
   const { mutate: mutateDelete } = useMutation(deleteComment, {
     onSuccess: (data: any) => {
+      // update the single tweet cache with a +1 total comments count
+      queryClient.setQueryData(
+        ["tweets", String(comment.post_id)],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            comments_count: old.comments_count - 1,
+          };
+        }
+      );
+      // update the tweet list cache with a +1 total comments count for the tweet
+      queryClient.setQueryData(["tweets"], (old: any) => {
+        if (!old) return;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => {
+            return {
+              ...page,
+              data: page.data.map((tweet: any) => {
+                if (tweet.id === comment.post_id) {
+                  return {
+                    ...tweet,
+                    comments_count: tweet.comments_count - 1,
+                  };
+                }
+                return tweet;
+              }),
+            };
+          }),
+        };
+      });
       // update the list of comments in the cache
       queryClient.setQueryData(
         ["comments", String(comment.post_id)],
@@ -352,7 +385,7 @@ const Comment = ({
       <Pressable style={styles.container}>
         <View style={styles.mainContainer}>
           <View style={{ flexDirection: "row" }}>
-            <Text style={styles.username}>@{comment.username}</Text>
+            <Text style={postStyles.username}>@{comment.username}</Text>
             {calculateHoursAgo(comment.created_at)}
             <Pressable
               style={{ marginLeft: "auto" }}
@@ -366,8 +399,8 @@ const Comment = ({
               />
             </Pressable>
           </View>
-          <Text style={styles.content}> {comment.text_content}</Text>
-          <View style={styles.footer}>
+          <Text style={postStyles.textContent}>{comment.text_content}</Text>
+          <View style={postStyles.footer}>
             {comment.parent_comment_id === null && (
               <Pressable
                 style={styles.iconWrapper}
@@ -428,24 +461,11 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 30,
   },
-  username: {
-    fontWeight: "bold",
-  },
-  content: {
-    lineHeight: 20,
-    marginTop: 5,
-  },
   image: {
     width: "100%",
     aspectRatio: 16 / 9,
     marginVertical: 10,
     borderRadius: 15,
-  },
-  footer: {
-    flexDirection: "row",
-    marginVertical: 5,
-    width: 120,
-    justifyContent: "space-between",
   },
   iconWrapper: {},
 });

@@ -2,6 +2,7 @@ import { PropsWithChildren, createContext, useContext } from "react";
 import { API_URL } from "../lib/api/config";
 import { useAuth } from "./AuthContext";
 import { useUser } from "./UserContext";
+import { getFileType } from "../lib/helpers";
 
 interface TweetsApiContextType {
   createComment: (data: {
@@ -495,15 +496,29 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     if (!authToken) {
       return {};
     }
+
+    const imageType = getFileType(data.imageURL);
+
+    const formData = new FormData();
+    if (imageType !== "") {
+      formData.append("image", {
+        uri: data.imageURL,
+        type: imageType,
+        name: `upload.${imageType.split("/").pop()}`,
+      } as any);
+    }
+    formData.append("textContent", data.textContent || "");
+    formData.append("neighborhoodID", data.neighborhoodID.toString());
+
     const url = `${API_URL}/v1/posts`;
 
     const res = await fetch(url, {
       method: "POST",
+      body: formData,
       headers: {
         Authorization: `Bearer ${authToken}`,
-        "Content-type": "Application/json",
+        "Content-Type": "multipart/form-data",
       },
-      body: JSON.stringify(data),
     });
 
     if (res.status === 403) {
