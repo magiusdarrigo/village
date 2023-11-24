@@ -10,6 +10,7 @@ const postStyles = StyleSheet.create({
     marginTop: 5,
     fontSize: 18,
     fontWeight: "500",
+    marginRight: 10,
   },
   timeContent: {
     fontSize: 16,
@@ -18,10 +19,11 @@ const postStyles = StyleSheet.create({
   },
   footer: {
     flexDirection: "row",
-    marginTop: 15,
-    marginBottom: 0,
+    marginTop: 20,
+    marginBottom: 10,
     width: 120,
     justifyContent: "space-between",
+    marginLeft: 70,
   },
   emptyPostsContainer: {
     flex: 1,

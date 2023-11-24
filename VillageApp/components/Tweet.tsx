@@ -35,7 +35,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
 
   const onLayout = (event: any) => {
     const { width } = event.nativeEvent.layout;
-    setPostWidth(width);
+    setPostWidth(width - 20);
   };
 
   // like a tweet
@@ -339,72 +339,92 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   return (
     <View
       style={{
-        flexDirection: "row",
+        flexDirection: "column",
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderColor: "lightgrey",
         backgroundColor: "white",
       }}
+      onLayout={onLayout}
     >
       <View
         style={{
-          width: 60,
-          flexDirection: "column",
+          flexDirection: "row",
+          backgroundColor: "white",
+          flex: 1,
         }}
       >
-        <Link
-          href={{
-            pathname: `/profile/${tweet.user_id}`,
-            params: {
-              userID: tweet.user_id,
-              username: tweet.username,
-              image: tweet.profile_image ?? "",
-            },
+        <View
+          style={{
+            width: 60,
+            flexDirection: "column",
           }}
-          asChild
         >
-          <Pressable
-            style={{
-              paddingTop: 10,
-              alignItems: "flex-end",
+          <Link
+            href={{
+              pathname: `/profile/${tweet.user_id}`,
+              params: {
+                userID: tweet.user_id,
+                username: tweet.username,
+                image: tweet.profile_image ?? "",
+              },
             }}
+            asChild
           >
-            <View
-              // source={{ uri: tweet.profile_image }}
-              style={[
-                styles.userImage,
-                { backgroundColor: tweet.profile_image },
-              ]}
-            />
-          </Pressable>
-        </Link>
+            <Pressable
+              style={{
+                paddingTop: 10,
+                alignItems: "flex-end",
+              }}
+            >
+              <View
+                // source={{ uri: tweet.profile_image }}
+                style={[
+                  styles.userImage,
+                  { backgroundColor: tweet.profile_image },
+                ]}
+              />
+            </Pressable>
+          </Link>
+          <Link href={`/tweet/${tweet.id}`} asChild>
+            <Pressable style={{ flex: 1 }}></Pressable>
+          </Link>
+        </View>
         <Link href={`/tweet/${tweet.id}`} asChild>
-          <Pressable style={{ flex: 1 }}></Pressable>
+          <Pressable style={styles.container}>
+            <View style={styles.mainContainer}>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={postStyles.username}>@{tweet.username}</Text>
+                {calculateHoursAgo(tweet.created_at)}
+                <Pressable
+                  style={{ marginLeft: "auto" }}
+                  onPress={() => handle3DotsPressed(user.id, tweet)}
+                >
+                  <Entypo
+                    name="dots-three-horizontal"
+                    size={16}
+                    color="grey"
+                    style={{ marginLeft: "auto", paddingRight: 10 }}
+                  />
+                </Pressable>
+              </View>
+              <Hyperlink
+                linkStyle={{ color: "#2980b9" }}
+                onPress={handlePressButtonAsync}
+              >
+                <Text style={postStyles.textContent}>{tweet.text_content}</Text>
+              </Hyperlink>
+            </View>
+          </Pressable>
         </Link>
       </View>
       <Link href={`/tweet/${tweet.id}`} asChild>
-        <Pressable style={styles.container}>
-          <View style={styles.mainContainer} onLayout={onLayout}>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={postStyles.username}>@{tweet.username}</Text>
-              {calculateHoursAgo(tweet.created_at)}
-              <Pressable
-                style={{ marginLeft: "auto" }}
-                onPress={() => handle3DotsPressed(user.id, tweet)}
-              >
-                <Entypo
-                  name="dots-three-horizontal"
-                  size={16}
-                  color="grey"
-                  style={{ marginLeft: "auto", paddingRight: 10 }}
-                />
-              </Pressable>
-            </View>
-            <Hyperlink
-              linkStyle={{ color: "#2980b9" }}
-              onPress={handlePressButtonAsync}
-            >
-              <Text style={postStyles.textContent}>{tweet.text_content}</Text>
-            </Hyperlink>
+        <Pressable style={{ flex: 1 }}>
+          <View
+            style={{
+              paddingHorizontal: 10,
+              backgroundColor: "white",
+            }}
+          >
             {tweet.image_url && (
               <Image
                 source={tweet.image_url}
@@ -415,34 +435,36 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                 ]}
               />
             )}
-
-            <View style={postStyles.footer}>
-              <Link href={`/tweet/${tweet.id}`} asChild>
-                <Pressable onPress={handleCommentIconClicked}>
-                  <MaterialCommunityIcon
-                    icon="comment-outline"
-                    text={tweet.comments_count}
-                    iconColor="#b2b2b2"
-                  />
-                </Pressable>
-              </Link>
-              <Pressable onPress={() => handleToggleLike(tweet.id)}>
-                {(tweet.liked_by_user && (
-                  <AntIcon
-                    icon="like1"
-                    text={tweet.likes_count}
-                    iconColor="red"
-                  />
-                )) || (
-                  <AntIcon
-                    icon="like2"
-                    text={tweet.likes_count}
-                    iconColor="#b2b2b2"
-                  />
-                )}
+          </View>
+        </Pressable>
+      </Link>
+      <Link href={`/tweet/${tweet.id}`} asChild>
+        <Pressable style={{ flex: 1 }}>
+          <View style={postStyles.footer}>
+            <Link href={`/tweet/${tweet.id}`} asChild>
+              <Pressable onPress={handleCommentIconClicked}>
+                <MaterialCommunityIcon
+                  icon="comment-outline"
+                  text={tweet.comments_count}
+                  iconColor="#b2b2b2"
+                />
               </Pressable>
-              {/* <IconButton icon="share-apple" /> */}
-            </View>
+            </Link>
+            <Pressable onPress={() => handleToggleLike(tweet.id)}>
+              {(tweet.liked_by_user && (
+                <AntIcon
+                  icon="like1"
+                  text={tweet.likes_count}
+                  iconColor="red"
+                />
+              )) || (
+                <AntIcon
+                  icon="like2"
+                  text={tweet.likes_count}
+                  iconColor="#b2b2b2"
+                />
+              )}
+            </Pressable>
           </View>
         </Pressable>
       </Link>
@@ -457,25 +479,22 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: "row",
-    padding: 10,
+    paddingTop: 10,
     paddingLeft: 5,
+    paddingRight: 5,
     flex: 1,
+    backgroundColor: "white",
   },
   mainContainer: {
     flex: 1,
     marginLeft: 5,
+    backgroundColor: "white",
   },
   userImage: {
     width: 50,
     height: 50,
     borderRadius: 50,
   },
-  // image: {
-  //   width: "100%",
-  //   aspectRatio: 1,
-  //   marginVertical: 10,
-  //   borderRadius: 8,
-  // },
   libraryImage: {
     marginTop: 10,
     borderRadius: 8,
