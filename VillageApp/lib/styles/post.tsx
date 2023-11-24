@@ -36,6 +36,7 @@ const postStyles = StyleSheet.create({
     color: "lightgrey",
   },
   emptyCommentsContainer: {
+    minHeight: 200,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

@@ -28,10 +28,29 @@ notifee.onBackgroundEvent(async ({ detail, type }) => {
 });
 
 export default function TabLayout() {
-  const { user } = useUser();
+  const { user, getStreamChatClient } = useUser();
   const [chatTabBadgeCount, setChatTabBadgeCount] = useState<
     string | undefined
   >(undefined);
+
+  const handleUnreadChatCount = (event: any) => {
+    if (event?.unread_count) {
+      setChatTabBadgeCount(event.unread_count);
+    }
+  };
+
+  // set up listener for unread chat count changes
+  useEffect(() => {
+    const streamChatUser = getStreamChatClient()?.user;
+    if (streamChatUser) {
+      streamChatUser.on("notification.message_new", handleUnreadChatCount);
+    }
+    return () => {
+      if (streamChatUser) {
+        streamChatUser.off("notification.message_new", handleUnreadChatCount);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
@@ -44,7 +63,7 @@ export default function TabLayout() {
         }
         // set the chat tab badge count
         if (remoteMessage?.notification?.ios?.badge) {
-          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
+          // setChatTabBadgeCount(remoteMessage.notification.ios.badge);
         }
       }
     );
@@ -69,7 +88,7 @@ export default function TabLayout() {
         }
         // set the chat tab badge count
         if (remoteMessage?.notification?.ios?.badge) {
-          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
+          // setChatTabBadgeCount(remoteMessage.notification.ios.badge);
         }
       });
 
@@ -131,7 +150,7 @@ export default function TabLayout() {
         listeners={{
           tabPress: (_) => {
             try {
-              setChatTabBadgeCount(undefined);
+              // setChatTabBadgeCount(undefined);
               notifee.setBadgeCount(0);
             } catch (error) {
               Sentry.Native.captureException(error);
