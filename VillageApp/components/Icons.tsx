@@ -35,12 +35,13 @@ type AntIconProps = {
   icon: React.ComponentProps<typeof AntDesign>["name"];
   text?: string | number;
   iconColor?: string;
+  size: number;
 };
 
-export const AntIcon = ({ icon, text, iconColor }: AntIconProps) => {
+export const AntIcon = ({ icon, text, iconColor, size }: AntIconProps) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <AntDesign name={icon} size={18} color={iconColor} />
+      <AntDesign name={icon} size={size} color={iconColor} />
       <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>{text}</Text>
     </View>
   );

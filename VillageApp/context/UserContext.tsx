@@ -40,6 +40,8 @@ interface UserContextType {
   updateChatTabBadgeCount: (count: number) => void;
   flatListRef?: React.RefObject<any>;
   scrollToTop: () => void;
+  updateChannel: (channel: ChannelType) => void;
+  channel: ChannelType | null;
 }
 
 interface UserContextProviderProps {
@@ -57,6 +59,7 @@ const UserContextProvider = ({
   const [user, setUser] = useState<User | null>(null);
   const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
   const flatListRef = useRef<FlatList>(null);
+  const [channel, setChannel] = useState<ChannelType | null>(null);
 
   const updateUser = (newUser: User) => {
     setUser(newUser);
@@ -79,6 +82,10 @@ const UserContextProvider = ({
     flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
   };
 
+  const updateChannel = (channel: ChannelType) => {
+    setChannel(channel);
+  };
+
   // Provide the user object to any descendants of this component
   return (
     <UserContext.Provider
@@ -91,6 +98,8 @@ const UserContextProvider = ({
         updateChatTabBadgeCount,
         flatListRef,
         scrollToTop,
+        updateChannel,
+        channel,
       }}
     >
       {children}

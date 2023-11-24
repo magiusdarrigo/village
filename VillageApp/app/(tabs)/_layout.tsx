@@ -23,10 +23,20 @@ notifee.onBackgroundEvent(async ({ detail, type }) => {
 });
 
 export default function TabLayout() {
-  const { user, chatTabBadgeCount, updateChatTabBadgeCount, scrollToTop } =
-    useUser();
+  const {
+    user,
+    chatTabBadgeCount,
+    updateChatTabBadgeCount,
+    scrollToTop,
+    channel,
+    updateChannel,
+    getStreamChatClient,
+  } = useUser();
   const [appState, setAppState] = useState(AppState.currentState);
+  const [activeTab, setActiveTab] = useState("home");
+  const streamChatClient = getStreamChatClient();
 
+  // badge count for when chat tab comes into foreground from background state
   useEffect(() => {
     const subscription = AppState.addEventListener(
       "change",
@@ -35,6 +45,11 @@ export default function TabLayout() {
           appState.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
+          if (activeTab === "chat") {
+            updateChatTabBadgeCount(0);
+            return;
+          }
+
           const count = await notifee.getBadgeCount();
           updateChatTabBadgeCount(count);
         }
@@ -47,23 +62,7 @@ export default function TabLayout() {
     };
   }, [appState]);
 
-  // this useEffect holds the logic for when a user TAPS on a notification.
-  useEffect(() => {
-    const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
-      (remoteMessage) => {}
-    );
-
-    notifee.getInitialNotification().then((initialNotification) => {});
-
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage) => {});
-
-    return () => {
-      unsubscribeOnNotificationOpen();
-    };
-  }, []);
-
+  // badge count for when chat tab comes into foreground from quit state
   useEffect(() => {
     const setChatTabBadgeCount = async () => {
       try {
@@ -74,6 +73,19 @@ export default function TabLayout() {
       }
     };
     setChatTabBadgeCount();
+  }, []);
+
+  // correct badge count for chat tab when app is in foreground
+  useEffect(() => {
+    const { unsubscribe } = streamChatClient.on((event) => {
+      if (event.type === "notification.message_new") {
+        updateChatTabBadgeCount(event.total_unread_count);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -117,9 +129,13 @@ export default function TabLayout() {
           ),
         }}
         listeners={{
+          focus: (_) => {
+            setActiveTab("home");
+          },
           tabPress: (_) => {
             try {
               scrollToTop();
+              channel?.stopWatching();
             } catch (error) {
               Sentry.Native.captureException(error);
             }
@@ -136,8 +152,12 @@ export default function TabLayout() {
           ),
         }}
         listeners={{
+          focus: (_) => {
+            setActiveTab("chat");
+          },
           tabPress: (_) => {
             try {
+              channel?.watch();
               updateChatTabBadgeCount(0);
             } catch (error) {
               Sentry.Native.captureException(error);

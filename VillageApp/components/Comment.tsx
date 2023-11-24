@@ -410,6 +410,7 @@ const Comment = ({
                   icon="comment-outline"
                   text={comment.replies_count}
                   iconColor="#b2b2b2"
+                  size={20}
                 />
               </Pressable>
             )}
@@ -419,12 +420,14 @@ const Comment = ({
                   icon="like1"
                   text={comment.likes_count}
                   iconColor="red"
+                  size={20}
                 />
               )) || (
                 <AntIcon
                   icon="like2"
                   text={comment.likes_count}
                   iconColor="#b2b2b2"
+                  size={20}
                 />
               )}
             </Pressable>

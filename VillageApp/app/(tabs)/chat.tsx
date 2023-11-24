@@ -92,9 +92,14 @@ const requestPermission = async () => {
 };
 
 const ChatScreen = () => {
-  const [channel, setChannel] = useState<ChannelType | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { user, getStreamChatClient, updateChatTabBadgeCount } = useUser();
+  const {
+    user,
+    getStreamChatClient,
+    updateChatTabBadgeCount,
+    channel,
+    updateChannel,
+  } = useUser();
   const streamChatClient = getStreamChatClient();
   const unsubscribeTokenRefreshListenerRef = useRef<() => void>();
 
@@ -151,8 +156,6 @@ const ChatScreen = () => {
       );
     };
 
-    let chatEventUnsubscribe: () => void;
-
     const connectUserAndFetchChannel = async () => {
       try {
         // ask for push notification permission
@@ -182,17 +185,10 @@ const ChatScreen = () => {
         const channels = await streamChatClient.queryChannels({
           id: { $eq: _id },
         });
-        const channel = channels[0];
-        setChannel(channel);
+        const currentChannel = channels[0];
+        updateChannel(currentChannel);
         // watch channel for new messages
-        await channel.watch();
-        // set badge count listeners
-        const { unsubscribe } = streamChatClient.on((event) => {
-          // if (event.type === "message.new") {
-          //   updateChatTabBadgeCount(event.total_unread_count);
-          // }
-        });
-        chatEventUnsubscribe = unsubscribe;
+        await currentChannel.watch();
         // ready to render
         setIsReady(true);
       } catch (error) {
@@ -207,7 +203,6 @@ const ChatScreen = () => {
 
     return () => {
       if (streamChatClient.userID) {
-        chatEventUnsubscribe();
         streamChatClient.disconnectUser();
         unsubscribeTokenRefreshListenerRef.current?.();
       }

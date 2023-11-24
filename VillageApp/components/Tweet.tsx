@@ -447,6 +447,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                   icon="comment-outline"
                   text={tweet.comments_count}
                   iconColor="#b2b2b2"
+                  size={22}
                 />
               </Pressable>
             </Link>
@@ -456,12 +457,14 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                   icon="like1"
                   text={tweet.likes_count}
                   iconColor="red"
+                  size={22}
                 />
               )) || (
                 <AntIcon
                   icon="like2"
                   text={tweet.likes_count}
                   iconColor="#b2b2b2"
+                  size={22}
                 />
               )}
             </Pressable>
