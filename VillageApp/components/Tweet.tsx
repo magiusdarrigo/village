@@ -1,4 +1,6 @@
-import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
+import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
+import { Image as ReactNativeImage } from "react-native";
+import { Image, ImageLoadEventData } from "expo-image";
 import { useEffect, useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
@@ -19,8 +21,8 @@ type TweetProps = {
 };
 
 const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
-  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-  const [postWidth, setPostWidth] = useState(0);
+  const [imageSize, setImageSize] = useState({ width: 1, height: 1 });
+  const [postWidth, setPostWidth] = useState(1);
   const { likeTweet, unlikeTweet, deleteTweet, reportTweet } = useTweetsApi();
   const queryClient = useQueryClient();
   const navigation = useNavigation();
@@ -35,25 +37,6 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     const { width } = event.nativeEvent.layout;
     setPostWidth(width);
   };
-
-  useEffect(() => {
-    if (!tweet.image_url || !postWidth) {
-      return;
-    }
-    Image.getSize(
-      tweet.image_url,
-      (width, height) => {
-        // Calculate aspect ratio
-        const aspectRatio = width / height;
-        // Set width and height based on aspect ratio
-        const scaledHeight = postWidth / aspectRatio;
-        setImageSize({ width: postWidth, height: scaledHeight });
-      },
-      (error) => {
-        console.error(`Couldn't get the image size: ${error.message}`);
-      }
-    );
-  }, [tweet.image_url, postWidth]);
 
   // like a tweet
   const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
@@ -344,6 +327,15 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     }
   };
 
+  const onPostImageLoad = (e: ImageLoadEventData) => {
+    const { width, height } = e.source;
+    // Calculate aspect ratio
+    const aspectRatio = width / height;
+    // Set width and height based on aspect ratio
+    const scaledHeight = postWidth / aspectRatio;
+    setImageSize({ width: postWidth, height: scaledHeight });
+  };
+
   return (
     <View
       style={{
@@ -415,7 +407,8 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             </Hyperlink>
             {tweet.image_url && (
               <Image
-                source={{ uri: tweet.image_url }}
+                source={tweet.image_url}
+                onLoad={onPostImageLoad}
                 style={[
                   { width: imageSize.width, height: imageSize.height },
                   styles.libraryImage,
@@ -484,6 +477,7 @@ const styles = StyleSheet.create({
   //   borderRadius: 8,
   // },
   libraryImage: {
+    marginTop: 10,
     borderRadius: 8,
   },
 });

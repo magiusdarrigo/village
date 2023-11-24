@@ -25,6 +25,11 @@ import { useGlobalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
 import * as Sentry from "sentry-expo";
+import { DynaPuffText } from "../../components/StyledText";
+import postStyles from "../../lib/styles/post";
+import { ScrollView } from "react-native-gesture-handler";
+
+const PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD = 200;
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -232,22 +237,49 @@ const TweetScreen = () => {
     inputRef.current?.focus();
   };
 
+  const renderEmptyListComponent = () => (
+    <View style={postStyles.emptyCommentsContainer}>
+      <DynaPuffText style={postStyles.emptyCommentsContainerText}>
+        Post something that’s on your mind.
+      </DynaPuffText>
+    </View>
+  );
+
+  const handleScroll = (event: any) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
+
+    // Check if the user has scrolled to the bottom
+    if (
+      offsetY + scrollViewHeight >=
+      contentHeight - PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD
+    ) {
+      // 50 is a threshold
+      if (!isFetching) {
+        handleLoadMore();
+      }
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
       keyboardVerticalOffset={keyboardVerticalOffset}
     >
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} onScroll={handleScroll}>
         <Tweet
           tweet={data}
           handleCommentIconClicked={handleCommentIconPressed}
         />
-        <View style={styles.postSeperatorContainer}>
-          <View style={styles.seperatorTextContainer}>
-            <Text style={styles.seperatorText}>Top Comments</Text>
+        {items.length > 0 && (
+          <View style={styles.postSeperatorContainer}>
+            <View style={styles.seperatorTextContainer}>
+              <Text style={styles.seperatorText}>Top Comments</Text>
+            </View>
           </View>
-        </View>
+        )}
         <FlatList
           keyExtractor={(item) => item.id.toString()}
           ref={flatListRef}
@@ -260,7 +292,6 @@ const TweetScreen = () => {
               isSelected={item.id === selectedCommentID}
             />
           )}
-          onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetchingNextPage || isFetching || isLoadingCreateComment ? (
@@ -268,8 +299,10 @@ const TweetScreen = () => {
             ) : null
           }
           contentContainerStyle={{ flexGrow: 1 }}
+          ListEmptyComponent={renderEmptyListComponent}
+          scrollEnabled={false}
         />
-      </View>
+      </ScrollView>
       <View style={styles.footer}>
         <TextInput
           ref={inputRef}
