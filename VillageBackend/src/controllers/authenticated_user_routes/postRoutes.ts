@@ -3,14 +3,16 @@ import prisma from "../../clients/prismaClient";
 import { getTop10CommentsFromPostQuery } from "../../sql_queries/comments";
 import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
-import {
-  getSinglePostQuery,
-  createPostOnlyTextQuery,
-} from "../../sql_queries/posts";
+import { getSinglePostQuery, createPostQuery } from "../../sql_queries/posts";
 import { postTextContentAllowed } from "../../utils/badwords";
+import { upload } from "../../middleware/upload";
+import {
+  uploadImageToSupabase,
+  convertFileIfNecessary,
+  deleteFileFromFS,
+} from "../../utils/uploads";
 
 const router = Router();
-
 const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
 
 // report a post
@@ -66,9 +68,9 @@ router.delete("/:id", async (req, res) => {
 });
 
 // create post
-router.post("/", async (req, res) => {
+router.post("/", upload.single("image"), async (req, res) => {
   console.log("create post called");
-  const { neighborhoodID, textContent, imageURL } = req.body;
+  const { neighborhoodID, textContent } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 
   if (textContent && !postTextContentAllowed(textContent)) {
@@ -77,11 +79,32 @@ router.post("/", async (req, res) => {
       .json({ error: "That post's content is not allowed." });
   }
 
+  // first try-catch is for image upload handling
+  let uploadedFilePath = "";
   try {
-    const newPostQuery = createPostOnlyTextQuery(
+    if (req.file) {
+      await convertFileIfNecessary(req.file);
+      // upload file to supabase
+      uploadedFilePath = await uploadImageToSupabase(
+        req.file,
+        String(currentUser.id)
+      );
+      // delete the file from the local filesystem
+      await deleteFileFromFS(req.file.path);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error uploading image for user`,
+    });
+  }
+  // second try-catch is for post creation
+  try {
+    const newPostQuery = createPostQuery(
       currentUser.id,
-      neighborhoodID,
-      textContent
+      Number(neighborhoodID),
+      textContent,
+      uploadedFilePath
     );
     const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
 

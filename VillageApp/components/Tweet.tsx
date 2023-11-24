@@ -1,5 +1,7 @@
-import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
-import { useState } from "react";
+import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
+import { Image as ReactNativeImage } from "react-native";
+import { Image, ImageLoadEventData } from "expo-image";
+import { useEffect, useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import { AntIcon, MaterialCommunityIcon } from "./Icons";
@@ -9,6 +11,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../context/UserContext";
 import { calculateHoursAgo } from "../lib/helpers";
 import * as Sentry from "sentry-expo";
+import postStyles from "../lib/styles/post";
+import Hyperlink from "react-native-hyperlink";
+import { handlePressButtonAsync } from "../lib/helpers";
 
 type TweetProps = {
   tweet: TweetType;
@@ -16,7 +21,8 @@ type TweetProps = {
 };
 
 const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageSize, setImageSize] = useState({ width: 1, height: 1 });
+  const [postWidth, setPostWidth] = useState(1);
   const { likeTweet, unlikeTweet, deleteTweet, reportTweet } = useTweetsApi();
   const queryClient = useQueryClient();
   const navigation = useNavigation();
@@ -26,6 +32,11 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     Alert.alert("Something went wrong. Try again.");
     return null;
   }
+
+  const onLayout = (event: any) => {
+    const { width } = event.nativeEvent.layout;
+    setPostWidth(width);
+  };
 
   // like a tweet
   const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
@@ -316,6 +327,15 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     }
   };
 
+  const onPostImageLoad = (e: ImageLoadEventData) => {
+    const { width, height } = e.source;
+    // Calculate aspect ratio
+    const aspectRatio = width / height;
+    // Set width and height based on aspect ratio
+    const scaledHeight = postWidth / aspectRatio;
+    setImageSize({ width: postWidth, height: scaledHeight });
+  };
+
   return (
     <View
       style={{
@@ -363,9 +383,9 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
       </View>
       <Link href={`/tweet/${tweet.id}`} asChild>
         <Pressable style={styles.container}>
-          <View style={styles.mainContainer}>
+          <View style={styles.mainContainer} onLayout={onLayout}>
             <View style={{ flexDirection: "row" }}>
-              <Text style={styles.username}>@{tweet.username}</Text>
+              <Text style={postStyles.username}>@{tweet.username}</Text>
               {calculateHoursAgo(tweet.created_at)}
               <Pressable
                 style={{ marginLeft: "auto" }}
@@ -379,14 +399,24 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                 />
               </Pressable>
             </View>
-
-            <Text style={styles.content}> {tweet.text_content}</Text>
-
+            <Hyperlink
+              linkStyle={{ color: "#2980b9" }}
+              onPress={handlePressButtonAsync}
+            >
+              <Text style={postStyles.textContent}>{tweet.text_content}</Text>
+            </Hyperlink>
             {tweet.image_url && (
-              <Image source={{ uri: tweet.image_url }} style={styles.image} />
+              <Image
+                source={tweet.image_url}
+                onLoad={onPostImageLoad}
+                style={[
+                  { width: imageSize.width, height: imageSize.height },
+                  styles.libraryImage,
+                ]}
+              />
             )}
 
-            <View style={styles.footer}>
+            <View style={postStyles.footer}>
               <Link href={`/tweet/${tweet.id}`} asChild>
                 <Pressable onPress={handleCommentIconClicked}>
                   <MaterialCommunityIcon
@@ -440,24 +470,15 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 50,
   },
-  username: {
-    fontWeight: "bold",
-  },
-  content: {
-    lineHeight: 20,
-    marginTop: 5,
-  },
-  image: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-    marginVertical: 10,
-    borderRadius: 15,
-  },
-  footer: {
-    flexDirection: "row",
-    marginVertical: 5,
-    width: 120,
-    justifyContent: "space-between",
+  // image: {
+  //   width: "100%",
+  //   aspectRatio: 1,
+  //   marginVertical: 10,
+  //   borderRadius: 8,
+  // },
+  libraryImage: {
+    marginTop: 10,
+    borderRadius: 8,
   },
 });
 

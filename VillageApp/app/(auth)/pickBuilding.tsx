@@ -17,6 +17,7 @@ import { useUser } from "../../context/UserContext";
 import { router } from "expo-router";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
+import * as Sentry from "sentry-expo";
 
 const PickBuilding = () => {
   const [address, setAddress] = useState("");
@@ -48,7 +49,7 @@ const PickBuilding = () => {
         },
       });
     } catch (error) {
-      console.log(error);
+      Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding your building address. Try again.");
     }
   };

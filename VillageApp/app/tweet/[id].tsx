@@ -24,6 +24,12 @@ import Tweet from "../../components/Tweet";
 import { useGlobalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
+import * as Sentry from "sentry-expo";
+import { DynaPuffText } from "../../components/StyledText";
+import postStyles from "../../lib/styles/post";
+import { ScrollView } from "react-native-gesture-handler";
+
+const PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD = 200;
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -75,8 +81,9 @@ const TweetScreen = () => {
         parentCommentID: String(selectedCommentID),
       });
       setCommentText("");
-    } catch (e: any) {
-      console.log("Error creating tweet", e.message);
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We had an issue publishing your comment.");
     }
   };
 
@@ -102,9 +109,38 @@ const TweetScreen = () => {
   const { isLoading: isLoadingCreateComment, mutateAsync } = useMutation({
     mutationFn: createComment,
     onSuccess: (newData) => {
+      // update the single tweet cache with a +1 total comments count
+      queryClient.setQueryData(["tweets", String(id)], (old: any) => {
+        if (!old) return;
+        return {
+          ...old,
+          comments_count: old.comments_count + 1,
+        };
+      });
+      // update the tweet list cache with a +1 total comments count for the tweet
+      queryClient.setQueryData(["tweets"], (old: any) => {
+        if (!old) return;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => {
+            return {
+              ...page,
+              data: page.data.map((tweet: any) => {
+                if (tweet.id === Number(id)) {
+                  return {
+                    ...tweet,
+                    comments_count: tweet.comments_count + 1,
+                  };
+                }
+                return tweet;
+              }),
+            };
+          }),
+        };
+      });
+      // update the comments cache with the new comment
       queryClient.setQueryData(["comments", String(id)], (old: any) => {
         if (!old) {
-          // If for some reason we don't have the pages, just return a new page structure
           return {
             pageParams: [],
             pages: [
@@ -112,8 +148,6 @@ const TweetScreen = () => {
             ],
           };
         }
-
-        // Otherwise, add the new comment to the beginning of the first page
         return {
           ...old,
           pages: [
@@ -127,7 +161,6 @@ const TweetScreen = () => {
       });
     },
     onError: async (error: any) => {
-      // convert error to json
       const err = await error.json();
       if (err?.status === 400) {
         Alert.alert(err?.body?.error);
@@ -204,22 +237,49 @@ const TweetScreen = () => {
     inputRef.current?.focus();
   };
 
+  const renderEmptyListComponent = () => (
+    <View style={postStyles.emptyCommentsContainer}>
+      <DynaPuffText style={postStyles.emptyCommentsContainerText}>
+        Post something that’s on your mind.
+      </DynaPuffText>
+    </View>
+  );
+
+  const handleScroll = (event: any) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
+
+    // Check if the user has scrolled to the bottom
+    if (
+      offsetY + scrollViewHeight >=
+      contentHeight - PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD
+    ) {
+      // 50 is a threshold
+      if (!isFetching) {
+        handleLoadMore();
+      }
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
       keyboardVerticalOffset={keyboardVerticalOffset}
     >
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} onScroll={handleScroll}>
         <Tweet
           tweet={data}
           handleCommentIconClicked={handleCommentIconPressed}
         />
-        <View style={styles.postSeperatorContainer}>
-          <View style={styles.seperatorTextContainer}>
-            <Text style={styles.seperatorText}>Top Comments</Text>
+        {items.length > 0 && (
+          <View style={styles.postSeperatorContainer}>
+            <View style={styles.seperatorTextContainer}>
+              <Text style={styles.seperatorText}>Top Comments</Text>
+            </View>
           </View>
-        </View>
+        )}
         <FlatList
           keyExtractor={(item) => item.id.toString()}
           ref={flatListRef}
@@ -232,7 +292,6 @@ const TweetScreen = () => {
               isSelected={item.id === selectedCommentID}
             />
           )}
-          onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetchingNextPage || isFetching || isLoadingCreateComment ? (
@@ -240,8 +299,10 @@ const TweetScreen = () => {
             ) : null
           }
           contentContainerStyle={{ flexGrow: 1 }}
+          ListEmptyComponent={renderEmptyListComponent}
+          scrollEnabled={false}
         />
-      </View>
+      </ScrollView>
       <View style={styles.footer}>
         <TextInput
           ref={inputRef}

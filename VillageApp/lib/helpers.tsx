@@ -1,5 +1,8 @@
-import { Text, StyleSheet, Platform } from "react-native";
+import { Text, Platform, Alert } from "react-native";
+import postStyles from "./styles/post";
 import * as Device from "expo-device";
+import * as WebBrowser from "expo-web-browser";
+import * as Sentry from "sentry-expo";
 
 export const calculateHoursAgo = (time: string) => {
   const now = new Date();
@@ -10,28 +13,52 @@ export const calculateHoursAgo = (time: string) => {
   const seconds = Math.floor(diff / 1000);
 
   if (seconds < 60) {
-    return <Text style={styles.time}>· {seconds}s</Text>;
+    return <Text style={postStyles.timeContent}>· {seconds}s</Text>;
   } else if (minutes < 60) {
-    return <Text style={styles.time}>· {minutes}m</Text>;
+    return <Text style={postStyles.timeContent}>· {minutes}m</Text>;
   } else if (hours < 24) {
-    return <Text style={styles.time}>· {hours}h</Text>;
+    return <Text style={postStyles.timeContent}>· {hours}h</Text>;
   } else {
     const dateWithoutYear = date
       .toDateString()
       .split(" ")
       .slice(0, 3)
       .join(" ");
-    return <Text style={styles.time}>· {dateWithoutYear}</Text>;
+    return <Text style={postStyles.timeContent}>· {dateWithoutYear}</Text>;
   }
 };
 
-const styles = StyleSheet.create({
-  time: {
-    color: "grey",
-    marginLeft: 5,
-  },
-});
-
 export const isIOSSimulator = () => {
   return Platform.OS === "ios" && !Device.isDevice;
+};
+
+export const handlePressButtonAsync = async (url: string) => {
+  try {
+    await WebBrowser.openBrowserAsync(url);
+  } catch (error) {
+    Sentry.Native.captureException(error);
+    Alert.alert("Sorry, this link is invalid");
+  }
+};
+export const getFileType = (uri?: string) => {
+  if (!uri) {
+    return "";
+  }
+  const extension = uri.split(".").pop();
+  if (!extension) {
+    throw new Error("Unsupported file type");
+  }
+  switch (extension.toLowerCase()) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "gif":
+      return "image/gif";
+    case "heic":
+      return "image/heic";
+    default:
+      throw new Error("Unsupported file type");
+  }
 };

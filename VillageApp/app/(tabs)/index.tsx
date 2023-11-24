@@ -12,6 +12,7 @@ import { Link } from "expo-router";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DynaPuffText } from "../../components/StyledText";
+import postStyles from "../../lib/styles/post";
 
 export default function FeedScreen() {
   const { listTweets } = useTweetsApi();
@@ -60,8 +61,8 @@ export default function FeedScreen() {
   });
 
   const renderEmptyListComponent = () => (
-    <View style={styles.emptyContainer}>
-      <DynaPuffText style={styles.emptyText}>
+    <View style={postStyles.emptyPostsContainer}>
+      <DynaPuffText style={postStyles.emptyPostsContainerText}>
         Post something that’s on your mind.
       </DynaPuffText>
     </View>
@@ -88,7 +89,7 @@ export default function FeedScreen() {
 
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={24} color="white" />
+          <Entypo name="plus" size={32} color="white" />
         </Pressable>
       </Link>
     </View>
@@ -96,18 +97,6 @@ export default function FeedScreen() {
 }
 
 const styles = StyleSheet.create({
-  emptyText: {
-    paddingHorizontal: 20,
-    fontSize: 36,
-    textAlign: "center",
-    color: "lightgrey",
-  },
-  emptyContainer: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   page: {
     flex: 1,
     backgroundColor: "white",

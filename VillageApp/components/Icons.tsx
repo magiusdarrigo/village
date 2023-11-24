@@ -4,6 +4,7 @@ import {
   EvilIcons,
   AntDesign,
   MaterialCommunityIcons,
+  Ionicons,
 } from "@expo/vector-icons";
 
 type EvilIconProps = {
@@ -49,16 +50,39 @@ type MaterialCommunityIconsProps = {
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   text?: string | number;
   iconColor?: string;
+  size?: number;
 };
 
 export const MaterialCommunityIcon = ({
   icon,
   text,
   iconColor,
+  size,
 }: MaterialCommunityIconsProps) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <MaterialCommunityIcons name={icon} size={18} color={iconColor} />
+      <MaterialCommunityIcons name={icon} size={size ?? 18} color={iconColor} />
+      <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>{text}</Text>
+    </View>
+  );
+};
+
+type IoniconsIconProps = {
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+  text?: string | number;
+  iconColor?: string;
+  size?: number;
+};
+
+export const IoniconsIcon = ({
+  icon,
+  text,
+  iconColor,
+  size,
+}: IoniconsIconProps) => {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <Ionicons name={icon} size={size ?? 18} color={iconColor} />
       <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>{text}</Text>
     </View>
   );

@@ -16,6 +16,7 @@ import { login } from "../../lib/api/auth";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
+import * as Sentry from "sentry-expo";
 
 const SignIn = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -45,7 +46,8 @@ const SignIn = () => {
       const user = await login({ phoneNumber });
       updateUser(user);
       router.replace({ pathname: "/authenticate", params: { phoneNumber } });
-    } catch (e) {
+    } catch (error) {
+      Sentry.Native.captureException(error);
       Alert.alert("We had an issue signing you in. Try again.");
     }
   };
