@@ -94,9 +94,20 @@ const requestPermission = async () => {
 const ChatScreen = () => {
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { user, getStreamChatClient } = useUser();
+  const { user, getStreamChatClient, updateChatTabBadgeCount } = useUser();
   const streamChatClient = getStreamChatClient();
   const unsubscribeTokenRefreshListenerRef = useRef<() => void>();
+
+  const setBackgroundMessageHandlerIfIOS = async () => {
+    if (Platform.OS !== "ios") {
+      return;
+    }
+
+    messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
+      const badgeCount = await notifee.getBadgeCount();
+      updateChatTabBadgeCount(badgeCount);
+    });
+  };
 
   useEffect(() => {
     // Register FCM token with stream chat server.
@@ -140,6 +151,8 @@ const ChatScreen = () => {
       );
     };
 
+    let chatEventUnsubscribe: () => void;
+
     const connectUserAndFetchChannel = async () => {
       try {
         // ask for push notification permission
@@ -154,6 +167,8 @@ const ChatScreen = () => {
           user?.chat_token,
           getStreamChatClient()
         );
+        // set background message handler for ios
+        // await setBackgroundMessageHandlerIfIOS();
         // connect user to chat
         await streamChatClient.connectUser(
           {
@@ -171,6 +186,13 @@ const ChatScreen = () => {
         setChannel(channel);
         // watch channel for new messages
         await channel.watch();
+        // set badge count listeners
+        const { unsubscribe } = streamChatClient.on((event) => {
+          // if (event.type === "message.new") {
+          //   updateChatTabBadgeCount(event.total_unread_count);
+          // }
+        });
+        chatEventUnsubscribe = unsubscribe;
         // ready to render
         setIsReady(true);
       } catch (error) {
@@ -185,6 +207,7 @@ const ChatScreen = () => {
 
     return () => {
       if (streamChatClient.userID) {
+        chatEventUnsubscribe();
         streamChatClient.disconnectUser();
         unsubscribeTokenRefreshListenerRef.current?.();
       }

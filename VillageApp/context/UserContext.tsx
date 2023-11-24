@@ -5,6 +5,7 @@ import React, {
   PropsWithChildren,
 } from "react";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
+import notifee from "@notifee/react-native";
 
 export type User = {
   neighborhood_id?: number;
@@ -33,6 +34,8 @@ interface UserContextType {
   updateUser: (user: User) => void;
   removeUser: () => void;
   getStreamChatClient: () => StreamChat<any>;
+  chatTabBadgeCount: number;
+  updateChatTabBadgeCount: (count: number) => void;
 }
 
 interface UserContextProviderProps {
@@ -48,6 +51,7 @@ const UserContextProvider = ({
   streamChatClient,
 }: UserContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
 
   const updateUser = (newUser: User) => {
     setUser(newUser);
@@ -61,10 +65,22 @@ const UserContextProvider = ({
     return streamChatClient;
   };
 
+  const updateChatTabBadgeCount = async (count: number) => {
+    await notifee.setBadgeCount(count);
+    setChatTabBadgeCount(count);
+  };
+
   // Provide the user object to any descendants of this component
   return (
     <UserContext.Provider
-      value={{ user, updateUser, removeUser, getStreamChatClient }}
+      value={{
+        user,
+        updateUser,
+        removeUser,
+        getStreamChatClient,
+        chatTabBadgeCount,
+        updateChatTabBadgeCount,
+      }}
     >
       {children}
     </UserContext.Provider>

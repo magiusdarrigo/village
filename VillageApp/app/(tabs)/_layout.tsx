@@ -15,86 +15,43 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+// listener for when a user TAPS on a notification
 notifee.onBackgroundEvent(async ({ detail, type }) => {
   if (type === EventType.PRESS) {
-    if (detail.notification) {
-      console.log(
-        "[Android] When the application is running but in the background. Notification: ",
-        detail.notification
-      );
-    }
     await Promise.resolve();
   }
 });
 
 export default function TabLayout() {
-  const { user, getStreamChatClient } = useUser();
-  const [chatTabBadgeCount, setChatTabBadgeCount] = useState<
-    string | undefined
-  >(undefined);
+  const { user, chatTabBadgeCount, updateChatTabBadgeCount } = useUser();
 
-  const handleUnreadChatCount = (event: any) => {
-    if (event?.unread_count) {
-      setChatTabBadgeCount(event.unread_count);
-    }
-  };
-
-  // set up listener for unread chat count changes
-  useEffect(() => {
-    const streamChatUser = getStreamChatClient()?.user;
-    if (streamChatUser) {
-      streamChatUser.on("notification.message_new", handleUnreadChatCount);
-    }
-    return () => {
-      if (streamChatUser) {
-        streamChatUser.off("notification.message_new", handleUnreadChatCount);
-      }
-    };
-  }, []);
-
+  // this useEffect holds the logic for when a user TAPS on a notification.
   useEffect(() => {
     const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
-      (remoteMessage) => {
-        if (remoteMessage?.notification) {
-          Sentry.Native.captureMessage(
-            "[iOS] When the application is running, but in the background. Notification: " +
-              JSON.stringify(remoteMessage?.notification)
-          );
-        }
-        // set the chat tab badge count
-        if (remoteMessage?.notification?.ios?.badge) {
-          // setChatTabBadgeCount(remoteMessage.notification.ios.badge);
-        }
-      }
+      (remoteMessage) => {}
     );
 
-    notifee.getInitialNotification().then((initialNotification) => {
-      if (initialNotification?.notification) {
-        console.log(
-          "[Android] When the application is opened from a quit state. Notification: ",
-          initialNotification
-        );
-      }
-    });
+    notifee.getInitialNotification().then((initialNotification) => {});
 
     messaging()
       .getInitialNotification()
-      .then((remoteMessage) => {
-        if (remoteMessage?.notification) {
-          Sentry.Native.captureMessage(
-            "[iOS] When the application is opened from a quit state. Notification: " +
-              JSON.stringify(remoteMessage?.notification)
-          );
-        }
-        // set the chat tab badge count
-        if (remoteMessage?.notification?.ios?.badge) {
-          // setChatTabBadgeCount(remoteMessage.notification.ios.badge);
-        }
-      });
+      .then((remoteMessage) => {});
 
     return () => {
       unsubscribeOnNotificationOpen();
     };
+  }, []);
+
+  useEffect(() => {
+    const setChatTabBadgeCount = async () => {
+      try {
+        const count = await notifee.getBadgeCount();
+        updateChatTabBadgeCount(count);
+      } catch (error) {
+        Sentry.Native.captureException(error);
+      }
+    };
+    setChatTabBadgeCount();
   }, []);
 
   return (
@@ -142,7 +99,7 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: user?.building?.address ?? "Chat",
-          tabBarBadge: chatTabBadgeCount,
+          tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="comments" color={color} />
           ),
@@ -150,8 +107,7 @@ export default function TabLayout() {
         listeners={{
           tabPress: (_) => {
             try {
-              // setChatTabBadgeCount(undefined);
-              notifee.setBadgeCount(0);
+              updateChatTabBadgeCount(0);
             } catch (error) {
               Sentry.Native.captureException(error);
             }
