@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,6 +7,7 @@ import {
   View,
   Alert,
 } from "react-native";
+import { Image } from "expo-image";
 import { User } from "../context/UserContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
@@ -21,8 +21,9 @@ type ProfileProps = {
 const ModalScreen = ({ user }: ProfileProps) => {
   const queryClient = useQueryClient();
   const { followUser, unFollowUser } = useTweetsApi();
-  const { user: currentUser } = useUser();
+  const { user: currentUser, getStreamChatClient } = useUser();
   const { removeAuthToken } = useAuth();
+  const streamChatClient = getStreamChatClient();
 
   const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
     followUser,
@@ -73,7 +74,6 @@ const ModalScreen = ({ user }: ProfileProps) => {
   };
 
   const handleLogOut = () => {
-    // ask user if they're sure they want to log out
     Alert.alert("Are you sure you want to log out?", "", [
       {
         text: "Cancel",
@@ -82,8 +82,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
       {
         text: "Log out",
         onPress: async () => {
-          // TODO: can i remove this disconnectUser call?
-          // streamChatClient.disconnectUser();
+          streamChatClient.disconnectUser();
           removeAuthToken();
         },
       },
@@ -93,7 +92,9 @@ const ModalScreen = ({ user }: ProfileProps) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
-        <View style={[styles.profilePhoto, { backgroundColor: user.image }]} />
+        <View style={styles.profilePhoto}>
+          <Image source={user.image} style={styles.profilePhoto} />
+        </View>
         <Text style={styles.username}>@{user.username}</Text>
         <View style={styles.countContainer}>
           <Text style={styles.countText}>

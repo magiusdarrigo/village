@@ -4,6 +4,9 @@ import { useAuth } from "./AuthContext";
 import { useUser } from "./UserContext";
 import { getFileType } from "../lib/helpers";
 
+const DEFAULT_IMAGE_BASE_URL =
+  "https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults";
+
 interface TweetsApiContextType {
   createComment: (data: {
     postID: string;
@@ -548,15 +551,48 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     if (!authToken) {
       return {};
     }
+
+    const formData = new FormData();
+
+    const hasDefaultImageBeenChosen =
+      data.profileImage?.includes(DEFAULT_IMAGE_BASE_URL) || false;
+
+    if (hasDefaultImageBeenChosen) {
+      formData.append("defaultImage", data.profileImage ?? "");
+    }
+
+    if (data.profileImage && !hasDefaultImageBeenChosen) {
+      const imageType = getFileType(data.profileImage);
+      if (imageType !== "") {
+        formData.append("image", {
+          uri: data.profileImage,
+          type: imageType,
+          name: `upload.${imageType.split("/").pop()}`,
+        } as any);
+      }
+    }
+
+    if (data.username) {
+      formData.append("username", data.username);
+    }
+
+    if (data.buildingID) {
+      formData.append("buildingID", data.buildingID);
+    }
+
+    if (data.neighborhoodID) {
+      formData.append("neighborhoodID", data.neighborhoodID);
+    }
+
     const url = `${API_URL}/v1/users`;
 
     const res = await fetch(url, {
       method: "PUT",
+      body: formData,
       headers: {
         Authorization: `Bearer ${authToken}`,
-        "Content-type": "Application/json",
+        "Content-Type": "multipart/form-data",
       },
-      body: JSON.stringify(data),
     });
 
     if (res.status === 403) {

@@ -55,9 +55,9 @@ const convertHeicToJpeg = async (filePath: string) => {
   try {
     const inputBuffer = await promisify(fs.readFile)(filePath);
     const outputBuffer = await convert({
-      buffer: inputBuffer, // the HEIC file buffer
-      format: "JPEG", // output format
-      quality: 1, // the jpeg compression quality, between 0 and 1
+      buffer: inputBuffer,
+      format: "JPEG",
+      quality: 1,
     });
     await promisify(fs.writeFile)(filePath, outputBuffer as any);
   } catch (error) {

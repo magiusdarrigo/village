@@ -6,22 +6,50 @@ import { AuthenticatedRequest } from "../../middleware/auth";
 import { usernameAllowed } from "../../utils/badwords";
 import { getUserProfileQuery } from "../../sql_queries/users";
 import streamChatClient from "../../clients/streamChatClient";
+import { upload } from "../../middleware/upload";
+import {
+  uploadImageToSupabase,
+  convertFileIfNecessary,
+  deleteFileFromFS,
+} from "../../utils/uploads";
 
 const router = Router();
 
 // update user profile
-router.put("/", async (req, res) => {
+router.put("/", upload.single("image"), async (req, res) => {
   console.log("update user profile called");
-  // we won't use the request parameter for the user id. We will get the user id from the token
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
-  let { username, profileImage, buildingID, neighborhoodID } = req.body;
+  let { username, buildingID, neighborhoodID, defaultImage } = req.body;
   // ensure username is not racist
   if (username && !usernameAllowed(username)) {
     return res.status(400).json({
       error: "That username is not allowed.",
     });
   }
+
+  // first try-catch is for image upload handling
+  let uploadedFilePath = "";
+  try {
+    if (req.file) {
+      await convertFileIfNecessary(req.file);
+      // upload file to supabase
+      uploadedFilePath = await uploadImageToSupabase(
+        req.file,
+        String(currentUser.id)
+      );
+      // delete the file from the local filesystem
+      await deleteFileFromFS(req.file.path);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error uploading image for user`,
+    });
+  }
+
+  uploadedFilePath = uploadedFilePath || defaultImage;
+
   // change buildingID and neighborhoodID to numbers
   buildingID = buildingID ? Number(buildingID) : null;
   neighborhoodID = neighborhoodID ? Number(neighborhoodID) : null;
@@ -32,7 +60,7 @@ router.put("/", async (req, res) => {
       },
       data: {
         username,
-        image: profileImage,
+        image: uploadedFilePath,
         building_id: buildingID,
         neighborhood_id: neighborhoodID,
       },
@@ -70,6 +98,7 @@ router.put("/", async (req, res) => {
         id: updatedUser.id.toString(),
         role: "user",
         name: updatedUser.username,
+        image: updatedUser.image,
       });
       await channel.addMembers([updatedUser.id.toString()]);
       // send a message to the building chat that the user joined
@@ -93,28 +122,6 @@ router.put("/", async (req, res) => {
     });
   }
 });
-
-// // update user profile (has custom image)
-// router.put("/upload", async (req, res) => {
-//   // we won't use the request parameter for the user id. We will get the user id from the token
-//   const currentUser = (req as unknown as AuthenticatedRequest).user;
-
-//   try {
-//     // Upload the file to Supabase Storage
-//     const { data, error } = await supabase.storage
-//       .from("avatars")
-//       .upload(`profiles/${file.originalname}`, file.stream);
-
-//     if (error) {
-//       throw error;
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       error: "error updating user",
-//     });
-//   }
-// });
 
 // follow a user
 router.post("/:id/follow", async (req, res) => {

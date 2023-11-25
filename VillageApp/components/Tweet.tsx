@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
-import { Image as ReactNativeImage } from "react-native";
 import { Image, ImageLoadEventData } from "expo-image";
 import { useEffect, useState } from "react";
 import { TweetType } from "../types";
@@ -376,13 +375,9 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                 alignItems: "flex-end",
               }}
             >
-              <View
-                // source={{ uri: tweet.profile_image }}
-                style={[
-                  styles.userImage,
-                  { backgroundColor: tweet.profile_image },
-                ]}
-              />
+              <View style={styles.userImage}>
+                <Image source={tweet.profile_image} style={styles.userImage} />
+              </View>
             </Pressable>
           </Link>
           <Link href={`/tweet/${tweet.id}`} asChild>

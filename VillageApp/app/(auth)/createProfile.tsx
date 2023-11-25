@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useUser } from "../../context/UserContext";
@@ -19,77 +20,39 @@ import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
+import { MaterialCommunityIcon } from "../../components/Icons";
+import { defaultImages } from "../../lib/api/onboarding";
 
 const CreateProfile = () => {
-  const { user, updateUser } = useUser();
+  const { updateUser } = useUser();
   const router = useRouter();
-  const { updateUserAttributes, uploadProfileWithCustomPic } = useTweetsApi();
-
-  // const getRandomProfileImageURL = () => {
-  //   // pick a random number from 0 to 50
-  //   const randomNumber = Math.floor(Math.random() * 50);
-  //   return `https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults/profile${randomNumber}.jpg`;
-  // };
-
-  // const [profileImage, setProfileImage] = useState<
-  //   string | ImagePicker.ImagePickerAsset
-  // >(user?.image || getRandomProfileImageURL());
+  const { updateUserAttributes } = useTweetsApi();
   const [username, setUsername] = useState("");
-  const [selectedColor, setSelectedColor] = useState("#0047AB");
-  const colors = [
-    "#065535",
-    "#F8BBD0",
-    "#800080",
-    "#990000",
-    "#20b2aa",
-    "#C5CAE9",
-    "#BBDEFB",
-    "#003366",
-    "#333333",
-    "#B2DFDB",
-    "#ffa500",
-    "#bada55",
-    "#854442",
-    "#96ceb4",
-    "#ff4040",
-    "#005b96",
-    "#00ff7f",
-    "#ffcf40",
-  ];
+  const [image, setImage] = useState<string | undefined>(undefined);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Function to render color options
   const renderColorOptions = () => {
-    return colors.map((color) => (
+    return defaultImages.map((colorImage) => (
       <TouchableOpacity
-        key={color}
-        style={[
-          styles.colorOption,
-          { backgroundColor: color },
-          selectedColor === color && styles.selectedColor,
-        ]}
-        onPress={() => setSelectedColor(color)}
-      />
+        key={colorImage}
+        onPress={() => setImage(colorImage)}
+        style={[styles.colorOption]}
+      >
+        <Image
+          source={{ uri: colorImage }}
+          style={[
+            {
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+            },
+            image === colorImage ? styles.selectedColor : {},
+          ]}
+        />
+      </TouchableOpacity>
     ));
   };
-
-  // const handleChoosePhoto = async () => {
-  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (status !== "granted") {
-  //     alert("Sorry, we need camera roll permissions to make this work!");
-  //     return;
-  //   }
-
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   });
-
-  //   if (!result.canceled) {
-  //     setProfileImage(result.assets[0]);
-  //   }
-  // };
 
   const validateInput = () => {
     if (!username) {
@@ -101,6 +64,9 @@ const CreateProfile = () => {
     } else if (username.includes(" ")) {
       Alert.alert("Please enter a username without spaces.");
       return true;
+    } else if (!image) {
+      Alert.alert("Please choose a profile picture.");
+      return true;
     }
     return false;
   };
@@ -111,13 +77,16 @@ const CreateProfile = () => {
       if (hasErr) {
         return;
       }
+      setIsSaving(true);
       const updatedUser = await updateUserAttributes({
         username,
-        profileImage: selectedColor,
+        profileImage: image,
       });
       updateUser(updatedUser);
       router.replace("/pickBuilding");
+      setIsSaving(false);
     } catch (error: any) {
+      setIsSaving(false);
       // convert error to json
       const err = await error.json();
       if (err?.status === 400) {
@@ -129,58 +98,36 @@ const CreateProfile = () => {
     }
   };
 
-  // const onSave = async () => {
-  //   try {
-  //     const hasErr = validateInput();
-  //     if (hasErr) {
-  //       return;
-  //     }
-  //     let updatedUser;
-  //     if (typeof profileImage === "string") {
-  //       updatedUser = await updateUserAttributes({
-  //         username,
-  //         profileImage,
-  //       });
-  //     } else {
-  //       // custom image from user
-  //       const formData = new FormData();
+  const handleChooseCustomImage = async () => {
+    try {
+      // Ask for permission
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert("Permission to access camera roll is required. Try again.");
+        return;
+      }
 
-  //       formData.append("photo", {
-  //         username,
-  //         uri:
-  //           Platform.OS === "ios"
-  //             ? profileImage.uri.replace("file://", "")
-  //             : profileImage.uri,
-  //         type: profileImage.type,
-  //         name: profileImage.fileName,
-  //       } as any);
-  //       updatedUser = await uploadProfileWithCustomPic(formData);
-  //     }
-  //     updateUser(updatedUser);
-  //     router.replace("/pickBuilding");
-  //   } catch (err) {
-  //     Alert.alert("We had an issue uploading your profile. Try again.");
-  //   }
-  // };
+      // Pick image
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: false,
+        quality: 1,
+      });
+      if (pickerResult.canceled === true) {
+        return;
+      }
+      if (pickerResult.assets.length === 0) {
+        return;
+      }
+      setImage(pickerResult.assets[0].uri);
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We had an issue uploading your image. Try again.");
+    }
+  };
 
-  // const imageToShow =
-  //   typeof profileImage === "string" ? profileImage : profileImage.uri;
-
-  // return (
-  //   <View style={styles.container}>
-  //     <Image source={{ uri: imageToShow }} style={styles.profileImage} />
-  //     <Button title="Change Profile" onPress={handleChoosePhoto} />
-  //     <TextInput
-  //       style={styles.usernameInput}
-  //       onChangeText={setUsername}
-  //       value={username}
-  //       placeholder="Username"
-  //     />
-  //     <Pressable style={styles.button} onPress={onSave}>
-  //       <Text style={styles.buttonText}>Save</Text>
-  //     </Pressable>
-  //   </View>
-  // );
+  const isButtonDisabled = !username || !image || isSaving;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -202,13 +149,43 @@ const CreateProfile = () => {
               value={username}
               onChangeText={setUsername}
               style={styles.input}
+              placeholderTextColor={"lightgrey"}
             />
-            <Text style={styles.inputLabel}>Color</Text>
+            <Text style={styles.inputLabel}>Profile Picture</Text>
+            <View style={styles.customProfilePictureParentContainer}>
+              <View style={styles.customProfilePictureContainer}>
+                <Image
+                  source={image}
+                  contentFit="cover"
+                  style={{ width: 100, height: 100, borderRadius: 50 }}
+                />
+                <TouchableOpacity
+                  style={[
+                    styles.cameraIconContainer,
+                    image ? { opacity: 0.15 } : { opacity: 0.35 },
+                  ]}
+                  onPress={handleChooseCustomImage}
+                >
+                  <MaterialCommunityIcon
+                    icon="camera-outline"
+                    size={40}
+                    iconColor="white"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
             <View style={styles.colorPickerContainer}>
               {renderColorOptions()}
             </View>
           </View>
-          <Pressable style={onboardingStyles.button} onPress={onSave}>
+          <Pressable
+            style={[
+              onboardingStyles.button,
+              isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+            ]}
+            onPress={onSave}
+            disabled={isButtonDisabled}
+          >
             <Text style={onboardingStyles.buttonText}>Save</Text>
           </Pressable>
         </View>
@@ -218,6 +195,39 @@ const CreateProfile = () => {
 };
 
 const styles = StyleSheet.create({
+  cameraIconContainer: {
+    position: "absolute",
+    backgroundColor: "black",
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    paddingTop: 2,
+    paddingLeft: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  customProfilePictureContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  customProfilePictureParentContainer: {
+    width: "100%",
+    height: 150,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   profileImage: {
     width: 150,
     height: 150,
@@ -273,7 +283,7 @@ const styles = StyleSheet.create({
   },
   selectedColor: {
     borderWidth: 2,
-    borderColor: "#000", // Change this color as needed for your design
+    borderColor: "#000",
   },
 });
 

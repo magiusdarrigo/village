@@ -2,7 +2,6 @@ import {
   View,
   StyleSheet,
   Text,
-  Image,
   TextInput,
   Pressable,
   ActivityIndicator,
@@ -11,7 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Image as ReactNativeImage,
 } from "react-native";
+import { Image } from "expo-image";
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -38,7 +39,7 @@ const NewTweet = () => {
     if (!image) {
       return;
     }
-    Image.getSize(
+    ReactNativeImage.getSize(
       image,
       (width, height) => {
         // Calculate aspect ratio
@@ -188,7 +189,9 @@ const NewTweet = () => {
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
-          <View style={[styles.image, { backgroundColor: user?.image }]} />
+          <View style={styles.image}>
+            <Image source={user?.image} style={styles.image} />
+          </View>
           <TextInput
             ref={tweetTextRef}
             autoFocus={false}
@@ -318,6 +321,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "white",
     fontSize: 16,
+    paddingVertical: 2,
   },
   buttonDisabled: {
     opacity: 0.5,

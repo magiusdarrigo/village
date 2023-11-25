@@ -177,6 +177,7 @@ const ChatScreen = () => {
           {
             id: String(user?.id),
             name: user?.username,
+            image: user?.image,
           },
           user?.chat_token
         );
