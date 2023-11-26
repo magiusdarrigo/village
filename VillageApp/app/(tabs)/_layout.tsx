@@ -1,11 +1,10 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs, useSegments } from "expo-router";
+import { Link, Tabs } from "expo-router";
 import { Pressable, AppState } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
-import messaging from "@react-native-firebase/messaging";
 import * as Sentry from "sentry-expo";
 
 function TabBarIcon(props: {
@@ -107,11 +106,6 @@ export default function TabLayout() {
               // but then I can't go back to the home page when I'm logged in.
               href={{
                 pathname: `/profile/you`,
-                params: {
-                  userID: user?.id ?? -1,
-                  username: user?.username ?? "",
-                  image: user?.image ?? "",
-                },
               }}
               asChild
             >

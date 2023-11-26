@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
+import { handleChooseCustomImage } from "../../lib/helpers";
 import { useRouter } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
@@ -98,35 +98,6 @@ const CreateProfile = () => {
     }
   };
 
-  const handleChooseCustomImage = async () => {
-    try {
-      // Ask for permission
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (permissionResult.granted === false) {
-        Alert.alert("Permission to access camera roll is required. Try again.");
-        return;
-      }
-
-      // Pick image
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: false,
-        quality: 1,
-      });
-      if (pickerResult.canceled === true) {
-        return;
-      }
-      if (pickerResult.assets.length === 0) {
-        return;
-      }
-      setImage(pickerResult.assets[0].uri);
-    } catch (error) {
-      Sentry.Native.captureException(error);
-      Alert.alert("We had an issue uploading your image. Try again.");
-    }
-  };
-
   const isButtonDisabled = !username || !image || isSaving;
 
   return (
@@ -161,10 +132,10 @@ const CreateProfile = () => {
                 />
                 <TouchableOpacity
                   style={[
-                    styles.cameraIconContainer,
+                    onboardingStyles.cameraIconContainer,
                     image ? { opacity: 0.15 } : { opacity: 0.35 },
                   ]}
-                  onPress={handleChooseCustomImage}
+                  onPress={() => handleChooseCustomImage(setImage)}
                 >
                   <MaterialCommunityIcon
                     icon="camera-outline"
@@ -195,25 +166,6 @@ const CreateProfile = () => {
 };
 
 const styles = StyleSheet.create({
-  cameraIconContainer: {
-    position: "absolute",
-    backgroundColor: "black",
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    paddingTop: 2,
-    paddingLeft: 6,
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
   customProfilePictureContainer: {
     width: 100,
     height: 100,

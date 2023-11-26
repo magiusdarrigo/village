@@ -15,8 +15,8 @@ const ProfileScreen = () => {
   // Set header title
   useEffect(() => {
     let headerTitle = `@${username}`;
-
-    if (user?.id === Number(userID)) {
+    // if userID is undefined then we are viewing our own profile
+    if (userID === undefined) {
       headerTitle = "You";
     }
 
@@ -27,7 +27,10 @@ const ProfileScreen = () => {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["profiles", userID],
-    queryFn: () => getUserProfile(userID as string),
+    queryFn: () => {
+      if (userID === undefined) return null;
+      return getUserProfile(userID as string);
+    },
   });
 
   if (error) {
@@ -36,13 +39,7 @@ const ProfileScreen = () => {
     return null;
   }
 
-  const currentUser: User = {
-    id: Number(userID),
-    username: String(username),
-    image: String(image),
-  };
-
-  return <ModalScreen user={data ?? currentUser} />;
+  return <ModalScreen user={data ?? user} />;
 };
 
 export default ProfileScreen;

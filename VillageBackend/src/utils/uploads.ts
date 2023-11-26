@@ -3,11 +3,15 @@ import * as fs from "fs";
 import convert from "heic-convert";
 import { promisify } from "util";
 
-const SUPABASE_BUCKET_URL = `${process.env.SUPABASE_URL}/storage/v1/object/public/post_images/`;
+const getBucketURL = (bucketName: string) => {
+  return `${process.env.SUPABASE_URL}/storage/v1/object/public/${bucketName}/`;
+};
 
 export const uploadImageToSupabase = async (
   file: Express.Multer.File,
-  userID: string
+  userID: string,
+  bucketName: string,
+  folderName: string
 ) => {
   const filePath = file.path;
   const fileMimeType = file.mimetype;
@@ -18,8 +22,8 @@ export const uploadImageToSupabase = async (
 
   // Upload the image to the bucket 'post_images'
   const { data, error } = await supabaseClient.storage
-    .from("post_images")
-    .upload(`uploads/${fileName}`, fileContents, {
+    .from(bucketName)
+    .upload(`${folderName}/${fileName}`, fileContents, {
       // cache set to 48 hours
       cacheControl: "172800",
       upsert: false,
@@ -29,7 +33,7 @@ export const uploadImageToSupabase = async (
   if (error) {
     throw error;
   }
-  return SUPABASE_BUCKET_URL + data.path;
+  return getBucketURL(bucketName) + data.path;
 };
 
 export const convertFileIfNecessary = async (file: Express.Multer.File) => {

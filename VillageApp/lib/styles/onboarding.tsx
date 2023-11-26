@@ -25,6 +25,25 @@ const onboardingStyles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.5,
   },
+  cameraIconContainer: {
+    position: "absolute",
+    backgroundColor: "black",
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    paddingTop: 2,
+    paddingLeft: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
 });
 
 export default onboardingStyles;

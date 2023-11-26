@@ -87,7 +87,9 @@ router.post("/", upload.single("image"), async (req, res) => {
       // upload file to supabase
       uploadedFilePath = await uploadImageToSupabase(
         req.file,
-        String(currentUser.id)
+        String(currentUser.id),
+        "post_images",
+        "uploads"
       );
       // delete the file from the local filesystem
       await deleteFileFromFS(req.file.path);

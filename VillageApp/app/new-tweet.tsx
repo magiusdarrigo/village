@@ -15,7 +15,7 @@ import {
 import { Image } from "expo-image";
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
+import { handleChooseCustomImage } from "../lib/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
@@ -135,36 +135,6 @@ const NewTweet = () => {
     }
   };
 
-  const handleUploadImageIconClicked = async () => {
-    try {
-      // Ask for permission
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (permissionResult.granted === false) {
-        Alert.alert("Permission to access camera roll is required. Try again.");
-        return;
-      }
-
-      // Pick image
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: false,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      if (pickerResult.canceled === true) {
-        return;
-      }
-      if (pickerResult.assets.length === 0) {
-        return;
-      }
-      setImage(pickerResult.assets[0].uri);
-    } catch (error) {
-      Sentry.Native.captureException(error);
-      Alert.alert("We had an issue uploading your image. Try again.");
-    }
-  };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -232,7 +202,7 @@ const NewTweet = () => {
         <View style={styles.multiMediaContainer}>
           <Pressable
             style={styles.uploadImageContainer}
-            onPress={handleUploadImageIconClicked}
+            onPress={() => handleChooseCustomImage(setImage)}
           >
             <IoniconsIcon icon="image-outline" iconColor="black" size={32} />
           </Pressable>

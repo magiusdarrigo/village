@@ -6,6 +6,8 @@ import {
   Text,
   View,
   Alert,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Image } from "expo-image";
 import { User } from "../context/UserContext";
@@ -13,6 +15,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
 import { useAuth } from "../context/AuthContext";
+import { handleChooseCustomImage } from "../lib/helpers";
+import { MaterialCommunityIcon } from "../components/Icons";
+import onboardingStyles from "../lib/styles/onboarding";
+import * as Sentry from "sentry-expo";
 
 type ProfileProps = {
   user: User;
@@ -20,10 +26,13 @@ type ProfileProps = {
 
 const ModalScreen = ({ user }: ProfileProps) => {
   const queryClient = useQueryClient();
-  const { followUser, unFollowUser } = useTweetsApi();
-  const { user: currentUser, getStreamChatClient } = useUser();
+  const { followUser, unFollowUser, updateUserAttributes } = useTweetsApi();
+  const { user: currentUser, getStreamChatClient, updateUser } = useUser();
   const { removeAuthToken } = useAuth();
   const streamChatClient = getStreamChatClient();
+  const [profileEditLoading, setProfileEditLoading] = React.useState(false);
+
+  const usersProfile = currentUser?.id === user.id;
 
   const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
     followUser,
@@ -89,49 +98,84 @@ const ModalScreen = ({ user }: ProfileProps) => {
     ]);
   };
 
+  const handleUpdateProfilePic = async () => {
+    try {
+      const newImage = await handleChooseCustomImage();
+      setProfileEditLoading(true);
+      const updatedUser = await updateUserAttributes({
+        profileImage: newImage,
+      });
+      setProfileEditLoading(false);
+      updateUser(updatedUser);
+    } catch (error) {
+      setProfileEditLoading(false);
+      Sentry.Native.captureException(error);
+      Alert.alert("We had an issue uploading your image. Try again.");
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.profileHeader}>
-        <View style={styles.profilePhoto}>
-          <Image source={user.image} style={styles.profilePhoto} />
-        </View>
-        <Text style={styles.username}>@{user.username}</Text>
-        <View style={styles.countContainer}>
-          <Text style={styles.countText}>
-            Following: {user.following_count ?? ""}
-          </Text>
-          <Text style={styles.countText}>
-            Followers: {user.followers_count ?? ""}
-          </Text>
-        </View>
-        {currentUser?.id === user.id ? (
-          <Pressable style={styles.followButton} onPress={handleLogOut}>
-            <Text style={styles.followButtonText}>Log out</Text>
-          </Pressable>
-        ) : (
-          <View style={styles.followButtonContainer}>
-            {user.followed_by_user ? (
-              <Pressable
-                style={styles.unfollowButton}
-                onPress={handleUnfollowUser}
+      {profileEditLoading ? (
+        <ActivityIndicator size="small" />
+      ) : (
+        <View style={styles.profileHeader}>
+          <View style={styles.profilePhoto}>
+            <Image
+              source={user.image}
+              contentFit="cover"
+              style={{ width: 100, height: 100, borderRadius: 50 }}
+            />
+            {usersProfile && (
+              <TouchableOpacity
+                style={[
+                  onboardingStyles.cameraIconContainer,
+                  user.image ? { opacity: 0.25 } : { opacity: 0.35 },
+                ]}
+                onPress={handleUpdateProfilePic}
               >
-                <Text style={styles.unfollowButtonText}>Following</Text>
-              </Pressable>
-            ) : (
-              <Pressable style={styles.followButton} onPress={handleFollowUser}>
-                <Text style={styles.followButtonText}>Follow</Text>
-              </Pressable>
+                <MaterialCommunityIcon
+                  icon="camera-outline"
+                  size={40}
+                  iconColor="white"
+                />
+              </TouchableOpacity>
             )}
           </View>
-        )}
-      </View>
-      {/* <View style={styles.tweetsContainer}>
-        {userProfile.tweets.map((tweet) => (
-          <View key={tweet.id} style={styles.tweet}>
-            <Text>{tweet.content}</Text>
+          <Text style={styles.username}>@{user.username}</Text>
+          <View style={styles.countContainer}>
+            <Text style={styles.countText}>
+              Following: {user.following_count ?? ""}
+            </Text>
+            <Text style={styles.countText}>
+              Followers: {user.followers_count ?? ""}
+            </Text>
           </View>
-        ))}
-      </View> */}
+          {usersProfile ? (
+            <Pressable style={styles.followButton} onPress={handleLogOut}>
+              <Text style={styles.followButtonText}>Log out</Text>
+            </Pressable>
+          ) : (
+            <View style={styles.followButtonContainer}>
+              {user.followed_by_user ? (
+                <Pressable
+                  style={styles.unfollowButton}
+                  onPress={handleUnfollowUser}
+                >
+                  <Text style={styles.unfollowButtonText}>Following</Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  style={styles.followButton}
+                  onPress={handleFollowUser}
+                >
+                  <Text style={styles.followButtonText}>Follow</Text>
+                </Pressable>
+              )}
+            </View>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 };

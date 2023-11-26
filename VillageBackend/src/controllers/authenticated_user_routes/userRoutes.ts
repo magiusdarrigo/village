@@ -36,7 +36,9 @@ router.put("/", upload.single("image"), async (req, res) => {
       // upload file to supabase
       uploadedFilePath = await uploadImageToSupabase(
         req.file,
-        String(currentUser.id)
+        String(currentUser.id),
+        "profile_pictures",
+        "uploads"
       );
       // delete the file from the local filesystem
       await deleteFileFromFS(req.file.path);
@@ -51,8 +53,8 @@ router.put("/", upload.single("image"), async (req, res) => {
   uploadedFilePath = uploadedFilePath || defaultImage;
 
   // change buildingID and neighborhoodID to numbers
-  buildingID = buildingID ? Number(buildingID) : null;
-  neighborhoodID = neighborhoodID ? Number(neighborhoodID) : null;
+  buildingID = buildingID ? Number(buildingID) : undefined;
+  neighborhoodID = neighborhoodID ? Number(neighborhoodID) : undefined;
   try {
     const updatedUser = await prisma.users.update({
       where: {

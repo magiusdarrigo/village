@@ -3,6 +3,7 @@ import postStyles from "./styles/post";
 import * as Device from "expo-device";
 import * as WebBrowser from "expo-web-browser";
 import * as Sentry from "sentry-expo";
+import * as ImagePicker from "expo-image-picker";
 
 export const calculateHoursAgo = (time: string) => {
   const now = new Date();
@@ -60,5 +61,39 @@ export const getFileType = (uri?: string) => {
       return "image/heic";
     default:
       throw new Error("Unsupported file type");
+  }
+};
+
+export const handleChooseCustomImage = async (
+  setImage?: (value: React.SetStateAction<string | undefined>) => void
+) => {
+  try {
+    // Ask for permission
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission to access camera roll is required. Try again.");
+      return;
+    }
+
+    // Pick image
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: false,
+      quality: 1,
+    });
+    if (pickerResult.canceled === true) {
+      return;
+    }
+    if (pickerResult.assets.length === 0) {
+      return;
+    }
+    if (setImage) {
+      setImage(pickerResult.assets[0].uri);
+    }
+    return pickerResult.assets[0].uri;
+  } catch (error) {
+    Sentry.Native.captureException(error);
+    Alert.alert("We had an issue uploading your image. Try again.");
   }
 };
