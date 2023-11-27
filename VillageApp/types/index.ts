@@ -10,6 +10,7 @@ export type TweetType = {
   comments_count: number;
   created_at: string;
   liked_by_user: boolean;
+  disliked_by_user: boolean;
 };
 
 export type CommentType = {
@@ -24,4 +25,5 @@ export type CommentType = {
   created_at: string;
   parent_comment_id?: number;
   liked_by_user: boolean;
+  disliked_by_user: boolean;
 };

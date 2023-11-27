@@ -38,11 +38,10 @@ type AntIconProps = {
   size: number;
 };
 
-export const AntIcon = ({ icon, text, iconColor, size }: AntIconProps) => {
+export const AntIcon = ({ icon, iconColor, size }: AntIconProps) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <AntDesign name={icon} size={size} color={iconColor} />
-      <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>{text}</Text>
     </View>
   );
 };
@@ -63,7 +62,11 @@ export const MaterialCommunityIcon = ({
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <MaterialCommunityIcons name={icon} size={size ?? 18} color={iconColor} />
-      <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>{text}</Text>
+      <Text
+        style={{ fontSize: 16, color: "grey", marginLeft: 5, paddingBottom: 2 }}
+      >
+        {text}
+      </Text>
     </View>
   );
 };

@@ -20,10 +20,16 @@ interface TweetsApiContextType {
   reportTweet: (id: string) => Promise<any>;
   deleteComment: (data: { id: string; postID: string }) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
-  likeComment: (id: string) => Promise<any>;
-  likeTweet: (id: string) => Promise<any>;
-  unlikeComment: (id: string) => Promise<any>;
-  unlikeTweet: (id: string) => Promise<any>;
+  likeComment: (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => Promise<any>;
+  likeTweet: (data: { postID: string; isDislike: boolean }) => Promise<any>;
+  unlikeComment: (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => Promise<any>;
+  unlikeTweet: (data: { postID: string; isDislike: boolean }) => Promise<any>;
   listComments: (
     postID: string,
     lastLikesCount: string,
@@ -304,12 +310,16 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const likeComment = async (id: string) => {
+  const likeComment = async (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => {
+    const { commentID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/comments/${id}/likes`;
+    const url = `${API_URL}/v1/comments/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -331,12 +341,13 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const likeTweet = async (id: string) => {
+  const likeTweet = async (data: { postID: string; isDislike: boolean }) => {
+    const { postID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/posts/${id}/likes`;
+    const url = `${API_URL}/v1/posts/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -358,12 +369,16 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const unlikeComment = async (id: string) => {
+  const unlikeComment = async (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => {
+    const { commentID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/comments/${id}/likes`;
+    const url = `${API_URL}/v1/comments/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "DELETE",
@@ -385,12 +400,13 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const unlikeTweet = async (id: string) => {
+  const unlikeTweet = async (data: { postID: string; isDislike: boolean }) => {
+    const { postID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/posts/${id}/likes`;
+    const url = `${API_URL}/v1/posts/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "DELETE",

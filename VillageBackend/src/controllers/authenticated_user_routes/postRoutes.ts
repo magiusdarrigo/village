@@ -203,10 +203,11 @@ router.get("/:id/comments", async (req, res) => {
   }
 });
 
-// like a post
+// +1 on either a post's thumbs up or thumbs down
 router.post("/:id/likes", async (req, res) => {
-  console.log("like a post called");
+  console.log("+1 on either a post's thumbs up or thumbs down, called");
   const { id } = req.params;
+  const { is_dislike } = req.query;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 
   try {
@@ -214,21 +215,22 @@ router.post("/:id/likes", async (req, res) => {
       data: {
         user_id: currentUser.id,
         post_id: Number(id),
+        is_dislike: is_dislike === "true",
       },
     });
 
-    const incrementLikes = prisma.posts.update({
+    const changeLikes = prisma.posts.update({
       where: { id: Number(id) },
       data: {
         likes_count: {
-          increment: 1,
+          increment: (is_dislike === "true" ? -1 : 1) as number,
         },
       },
     });
 
     const [newLike, updatedPost] = await prisma.$transaction([
       createLike,
-      incrementLikes,
+      changeLikes,
     ]);
 
     res.status(200).json({ newLike, updatedPost });
@@ -238,10 +240,11 @@ router.post("/:id/likes", async (req, res) => {
   }
 });
 
-// unlike a post
+// -1 on either a post's thumbs up or thumbs down
 router.delete("/:id/likes", async (req, res) => {
-  console.log("unlike a post called");
+  console.log("-1 on either a post's thumbs up or thumbs down, called");
   const { id } = req.params;
+  const { is_dislike } = req.query;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
 
   try {
@@ -254,18 +257,18 @@ router.delete("/:id/likes", async (req, res) => {
       },
     });
 
-    const decrementLikes = prisma.posts.update({
+    const changeLikes = prisma.posts.update({
       where: { id: Number(id) },
       data: {
         likes_count: {
-          decrement: 1,
+          decrement: (is_dislike === "true" ? -1 : 1) as number,
         },
       },
     });
 
     const [newUnlike, updatedPost] = await prisma.$transaction([
       deleteLike,
-      decrementLikes,
+      changeLikes,
     ]);
 
     res.status(200).json({ newUnlike, updatedPost });

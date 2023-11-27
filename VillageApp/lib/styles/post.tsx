@@ -21,9 +21,14 @@ const postStyles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 20,
     marginBottom: 10,
-    width: 120,
+    width: 150,
     justifyContent: "space-between",
     marginLeft: 70,
+  },
+  likesContainer: {
+    flexDirection: "row",
+    marginLeft: "auto",
+    alignItems: "center",
   },
   emptyPostsContainer: {
     flex: 1,

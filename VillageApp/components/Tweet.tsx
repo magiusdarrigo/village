@@ -37,11 +37,13 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     setPostWidth(width - 20);
   };
 
-  // like a tweet
-  const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
+  // +1 on either like or dislike
+  const { mutateAsync: mutateLike, isLoading: isLoadingLike } = useMutation(
     likeTweet,
     {
-      onMutate: async (postID: string) => {
+      onMutate: async (data: { postID: string; isDislike: boolean }) => {
+        const { postID, isDislike } = data;
+        const likeDelta = isDislike ? -1 : 1;
         // cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
@@ -59,8 +61,9 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         queryClient.setQueryData(["tweets", postID], (old: any) => {
           return {
             ...old,
-            liked_by_user: true,
-            likes_count: old?.likes_count + 1,
+            liked_by_user: !isDislike,
+            disliked_by_user: isDislike,
+            likes_count: old?.likes_count + likeDelta,
           };
         });
         queryClient.setQueryData(["tweets"], (old: any) => {
@@ -76,8 +79,9 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                   tweet.id === Number(postID)
                     ? {
                         ...tweet,
-                        liked_by_user: true,
-                        likes_count: tweet.likes_count + 1,
+                        liked_by_user: !isDislike,
+                        disliked_by_user: isDislike,
+                        likes_count: tweet.likes_count + likeDelta,
                       }
                     : tweet
                 ),
@@ -94,7 +98,8 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
           return {
             ...old,
-            liked_by_user: true,
+            liked_by_user: !data.newLike.is_dislike,
+            disliked_by_user: data.newLike.is_dislike,
             likes_count: data.updatedPost.likes_count,
           };
         });
@@ -112,7 +117,8 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                   tweet.id === data.newLike.post_id
                     ? {
                         ...tweet,
-                        liked_by_user: true,
+                        liked_by_user: !data.newLike.is_dislike,
+                        disliked_by_user: data.newLike.is_dislike,
                         likes_count: data.updatedPost.likes_count,
                       }
                     : tweet
@@ -140,11 +146,13 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     }
   );
 
-  // unlike a tweet
-  const { mutate: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
+  // -1 on either like or dislike
+  const { mutateAsync: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
     unlikeTweet,
     {
-      onMutate: async (postID: string) => {
+      onMutate: async (data: { postID: string; isDislike: boolean }) => {
+        const { postID, isDislike } = data;
+        const likeDelta = isDislike ? -1 : 1;
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
           queryClient.cancelQueries(["tweets"]),
@@ -162,7 +170,8 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           return {
             ...old,
             liked_by_user: false,
-            likes_count: old?.likes_count - 1,
+            disliked_by_user: false,
+            likes_count: old?.likes_count - likeDelta,
           };
         });
 
@@ -180,7 +189,8 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                     ? {
                         ...tweet,
                         liked_by_user: false,
-                        likes_count: tweet.likes_count - 1,
+                        disliked_by_user: false,
+                        likes_count: tweet.likes_count - likeDelta,
                       }
                     : tweet
                 ),
@@ -198,6 +208,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           return {
             ...old,
             liked_by_user: false,
+            disliked_by_user: false,
             likes_count: data.updatedPost.likes_count,
           };
         });
@@ -216,6 +227,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                     ? {
                         ...tweet,
                         liked_by_user: false,
+                        disliked_by_user: false,
                         likes_count: data.updatedPost.likes_count,
                       }
                     : tweet
@@ -291,7 +303,6 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
       Alert.alert("Report Post?", "", [
         {
           text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
         { text: "Yes", onPress: () => onReport(tweet.id) },
@@ -303,7 +314,6 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         [
           {
             text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
             style: "cancel",
           },
           { text: "Yes", onPress: () => mutateDelete(String(tweet.id)) },
@@ -312,13 +322,49 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     }
   };
 
-  const handleToggleLike = async (postID: number) => {
+  const handleToggleLike = async (isDislike: boolean) => {
     try {
       if (isLoadingLike || isLoadingUnlike) return;
-      if (tweet.liked_by_user) {
-        mutateUnlike(String(postID));
-      } else {
-        mutateLike(String(postID));
+      const dislikePayload = {
+        postID: String(tweet.id),
+        isDislike: true,
+      };
+
+      const likePayload = {
+        postID: String(tweet.id),
+        isDislike: false,
+      };
+
+      if (tweet.liked_by_user && !isDislike) {
+        await mutateUnlike(likePayload);
+        return;
+      }
+
+      if (tweet.liked_by_user && isDislike) {
+        await mutateUnlike(likePayload);
+        await mutateLike(dislikePayload);
+        return;
+      }
+
+      if (tweet.disliked_by_user && isDislike) {
+        await mutateUnlike(dislikePayload);
+        return;
+      }
+
+      if (tweet.disliked_by_user && !isDislike) {
+        await mutateUnlike(dislikePayload);
+        await mutateLike(likePayload);
+        return;
+      }
+
+      // if the user hasn't liked or disliked the post
+      if (!tweet.liked_by_user && !tweet.disliked_by_user && isDislike) {
+        await mutateLike(dislikePayload);
+        return;
+      }
+      if (!tweet.liked_by_user && !tweet.disliked_by_user && !isDislike) {
+        await mutateLike(likePayload);
+        return;
       }
     } catch (error) {
       Sentry.Native.captureException(error);
@@ -446,23 +492,28 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                 />
               </Pressable>
             </Link>
-            <Pressable onPress={() => handleToggleLike(tweet.id)}>
-              {(tweet.liked_by_user && (
-                <AntIcon
-                  icon="like1"
-                  text={tweet.likes_count}
-                  iconColor="red"
-                  size={22}
-                />
-              )) || (
-                <AntIcon
-                  icon="like2"
-                  text={tweet.likes_count}
-                  iconColor="#b2b2b2"
-                  size={22}
-                />
-              )}
-            </Pressable>
+            <View style={postStyles.likesContainer}>
+              <Pressable onPress={() => handleToggleLike(false)}>
+                {(tweet.liked_by_user && (
+                  <AntIcon icon="like1" iconColor="red" size={22} />
+                )) || <AntIcon icon="like2" iconColor="#b2b2b2" size={22} />}
+              </Pressable>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "grey",
+                  marginLeft: 5,
+                  marginRight: 6,
+                }}
+              >
+                {tweet.likes_count}
+              </Text>
+              <Pressable onPress={() => handleToggleLike(true)}>
+                {(tweet.disliked_by_user && (
+                  <AntIcon icon="dislike1" iconColor="red" size={22} />
+                )) || <AntIcon icon="dislike2" iconColor="#b2b2b2" size={22} />}
+              </Pressable>
+            </View>
           </View>
         </Pressable>
       </Link>
