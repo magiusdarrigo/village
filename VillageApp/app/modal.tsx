@@ -128,12 +128,12 @@ const ModalScreen = ({ user }: ProfileProps) => {
             <Image
               source={user.image}
               contentFit="cover"
-              style={{ width: 100, height: 100, borderRadius: 50 }}
+              style={{ width: 120, height: 120, borderRadius: 60 }}
             />
             {usersProfile && (
               <TouchableOpacity
                 style={[
-                  onboardingStyles.cameraIconContainer,
+                  styles.cameraIconContainer,
                   user.image ? { opacity: 0.25 } : { opacity: 0.35 },
                 ]}
                 onPress={handleUpdateProfilePic}
@@ -233,11 +233,31 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
+    backgroundColor: "blue",
+  },
+  cameraIconContainer: {
+    position: "absolute",
+    backgroundColor: "black",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    paddingTop: 2,
+    paddingLeft: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   username: {
     fontSize: 22,
     fontWeight: "bold",
-    marginVertical: 8,
+    marginVertical: 12,
   },
   countContainer: {
     flexDirection: "row",

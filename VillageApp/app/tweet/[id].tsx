@@ -241,7 +241,7 @@ const TweetScreen = () => {
   const renderEmptyListComponent = () => (
     <View style={postStyles.emptyCommentsContainer}>
       <DynaPuffText style={postStyles.emptyCommentsContainerText}>
-        Post something that’s on your mind.
+        No comments yet.
       </DynaPuffText>
     </View>
   );

@@ -13,6 +13,7 @@ import * as Sentry from "sentry-expo";
 import postStyles from "../lib/styles/post";
 import Hyperlink from "react-native-hyperlink";
 import { handlePressButtonAsync } from "../lib/helpers";
+import Colors from "../constants/Colors";
 
 type TweetProps = {
   tweet: TweetType;
@@ -501,7 +502,8 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               <Text
                 style={{
                   fontSize: 16,
-                  color: "grey",
+                  fontWeight: "bold",
+                  color: Colors.light.counterFontColor,
                   marginLeft: 5,
                   marginRight: 6,
                 }}

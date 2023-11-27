@@ -12,6 +12,7 @@ export default {
     replyBackground: "#EEECEC",
     selectedCommentBackground: "#FCFCCF",
     mainBackground: "#f2f2f2",
+    counterFontColor: "#b2b2b2",
   },
   dark: {
     text: "#ffffff",

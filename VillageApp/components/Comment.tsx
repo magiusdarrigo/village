@@ -467,7 +467,8 @@ const Comment = ({
               <Text
                 style={{
                   fontSize: 16,
-                  color: "grey",
+                  fontWeight: "bold",
+                  color: Colors.light.counterFontColor,
                   marginLeft: 5,
                   marginRight: 6,
                 }}
