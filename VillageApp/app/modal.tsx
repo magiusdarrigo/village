@@ -101,6 +101,10 @@ const ModalScreen = ({ user }: ProfileProps) => {
   const handleUpdateProfilePic = async () => {
     try {
       const newImage = await handleChooseCustomImage();
+      if (!newImage) {
+        // User cancelled
+        return;
+      }
       setProfileEditLoading(true);
       const updatedUser = await updateUserAttributes({
         profileImage: newImage,
