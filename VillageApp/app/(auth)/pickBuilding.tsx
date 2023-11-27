@@ -54,6 +54,8 @@ const PickBuilding = () => {
     }
   };
 
+  const isButtonDisabled = address === "";
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
@@ -117,7 +119,14 @@ const PickBuilding = () => {
             nearbyPlacesAPI="GooglePlacesSearch"
             debounce={200}
           />
-          <Pressable style={onboardingStyles.button} onPress={onSubmit}>
+          <Pressable
+            style={[
+              onboardingStyles.button,
+              isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+            ]}
+            onPress={onSubmit}
+            disabled={isButtonDisabled}
+          >
             <Text style={onboardingStyles.buttonText}>Submit</Text>
           </Pressable>
         </View>

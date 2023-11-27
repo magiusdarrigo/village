@@ -92,11 +92,27 @@ const requestPermission = async () => {
 };
 
 const ChatScreen = () => {
-  const [channel, setChannel] = useState<ChannelType | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { user, getStreamChatClient } = useUser();
+  const {
+    user,
+    getStreamChatClient,
+    updateChatTabBadgeCount,
+    channel,
+    updateChannel,
+  } = useUser();
   const streamChatClient = getStreamChatClient();
   const unsubscribeTokenRefreshListenerRef = useRef<() => void>();
+
+  const setBackgroundMessageHandlerIfIOS = async () => {
+    if (Platform.OS !== "ios") {
+      return;
+    }
+
+    messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
+      const badgeCount = await notifee.getBadgeCount();
+      updateChatTabBadgeCount(badgeCount);
+    });
+  };
 
   useEffect(() => {
     // Register FCM token with stream chat server.
@@ -154,11 +170,14 @@ const ChatScreen = () => {
           user?.chat_token,
           getStreamChatClient()
         );
+        // set background message handler for ios
+        // await setBackgroundMessageHandlerIfIOS();
         // connect user to chat
         await streamChatClient.connectUser(
           {
             id: String(user?.id),
             name: user?.username,
+            image: user?.image,
           },
           user?.chat_token
         );
@@ -167,10 +186,10 @@ const ChatScreen = () => {
         const channels = await streamChatClient.queryChannels({
           id: { $eq: _id },
         });
-        const channel = channels[0];
-        setChannel(channel);
+        const currentChannel = channels[0];
+        updateChannel(currentChannel);
         // watch channel for new messages
-        await channel.watch();
+        await currentChannel.watch();
         // ready to render
         setIsReady(true);
       } catch (error) {

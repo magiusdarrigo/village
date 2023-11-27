@@ -28,6 +28,7 @@ import * as Sentry from "sentry-expo";
 import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
 import { ScrollView } from "react-native-gesture-handler";
+import Colors from "../../constants/Colors";
 
 const PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD = 200;
 
@@ -274,11 +275,7 @@ const TweetScreen = () => {
           handleCommentIconClicked={handleCommentIconPressed}
         />
         {items.length > 0 && (
-          <View style={styles.postSeperatorContainer}>
-            <View style={styles.seperatorTextContainer}>
-              <Text style={styles.seperatorText}>Top Comments</Text>
-            </View>
-          </View>
+          <View style={styles.postSeperatorContainer}></View>
         )}
         <FlatList
           keyExtractor={(item) => item.id.toString()}
@@ -342,9 +339,7 @@ const styles = StyleSheet.create({
   postSeperatorContainer: {
     display: "flex",
     height: 25,
-    backgroundColor: "white",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: "lightgrey",
+    backgroundColor: Colors.light.mainBackground,
   },
   buttonContainer: {
     backgroundColor: "white",

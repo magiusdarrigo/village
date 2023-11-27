@@ -19,7 +19,8 @@ export const getTop10CommentsFromPostQuery = (
           c.parent_comment_id,
           u.username,
           u.image AS profile_image,
-          CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user
+          CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user,
+          CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
       FROM 
           comments c
       LEFT JOIN
@@ -53,7 +54,8 @@ export const getTop10CommentsFromPostQuery = (
       r.parent_comment_id,
       u.username,
       u.image AS profile_image,
-      CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user
+      CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user,
+      CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
   FROM 
       comments r
   LEFT JOIN
@@ -62,7 +64,7 @@ export const getTop10CommentsFromPostQuery = (
       users u ON r.user_id = u.id
   WHERE 
       r.parent_comment_id IN (SELECT id FROM TopComments)
-  
+
   ORDER BY likes_count ASC, id DESC;
   `;
 };
