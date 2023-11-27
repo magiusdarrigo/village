@@ -367,6 +367,8 @@ const Comment = ({
     }
   };
 
+  if (isReply) console.log("reply: ", comment);
+
   return (
     <View
       style={

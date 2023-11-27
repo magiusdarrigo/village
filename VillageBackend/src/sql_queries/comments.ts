@@ -19,7 +19,7 @@ export const getTop10CommentsFromPostQuery = (
           c.parent_comment_id,
           u.username,
           u.image AS profile_image,
-          CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user,
+          CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
           CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
       FROM 
           comments c
@@ -54,7 +54,7 @@ export const getTop10CommentsFromPostQuery = (
       r.parent_comment_id,
       u.username,
       u.image AS profile_image,
-      CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user,
+      CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
       CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
   FROM 
       comments r
