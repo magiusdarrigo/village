@@ -2,7 +2,6 @@ import {
   View,
   StyleSheet,
   Text,
-  Image,
   TextInput,
   Pressable,
   ActivityIndicator,
@@ -11,10 +10,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Image as ReactNativeImage,
 } from "react-native";
+import { Image } from "expo-image";
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
+import { handleChooseCustomImage } from "../lib/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
@@ -25,7 +26,7 @@ const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
   const { createTweet } = useTweetsApi();
-  const { user } = useUser();
+  const { user, scrollToTop } = useUser();
   const queryClient = useQueryClient();
   const tweetTextRef = useRef<TextInput>(null);
   const [image, setImage] = useState<string | undefined>(undefined);
@@ -38,7 +39,7 @@ const NewTweet = () => {
     if (!image) {
       return;
     }
-    Image.getSize(
+    ReactNativeImage.getSize(
       image,
       (width, height) => {
         // Calculate aspect ratio
@@ -127,39 +128,10 @@ const NewTweet = () => {
       });
       setText("");
       router.back();
+      scrollToTop();
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue making your post.");
-    }
-  };
-
-  const handleUploadImageIconClicked = async () => {
-    try {
-      // Ask for permission
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (permissionResult.granted === false) {
-        Alert.alert("Permission to access camera roll is required. Try again.");
-        return;
-      }
-
-      // Pick image
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: false,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      if (pickerResult.canceled === true) {
-        return;
-      }
-      if (pickerResult.assets.length === 0) {
-        return;
-      }
-      setImage(pickerResult.assets[0].uri);
-    } catch (error) {
-      Sentry.Native.captureException(error);
-      Alert.alert("We had an issue uploading your image. Try again.");
     }
   };
 
@@ -187,7 +159,9 @@ const NewTweet = () => {
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
-          <View style={[styles.image, { backgroundColor: user?.image }]} />
+          <View style={styles.image}>
+            <Image source={user?.image} style={styles.image} />
+          </View>
           <TextInput
             ref={tweetTextRef}
             autoFocus={false}
@@ -228,7 +202,7 @@ const NewTweet = () => {
         <View style={styles.multiMediaContainer}>
           <Pressable
             style={styles.uploadImageContainer}
-            onPress={handleUploadImageIconClicked}
+            onPress={() => handleChooseCustomImage(setImage)}
           >
             <IoniconsIcon icon="image-outline" iconColor="black" size={32} />
           </Pressable>
@@ -285,7 +259,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingVertical: 20,
   },
   container: {
     flex: 1,
@@ -317,6 +291,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "white",
     fontSize: 16,
+    paddingVertical: 2,
   },
   buttonDisabled: {
     opacity: 0.5,

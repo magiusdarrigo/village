@@ -1,6 +1,7 @@
 import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
 import { CommentType } from "../types";
 import { Link } from "expo-router";
+import { Image } from "expo-image";
 import { calculateHoursAgo } from "../lib/helpers";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcon, AntIcon } from "./Icons";
@@ -36,10 +37,12 @@ const Comment = ({
   }
 
   // like a comment
-  const { mutate: mutateLike, isLoading: isLoadingLike } = useMutation(
+  const { mutateAsync: mutateLike, isLoading: isLoadingLike } = useMutation(
     likeComment,
     {
-      onMutate: async (commentID: string) => {
+      onMutate: async (data: { commentID: string; isDislike: boolean }) => {
+        const { commentID, isDislike } = data;
+        const likeDelta = isDislike ? -1 : 1;
         // cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await queryClient.cancelQueries(["comments", String(comment.post_id)]);
         // snapshot the previous value
@@ -64,8 +67,9 @@ const Comment = ({
                       currentComment.id === Number(commentID)
                         ? {
                             ...currentComment,
-                            liked_by_user: true,
-                            likes_count: currentComment.likes_count + 1,
+                            liked_by_user: !isDislike,
+                            disliked_by_user: isDislike,
+                            likes_count: currentComment.likes_count + likeDelta,
                           }
                         : currentComment
                     ),
@@ -95,7 +99,8 @@ const Comment = ({
                     currentComment.id === data.newLike.comment_id
                       ? {
                           ...currentComment,
-                          liked_by_user: true,
+                          liked_by_user: !data.newLike.is_dislike,
+                          disliked_by_user: data.newLike.is_dislike,
                           likes_count: data.updatedComment.likes_count,
                         }
                       : currentComment
@@ -121,10 +126,12 @@ const Comment = ({
   );
 
   // unlike a comment
-  const { mutate: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
+  const { mutateAsync: mutateUnlike, isLoading: isLoadingUnlike } = useMutation(
     unlikeComment,
     {
-      onMutate: async (commentID: string) => {
+      onMutate: async (data: { commentID: string; isDislike: boolean }) => {
+        const { commentID, isDislike } = data;
+        const likeDelta = isDislike ? -1 : 1;
         // cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await queryClient.cancelQueries(["comments", String(comment.post_id)]);
         // snapshot the previous value
@@ -150,7 +157,8 @@ const Comment = ({
                         ? {
                             ...currentComment,
                             liked_by_user: false,
-                            likes_count: currentComment.likes_count - 1,
+                            disliked_by_user: false,
+                            likes_count: currentComment.likes_count - likeDelta,
                           }
                         : currentComment
                     ),
@@ -181,6 +189,7 @@ const Comment = ({
                       ? {
                           ...currentComment,
                           liked_by_user: false,
+                          disliked_by_user: false,
                           likes_count: data.updatedComment.likes_count,
                         }
                       : currentComment
@@ -282,7 +291,6 @@ const Comment = ({
       Alert.alert("Report Comment?", "", [
         {
           text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
         { text: "Yes", onPress: () => onReport(comment.id) },
@@ -294,7 +302,6 @@ const Comment = ({
         [
           {
             text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
             style: "cancel",
           },
           {
@@ -310,17 +317,53 @@ const Comment = ({
     }
   };
 
-  const handleToggleLike = async () => {
+  const handleToggleLike = async (isDislike: boolean) => {
     try {
       if (isLoadingLike || isLoadingUnlike) return;
-      if (comment.liked_by_user) {
-        mutateUnlike(String(comment.id));
-      } else {
-        mutateLike(String(comment.id));
+      const dislikePayload = {
+        commentID: String(comment.id),
+        isDislike: true,
+      };
+
+      const likePayload = {
+        commentID: String(comment.id),
+        isDislike: false,
+      };
+
+      if (comment.liked_by_user && !isDislike) {
+        await mutateUnlike(likePayload);
+        return;
+      }
+
+      if (comment.liked_by_user && isDislike) {
+        await mutateUnlike(likePayload);
+        await mutateLike(dislikePayload);
+        return;
+      }
+
+      if (comment.disliked_by_user && isDislike) {
+        await mutateUnlike(dislikePayload);
+        return;
+      }
+
+      if (comment.disliked_by_user && !isDislike) {
+        await mutateUnlike(dislikePayload);
+        await mutateLike(likePayload);
+        return;
+      }
+
+      // if the user hasn't liked or disliked the comment
+      if (!comment.liked_by_user && !comment.disliked_by_user && isDislike) {
+        await mutateLike(dislikePayload);
+        return;
+      }
+      if (!comment.liked_by_user && !comment.disliked_by_user && !isDislike) {
+        await mutateLike(likePayload);
+        return;
       }
     } catch (error) {
       Sentry.Native.captureException(error);
-      Alert.alert("We couldn't like this post. Try again.");
+      Alert.alert("We couldn't like this comment. Try again.");
     }
   };
 
@@ -372,13 +415,12 @@ const Comment = ({
               alignItems: "flex-end",
             }}
           >
-            <View
-              // source={{ uri: tweet.profile_image }}
-              style={[
-                !isReply ? styles.userImage : styles.replyUserImage,
-                { backgroundColor: comment.profile_image },
-              ]}
-            />
+            <View style={!isReply ? styles.userImage : styles.replyUserImage}>
+              <Image
+                source={comment.profile_image}
+                style={!isReply ? styles.userImage : styles.replyUserImage}
+              />
+            </View>
           </Pressable>
         </Link>
       </View>
@@ -410,25 +452,32 @@ const Comment = ({
                   icon="comment-outline"
                   text={comment.replies_count}
                   iconColor="#b2b2b2"
+                  size={22}
                 />
               </Pressable>
             )}
-            <Pressable style={styles.iconWrapper} onPress={handleToggleLike}>
-              {(comment.liked_by_user && (
-                <AntIcon
-                  icon="like1"
-                  text={comment.likes_count}
-                  iconColor="red"
-                />
-              )) || (
-                <AntIcon
-                  icon="like2"
-                  text={comment.likes_count}
-                  iconColor="#b2b2b2"
-                />
-              )}
-            </Pressable>
-            {/* <IconButton icon="share-apple" /> */}
+            <View style={postStyles.likesContainer}>
+              <Pressable onPress={() => handleToggleLike(false)}>
+                {(comment.liked_by_user && (
+                  <AntIcon icon="like1" iconColor="red" size={22} />
+                )) || <AntIcon icon="like2" iconColor="#b2b2b2" size={22} />}
+              </Pressable>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "grey",
+                  marginLeft: 5,
+                  marginRight: 6,
+                }}
+              >
+                {comment.likes_count}
+              </Text>
+              <Pressable onPress={() => handleToggleLike(true)}>
+                {(comment.disliked_by_user && (
+                  <AntIcon icon="dislike1" iconColor="red" size={22} />
+                )) || <AntIcon icon="dislike2" iconColor="#b2b2b2" size={22} />}
+              </Pressable>
+            </View>
           </View>
         </View>
       </Pressable>

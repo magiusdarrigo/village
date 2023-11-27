@@ -10,7 +10,8 @@ export const getPostsByUserAndNeighborhoodQuery = (
                 posts.*, 
                 users.username, 
                 users.image AS profile_image,
-                CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
+                CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
+                CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
             FROM 
                 posts
             INNER JOIN 
@@ -31,7 +32,8 @@ export const getSinglePostQuery = (userID: number, postID: number) => {
                     posts.*, 
                     users.username, 
                     users.image AS profile_image,
-                    CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
+                    CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
+                    CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
                 FROM 
                     posts
                 INNER JOIN 
@@ -95,7 +97,8 @@ export const getPostsByUserQuery = (userID: number, cursor: number) => {
   return Prisma.sql`
             SELECT 
                 posts.*, 
-                CASE WHEN post_likes.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user 
+                CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
+                CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
             FROM 
                 posts 
             LEFT JOIN 

@@ -10,6 +10,7 @@ const postStyles = StyleSheet.create({
     marginTop: 5,
     fontSize: 18,
     fontWeight: "500",
+    marginRight: 10,
   },
   timeContent: {
     fontSize: 16,
@@ -18,10 +19,16 @@ const postStyles = StyleSheet.create({
   },
   footer: {
     flexDirection: "row",
-    marginTop: 15,
-    marginBottom: 0,
-    width: 120,
+    marginTop: 20,
+    marginBottom: 10,
+    width: 150,
     justifyContent: "space-between",
+    marginLeft: 70,
+  },
+  likesContainer: {
+    flexDirection: "row",
+    marginLeft: "auto",
+    alignItems: "center",
   },
   emptyPostsContainer: {
     flex: 1,
@@ -36,6 +43,7 @@ const postStyles = StyleSheet.create({
     color: "lightgrey",
   },
   emptyCommentsContainer: {
+    minHeight: 200,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

@@ -11,6 +11,7 @@ export default {
     tertiary: "#F4EBD0",
     replyBackground: "#EEECEC",
     selectedCommentBackground: "#FCFCCF",
+    mainBackground: "#f2f2f2",
   },
   dark: {
     text: "#ffffff",

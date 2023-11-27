@@ -1,11 +1,10 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { Pressable, AppState } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
-import messaging from "@react-native-firebase/messaging";
 import * as Sentry from "sentry-expo";
 
 function TabBarIcon(props: {
@@ -15,66 +14,76 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+// listener for when a user TAPS on a notification
 notifee.onBackgroundEvent(async ({ detail, type }) => {
   if (type === EventType.PRESS) {
-    if (detail.notification) {
-      console.log(
-        "[Android] When the application is running but in the background. Notification: ",
-        detail.notification
-      );
-    }
     await Promise.resolve();
   }
 });
 
 export default function TabLayout() {
-  const { user } = useUser();
-  const [chatTabBadgeCount, setChatTabBadgeCount] = useState<
-    string | undefined
-  >(undefined);
+  const {
+    user,
+    chatTabBadgeCount,
+    updateChatTabBadgeCount,
+    scrollToTop,
+    channel,
+    updateChannel,
+    getStreamChatClient,
+  } = useUser();
+  const [appState, setAppState] = useState(AppState.currentState);
+  const [activeTab, setActiveTab] = useState("home");
+  const streamChatClient = getStreamChatClient();
 
+  // badge count for when chat tab comes into foreground from background state
   useEffect(() => {
-    const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
-      (remoteMessage) => {
-        if (remoteMessage?.notification) {
-          Sentry.Native.captureMessage(
-            "[iOS] When the application is running, but in the background. Notification: " +
-              JSON.stringify(remoteMessage?.notification)
-          );
+    const subscription = AppState.addEventListener(
+      "change",
+      async (nextAppState) => {
+        if (
+          appState.match(/inactive|background/) &&
+          nextAppState === "active"
+        ) {
+          if (activeTab === "chat") {
+            updateChatTabBadgeCount(0);
+            return;
+          }
+
+          const count = await notifee.getBadgeCount();
+          updateChatTabBadgeCount(count);
         }
-        // set the chat tab badge count
-        if (remoteMessage?.notification?.ios?.badge) {
-          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
-        }
+        setAppState(nextAppState);
       }
     );
 
-    notifee.getInitialNotification().then((initialNotification) => {
-      if (initialNotification?.notification) {
-        console.log(
-          "[Android] When the application is opened from a quit state. Notification: ",
-          initialNotification
-        );
+    return () => {
+      subscription.remove();
+    };
+  }, [appState]);
+
+  // badge count for when chat tab comes into foreground from quit state
+  useEffect(() => {
+    const setChatTabBadgeCount = async () => {
+      try {
+        const count = await notifee.getBadgeCount();
+        updateChatTabBadgeCount(count);
+      } catch (error) {
+        Sentry.Native.captureException(error);
+      }
+    };
+    setChatTabBadgeCount();
+  }, []);
+
+  // correct badge count for chat tab when app is in foreground
+  useEffect(() => {
+    const { unsubscribe } = streamChatClient.on((event) => {
+      if (event.type === "notification.message_new") {
+        updateChatTabBadgeCount(event.total_unread_count);
       }
     });
 
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage) => {
-        if (remoteMessage?.notification) {
-          Sentry.Native.captureMessage(
-            "[iOS] When the application is opened from a quit state. Notification: " +
-              JSON.stringify(remoteMessage?.notification)
-          );
-        }
-        // set the chat tab badge count
-        if (remoteMessage?.notification?.ios?.badge) {
-          setChatTabBadgeCount(remoteMessage.notification.ios.badge);
-        }
-      });
-
     return () => {
-      unsubscribeOnNotificationOpen();
+      unsubscribe();
     };
   }, []);
 
@@ -97,11 +106,6 @@ export default function TabLayout() {
               // but then I can't go back to the home page when I'm logged in.
               href={{
                 pathname: `/profile/you`,
-                params: {
-                  userID: user?.id ?? -1,
-                  username: user?.username ?? "",
-                  image: user?.image ?? "",
-                },
               }}
               asChild
             >
@@ -118,21 +122,37 @@ export default function TabLayout() {
             </Link>
           ),
         }}
+        listeners={{
+          focus: (_) => {
+            setActiveTab("home");
+          },
+          tabPress: (_) => {
+            try {
+              scrollToTop();
+              channel?.stopWatching();
+            } catch (error) {
+              Sentry.Native.captureException(error);
+            }
+          },
+        }}
       />
       <Tabs.Screen
         name="chat"
         options={{
           title: user?.building?.address ?? "Chat",
-          tabBarBadge: chatTabBadgeCount,
+          tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="comments" color={color} />
           ),
         }}
         listeners={{
+          focus: (_) => {
+            setActiveTab("chat");
+          },
           tabPress: (_) => {
             try {
-              setChatTabBadgeCount(undefined);
-              notifee.setBadgeCount(0);
+              channel?.watch();
+              updateChatTabBadgeCount(0);
             } catch (error) {
               Sentry.Native.captureException(error);
             }

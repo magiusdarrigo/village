@@ -3,8 +3,11 @@ import React, {
   useContext,
   useState,
   PropsWithChildren,
+  useRef,
 } from "react";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
+import { FlatList } from "react-native";
+import notifee from "@notifee/react-native";
 
 export type User = {
   neighborhood_id?: number;
@@ -33,6 +36,12 @@ interface UserContextType {
   updateUser: (user: User) => void;
   removeUser: () => void;
   getStreamChatClient: () => StreamChat<any>;
+  chatTabBadgeCount: number;
+  updateChatTabBadgeCount: (count: number) => void;
+  flatListRef?: React.RefObject<any>;
+  scrollToTop: () => void;
+  updateChannel: (channel: ChannelType) => void;
+  channel: ChannelType | null;
 }
 
 interface UserContextProviderProps {
@@ -48,6 +57,9 @@ const UserContextProvider = ({
   streamChatClient,
 }: UserContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
+  const flatListRef = useRef<FlatList>(null);
+  const [channel, setChannel] = useState<ChannelType | null>(null);
 
   const updateUser = (newUser: User) => {
     setUser(newUser);
@@ -61,10 +73,34 @@ const UserContextProvider = ({
     return streamChatClient;
   };
 
+  const updateChatTabBadgeCount = async (count: number) => {
+    await notifee.setBadgeCount(count);
+    setChatTabBadgeCount(count);
+  };
+
+  const scrollToTop = () => {
+    flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+  };
+
+  const updateChannel = (channel: ChannelType) => {
+    setChannel(channel);
+  };
+
   // Provide the user object to any descendants of this component
   return (
     <UserContext.Provider
-      value={{ user, updateUser, removeUser, getStreamChatClient }}
+      value={{
+        user,
+        updateUser,
+        removeUser,
+        getStreamChatClient,
+        chatTabBadgeCount,
+        updateChatTabBadgeCount,
+        flatListRef,
+        scrollToTop,
+        updateChannel,
+        channel,
+      }}
     >
       {children}
     </UserContext.Provider>

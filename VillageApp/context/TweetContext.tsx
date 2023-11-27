@@ -4,6 +4,9 @@ import { useAuth } from "./AuthContext";
 import { useUser } from "./UserContext";
 import { getFileType } from "../lib/helpers";
 
+const DEFAULT_IMAGE_BASE_URL =
+  "https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults";
+
 interface TweetsApiContextType {
   createComment: (data: {
     postID: string;
@@ -17,10 +20,16 @@ interface TweetsApiContextType {
   reportTweet: (id: string) => Promise<any>;
   deleteComment: (data: { id: string; postID: string }) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
-  likeComment: (id: string) => Promise<any>;
-  likeTweet: (id: string) => Promise<any>;
-  unlikeComment: (id: string) => Promise<any>;
-  unlikeTweet: (id: string) => Promise<any>;
+  likeComment: (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => Promise<any>;
+  likeTweet: (data: { postID: string; isDislike: boolean }) => Promise<any>;
+  unlikeComment: (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => Promise<any>;
+  unlikeTweet: (data: { postID: string; isDislike: boolean }) => Promise<any>;
   listComments: (
     postID: string,
     lastLikesCount: string,
@@ -301,12 +310,16 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const likeComment = async (id: string) => {
+  const likeComment = async (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => {
+    const { commentID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/comments/${id}/likes`;
+    const url = `${API_URL}/v1/comments/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -328,12 +341,13 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const likeTweet = async (id: string) => {
+  const likeTweet = async (data: { postID: string; isDislike: boolean }) => {
+    const { postID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/posts/${id}/likes`;
+    const url = `${API_URL}/v1/posts/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -355,12 +369,16 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const unlikeComment = async (id: string) => {
+  const unlikeComment = async (data: {
+    commentID: string;
+    isDislike: boolean;
+  }) => {
+    const { commentID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/comments/${id}/likes`;
+    const url = `${API_URL}/v1/comments/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "DELETE",
@@ -382,12 +400,13 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const unlikeTweet = async (id: string) => {
+  const unlikeTweet = async (data: { postID: string; isDislike: boolean }) => {
+    const { postID: id, isDislike } = data;
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/posts/${id}/likes`;
+    const url = `${API_URL}/v1/posts/${id}/likes?is_dislike=${isDislike}`;
 
     const res = await fetch(url, {
       method: "DELETE",
@@ -548,15 +567,48 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     if (!authToken) {
       return {};
     }
+
+    const formData = new FormData();
+
+    const hasDefaultImageBeenChosen =
+      data.profileImage?.includes(DEFAULT_IMAGE_BASE_URL) || false;
+
+    if (hasDefaultImageBeenChosen) {
+      formData.append("defaultImage", data.profileImage ?? "");
+    }
+
+    if (data.profileImage && !hasDefaultImageBeenChosen) {
+      const imageType = getFileType(data.profileImage);
+      if (imageType !== "") {
+        formData.append("image", {
+          uri: data.profileImage,
+          type: imageType,
+          name: `upload.${imageType.split("/").pop()}`,
+        } as any);
+      }
+    }
+
+    if (data.username) {
+      formData.append("username", data.username);
+    }
+
+    if (data.buildingID) {
+      formData.append("buildingID", data.buildingID);
+    }
+
+    if (data.neighborhoodID) {
+      formData.append("neighborhoodID", data.neighborhoodID);
+    }
+
     const url = `${API_URL}/v1/users`;
 
     const res = await fetch(url, {
       method: "PUT",
+      body: formData,
       headers: {
         Authorization: `Bearer ${authToken}`,
-        "Content-type": "Application/json",
+        "Content-Type": "multipart/form-data",
       },
-      body: JSON.stringify(data),
     });
 
     if (res.status === 403) {
