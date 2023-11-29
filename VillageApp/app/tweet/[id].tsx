@@ -29,8 +29,7 @@ import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
 import { ScrollView } from "react-native-gesture-handler";
 import Colors from "../../constants/Colors";
-
-const PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD = 200;
+import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../../lib/api/pagination";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -269,7 +268,11 @@ const TweetScreen = () => {
       style={{ flex: 1 }}
       keyboardVerticalOffset={keyboardVerticalOffset}
     >
-      <ScrollView style={{ flex: 1 }} onScroll={handleScroll}>
+      <ScrollView
+        style={{ flex: 1 }}
+        onScroll={handleScroll}
+        scrollEventThrottle={500}
+      >
         <Tweet
           tweet={data}
           handleCommentIconClicked={handleCommentIconPressed}

@@ -35,6 +35,7 @@ interface TweetsApiContextType {
     lastLikesCount: string,
     lastCommentID: string
   ) => Promise<any>;
+  listTweetsForProfile: (page: number) => Promise<any>;
   listTweets: (page: number) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
@@ -70,6 +71,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   unlikeComment: async () => {},
   unlikeTweet: async () => {},
   listComments: async () => {},
+  listTweetsForProfile: async () => {},
   listTweets: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
@@ -457,6 +459,32 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const listTweetsForProfile = async (page: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${user?.id}/posts?cursor=${page}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching posts for user");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   const listTweets = async (page: number) => {
     if (!authToken) {
       return {};
@@ -729,6 +757,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         unlikeComment,
         unlikeTweet,
         listComments,
+        listTweetsForProfile,
         listTweets,
         getTweet,
         createTweet,

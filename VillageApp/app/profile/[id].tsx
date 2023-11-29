@@ -2,7 +2,7 @@ import { Alert } from "react-native";
 import { useEffect } from "react";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import ModalScreen from "../modal";
-import { useUser, User } from "../../context/UserContext";
+import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
 
@@ -25,6 +25,7 @@ const ProfileScreen = () => {
     });
   }, [navigation, userID]);
 
+  // get user profile
   const { data, isLoading, error } = useQuery({
     queryKey: ["profiles", userID],
     queryFn: () => {

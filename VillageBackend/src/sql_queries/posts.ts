@@ -97,10 +97,14 @@ export const getPostsByUserQuery = (userID: number, cursor: number) => {
   return Prisma.sql`
             SELECT 
                 posts.*, 
+                users.username, 
+                users.image AS profile_image,
                 CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
                 CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
             FROM 
                 posts 
+            INNER JOIN 
+                users ON posts.user_id = users.id
             LEFT JOIN 
                 post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID} 
             WHERE 

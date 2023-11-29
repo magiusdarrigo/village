@@ -83,6 +83,7 @@ export default function FeedScreen() {
   return (
     <View style={styles.page}>
       <FlatList
+        keyExtractor={(item) => item.id}
         ref={flatListRef}
         data={uniqueItems}
         renderItem={({ item }) => (

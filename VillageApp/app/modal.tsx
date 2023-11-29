@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -8,17 +8,26 @@ import {
   Alert,
   TouchableOpacity,
   ActivityIndicator,
+  FlatList,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { User } from "../context/UserContext";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
 import { useAuth } from "../context/AuthContext";
 import { handleChooseCustomImage } from "../lib/helpers";
 import { MaterialCommunityIcon } from "../components/Icons";
-import onboardingStyles from "../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
+import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../lib/api/pagination";
+import Tweet from "../components/Tweet";
+import { DynaPuffText } from "../components/StyledText";
+import postStyles from "../lib/styles/post";
 
 type ProfileProps = {
   user: User;
@@ -26,13 +35,82 @@ type ProfileProps = {
 
 const ModalScreen = ({ user }: ProfileProps) => {
   const queryClient = useQueryClient();
-  const { followUser, unFollowUser, updateUserAttributes } = useTweetsApi();
+  const {
+    followUser,
+    unFollowUser,
+    updateUserAttributes,
+    listTweetsForProfile,
+  } = useTweetsApi();
   const { user: currentUser, getStreamChatClient, updateUser } = useUser();
   const { removeAuthToken } = useAuth();
   const streamChatClient = getStreamChatClient();
   const [profileEditLoading, setProfileEditLoading] = React.useState(false);
+  const flatListRef = useRef<FlatList>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const usersProfile = currentUser?.id === user.id;
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
+  const useProfileTweetsInfiniteQuery = () => {
+    return useInfiniteQuery({
+      queryKey: ["profileTweets", String(user.id)],
+      queryFn: async ({ pageParam = 0 }) => listTweetsForProfile(pageParam),
+      getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
+    });
+  };
+
+  const {
+    data: profileTweetsData,
+    isFetching,
+    refetch,
+    error: profileTweetsFetchError,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useProfileTweetsInfiniteQuery();
+
+  const postItems = profileTweetsData?.pages.flatMap((page) => page.data) ?? [];
+  // Create a new Set to track unique tweet IDs
+  const uniquePostIds = new Set();
+  const uniquePostItems = postItems.filter((tweet) => {
+    if (!tweet) return false;
+    const isDuplicate = uniquePostIds.has(tweet.id);
+
+    // Add the ID to the Set if it's not already there
+    if (!isDuplicate) {
+      uniquePostIds.add(tweet.id);
+      return true;
+    }
+
+    // If it's a duplicate, filter it out
+    return false;
+  });
+
+  const handleLoadMore = () => {
+    if (hasNextPage) fetchNextPage();
+  };
+
+  const handleScroll = (event: any) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
+
+    // Check if the user has scrolled to the bottom
+    if (
+      offsetY + scrollViewHeight >=
+      contentHeight - PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD
+    ) {
+      // 50 is a threshold
+      if (!isFetching) {
+        handleLoadMore();
+      }
+    }
+  };
 
   const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
     followUser,
@@ -118,8 +196,20 @@ const ModalScreen = ({ user }: ProfileProps) => {
     }
   };
 
+  const renderEmptyListComponent = () => (
+    <View style={postStyles.emptyPostsContainer}>
+      <DynaPuffText style={postStyles.emptyPostsContainerText}>
+        No posts yet.
+      </DynaPuffText>
+    </View>
+  );
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      onScroll={handleScroll}
+      scrollEventThrottle={500}
+    >
       {profileEditLoading ? (
         <ActivityIndicator size="small" />
       ) : (
@@ -180,6 +270,30 @@ const ModalScreen = ({ user }: ProfileProps) => {
           )}
         </View>
       )}
+      <View style={styles.tweetsContainer}>
+        <FlatList
+          keyExtractor={(item) => item.id}
+          ref={flatListRef}
+          data={uniquePostItems}
+          renderItem={({ item }) => (
+            <Tweet
+              tweet={item}
+              handleCommentIconClicked={() => console.log("comment clicked")}
+            />
+          )}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
+          }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={renderEmptyListComponent}
+          contentContainerStyle={{ flexGrow: 1 }}
+          scrollEnabled={false}
+        />
+      </View>
     </ScrollView>
   );
 };
@@ -269,7 +383,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   tweetsContainer: {
-    alignItems: "center",
+    flex: 1,
   },
   tweet: {
     width: "90%",

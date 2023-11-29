@@ -268,14 +268,23 @@ router.get("/", async (req, res) => {
  * paginate by 10 for infinite scroll on the frontend
  */
 router.get("/:id/posts", async (req, res) => {
-  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  console.log("get posts by user id called, id: ", req.params.id);
+  const { id } = req.params;
+  // const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const userID = getNumberFromQuery(id);
   const cursor = getNumberFromQuery(req.query.cursor) || 0;
 
-  try {
-    const getPostsSqlQuery = getPostsByUserQuery(currentUser.id, cursor);
-    const posts = await prisma.$queryRaw(getPostsSqlQuery);
+  if (!userID) {
+    return res.status(400).json({ error: "id is required" });
+  }
 
-    res.json(posts);
+  try {
+    const getPostsSqlQuery = getPostsByUserQuery(userID, cursor);
+    const posts = (await prisma.$queryRaw(getPostsSqlQuery)) as any;
+
+    const nextCursor = posts.length < 10 ? undefined : cursor + 10;
+
+    res.json({ data: posts, nextCursor });
   } catch (error) {
     console.error(error);
     res.status(500).json({
