@@ -270,7 +270,8 @@ router.get("/", async (req, res) => {
 router.get("/:id/posts", async (req, res) => {
   console.log("get posts by user id called, id: ", req.params.id);
   const { id } = req.params;
-  // const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const currentUserID = currentUser.id;
   const userID = getNumberFromQuery(id);
   const cursor = getNumberFromQuery(req.query.cursor) || 0;
 
@@ -279,7 +280,7 @@ router.get("/:id/posts", async (req, res) => {
   }
 
   try {
-    const getPostsSqlQuery = getPostsByUserQuery(userID, cursor);
+    const getPostsSqlQuery = getPostsByUserQuery(userID, currentUserID, cursor);
     const posts = (await prisma.$queryRaw(getPostsSqlQuery)) as any;
 
     const nextCursor = posts.length < 10 ? undefined : cursor + 10;

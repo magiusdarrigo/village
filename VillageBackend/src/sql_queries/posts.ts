@@ -93,7 +93,11 @@ export const createPostWithTextAndImageQuery = (
               `;
 };
 
-export const getPostsByUserQuery = (userID: number, cursor: number) => {
+export const getPostsByUserQuery = (
+  userID: number,
+  currentUserID: number,
+  cursor: number
+) => {
   return Prisma.sql`
             SELECT 
                 posts.*, 
@@ -106,7 +110,7 @@ export const getPostsByUserQuery = (userID: number, cursor: number) => {
             INNER JOIN 
                 users ON posts.user_id = users.id
             LEFT JOIN 
-                post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID} 
+                post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${currentUserID} 
             WHERE 
                 posts.user_id = ${userID} 
             ORDER BY 

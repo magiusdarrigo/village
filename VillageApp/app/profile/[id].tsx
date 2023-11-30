@@ -1,4 +1,4 @@
-import { Alert } from "react-native";
+import { ActivityIndicator, Alert } from "react-native";
 import { useEffect } from "react";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import ModalScreen from "../modal";
@@ -33,6 +33,10 @@ const ProfileScreen = () => {
       return getUserProfile(userID as string);
     },
   });
+
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
 
   if (error) {
     console.log(error);

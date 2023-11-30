@@ -35,7 +35,7 @@ interface TweetsApiContextType {
     lastLikesCount: string,
     lastCommentID: string
   ) => Promise<any>;
-  listTweetsForProfile: (page: number) => Promise<any>;
+  listTweetsForProfile: (userID: number, page: number) => Promise<any>;
   listTweets: (page: number) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
@@ -459,12 +459,12 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const listTweetsForProfile = async (page: number) => {
+  const listTweetsForProfile = async (userID: number, page: number) => {
     if (!authToken) {
       return {};
     }
 
-    const url = `${API_URL}/v1/users/${user?.id}/posts?cursor=${page}`;
+    const url = `${API_URL}/v1/users/${userID}/posts?cursor=${page}`;
 
     const res = await fetch(url, {
       headers: {

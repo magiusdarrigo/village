@@ -34,6 +34,7 @@ type ProfileProps = {
 };
 
 const ModalScreen = ({ user }: ProfileProps) => {
+  console.log("current user rendered", user);
   const queryClient = useQueryClient();
   const {
     followUser,
@@ -59,7 +60,8 @@ const ModalScreen = ({ user }: ProfileProps) => {
   const useProfileTweetsInfiniteQuery = () => {
     return useInfiniteQuery({
       queryKey: ["profiletweets", String(user.id)],
-      queryFn: async ({ pageParam = 0 }) => listTweetsForProfile(pageParam),
+      queryFn: async ({ pageParam = 0 }) =>
+        listTweetsForProfile(user.id, pageParam),
       getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     });
   };
