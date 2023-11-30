@@ -34,7 +34,6 @@ type ProfileProps = {
 };
 
 const ModalScreen = ({ user }: ProfileProps) => {
-  console.log("current user rendered", user);
   const queryClient = useQueryClient();
   const {
     followUser,

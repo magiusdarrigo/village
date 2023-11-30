@@ -7,29 +7,23 @@ import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
 
 const ProfileScreen = () => {
-  const { userID, image, username } = useGlobalSearchParams();
+  const { userID, username } = useGlobalSearchParams();
   const navigation = useNavigation();
   const { getUserProfile } = useTweetsApi();
-  const { user } = useUser();
 
   // Set header title
   useEffect(() => {
     let headerTitle = `@${username}`;
-    // if userID is undefined then we are viewing our own profile
-    if (userID === undefined) {
-      headerTitle = "You";
-    }
-
     navigation.setOptions({
       title: headerTitle,
     });
-  }, [navigation, userID]);
+  }, [username]);
 
   // get user profile
   const { data, isLoading, error } = useQuery({
     queryKey: ["profiles", userID],
     queryFn: () => {
-      if (userID === undefined) return null;
+      if (!userID) return null;
       return getUserProfile(userID as string);
     },
   });
@@ -39,12 +33,15 @@ const ProfileScreen = () => {
   }
 
   if (error) {
-    console.log(error);
     Alert.alert("We had an issue getting this profile.");
     return null;
   }
 
-  return <ModalScreen user={data ?? user} />;
+  if (!data) {
+    return null;
+  }
+
+  return <ModalScreen user={data} />;
 };
 
 export default ProfileScreen;

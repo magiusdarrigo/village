@@ -431,7 +431,6 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               params: {
                 userID: tweet.user_id,
                 username: tweet.username,
-                image: tweet.profile_image ?? "",
               },
             }}
             asChild

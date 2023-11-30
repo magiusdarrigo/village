@@ -210,6 +210,7 @@ router.get("/:id", async (req, res) => {
     const user = (await prisma.$queryRaw(getUserQuery)) as any[];
 
     if (user.length !== 1) {
+      console.log("user not found");
       return res.status(404).json({ error: "user not found" });
     }
 
