@@ -2,7 +2,6 @@ import { ActivityIndicator, Alert } from "react-native";
 import { useEffect } from "react";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import ModalScreen from "../modal";
-import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
 
@@ -11,23 +10,26 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const { getUserProfile } = useTweetsApi();
 
+  console.log("profile screen rendering, userID: ", userID);
+
   // Set header title
   useEffect(() => {
-    let headerTitle = `@${username}`;
-    navigation.setOptions({
-      title: headerTitle,
-    });
-  }, [username]);
+    if (username) {
+      let headerTitle = `@${username}`;
+      navigation.setOptions({
+        title: headerTitle,
+      });
+    }
+  }, [username, navigation]);
 
-  // get user profile
+  // Get user profile
   const { data, isLoading, error } = useQuery({
     queryKey: ["profiles", userID],
-    queryFn: () => {
-      if (!userID) return null;
-      return getUserProfile(userID as string);
-    },
+    queryFn: () => (userID ? getUserProfile(String(userID)) : null),
+    enabled: !!userID, // This will prevent the query from running if userID is undefined
   });
 
+  // Handle loading and error states
   if (isLoading) {
     return <ActivityIndicator />;
   }
@@ -37,8 +39,9 @@ const ProfileScreen = () => {
     return null;
   }
 
-  if (!data) {
-    return null;
+  // Handle case when userID is undefined or data is not available
+  if (!userID || !data) {
+    return null; // Or render some fallback UI
   }
 
   return <ModalScreen user={data} />;
