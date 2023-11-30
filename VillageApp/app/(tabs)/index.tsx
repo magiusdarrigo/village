@@ -31,7 +31,7 @@ const FeedScreen = () => {
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["tweets"],
+    queryKey: ["infinitetweets"],
     queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
     getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     getPreviousPageParam: (firstPage, _) => firstPage.prevCursor,

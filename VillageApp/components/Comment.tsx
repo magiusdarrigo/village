@@ -229,7 +229,7 @@ const Comment = ({
         }
       );
       // update the tweet list cache with a +1 total comments count for the tweet
-      queryClient.setQueryData(["tweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets"], (old: any) => {
         if (!old) return;
         return {
           ...old,

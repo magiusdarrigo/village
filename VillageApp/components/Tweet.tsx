@@ -48,11 +48,11 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         // cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
-          queryClient.cancelQueries(["tweets"]),
+          queryClient.cancelQueries(["infinitetweets"]),
         ]);
 
         // snapshot the previous value
-        const previousTweets = queryClient.getQueryData(["tweets"]);
+        const previousTweets = queryClient.getQueryData(["infinitetweets"]);
         const previousTweet = queryClient.getQueryData([
           "tweets",
           String(tweet.id),
@@ -67,7 +67,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             likes_count: old?.likes_count + likeDelta,
           };
         });
-        queryClient.setQueryData(["tweets"], (old: any) => {
+        queryClient.setQueryData(["infinitetweets"], (old: any) => {
           if (!old) return;
           // Map over the pages
           return {
@@ -105,7 +105,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           };
         });
         // update the list of tweets in the cache
-        queryClient.setQueryData(["tweets"], (old: any) => {
+        queryClient.setQueryData(["infinitetweets"], (old: any) => {
           if (!old) return;
           // Map over the pages
           return {
@@ -135,7 +135,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
 
         // revert to the previous value
         if (context?.previousTweets) {
-          queryClient.setQueryData(["tweets"], context.previousTweets);
+          queryClient.setQueryData(["infinitetweets"], context.previousTweets);
         }
         if (context?.previousTweet) {
           queryClient.setQueryData(
@@ -156,11 +156,11 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         const likeDelta = isDislike ? -1 : 1;
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
-          queryClient.cancelQueries(["tweets"]),
+          queryClient.cancelQueries(["infinitetweets"]),
         ]);
 
         // snapshot the previous values
-        const previousTweets = queryClient.getQueryData(["tweets"]);
+        const previousTweets = queryClient.getQueryData(["infinitetweets"]);
         const previousTweet = queryClient.getQueryData([
           "tweets",
           String(tweet.id),
@@ -176,7 +176,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           };
         });
 
-        queryClient.setQueryData(["tweets"], (old: any) => {
+        queryClient.setQueryData(["infinitetweets"], (old: any) => {
           if (!old) return;
           // Map over the pages
           return {
@@ -214,7 +214,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           };
         });
         // update the list of tweets in the cache
-        queryClient.setQueryData(["tweets"], (old: any) => {
+        queryClient.setQueryData(["infinitetweets"], (old: any) => {
           if (!old) return;
           // Map over the pages
           return {
@@ -243,7 +243,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         Alert.alert("We couldn't like this post. Try again.");
         // revert to the previous value
         if (context?.previousTweets) {
-          queryClient.setQueryData(["tweets"], context.previousTweets);
+          queryClient.setQueryData(["infinitetweets"], context.previousTweets);
         }
         if (context?.previousTweet) {
           queryClient.setQueryData(
@@ -259,7 +259,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   const { mutate: mutateDelete } = useMutation(deleteTweet, {
     onSuccess: (data) => {
       // update the list of tweets in the cache
-      queryClient.setQueryData(["tweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets"], (old: any) => {
         if (!old) return;
         // Map over the pages
         return {

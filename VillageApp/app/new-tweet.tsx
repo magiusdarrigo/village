@@ -65,7 +65,7 @@ const NewTweet = () => {
   const { isLoading, mutateAsync } = useMutation({
     mutationFn: createTweet,
     onSuccess: (newData) => {
-      queryClient.setQueryData(["tweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets"], (old: any) => {
         if (!old) {
           return {
             pageParams: [],
