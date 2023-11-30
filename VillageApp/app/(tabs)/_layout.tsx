@@ -114,6 +114,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
+          headerTitle: user?.neighborhood?.name || "Home",
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
           ),
@@ -158,6 +159,7 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: "Building",
+          headerTitle: user?.building?.address || "Building",
           tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="comments" color={color} />
