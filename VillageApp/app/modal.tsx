@@ -58,7 +58,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
 
   const useProfileTweetsInfiniteQuery = () => {
     return useInfiniteQuery({
-      queryKey: ["profileTweets", String(user.id)],
+      queryKey: ["profiletweets", String(user.id)],
       queryFn: async ({ pageParam = 0 }) => listTweetsForProfile(pageParam),
       getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     });

@@ -49,6 +49,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
           queryClient.cancelQueries(["infinitetweets"]),
+          queryClient.cancelQueries(["profiletweets", String(tweet.user_id)]),
         ]);
 
         // snapshot the previous value
@@ -56,6 +57,10 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         const previousTweet = queryClient.getQueryData([
           "tweets",
           String(tweet.id),
+        ]);
+        const previousProfileTweets = queryClient.getQueryData([
+          "profiletweets",
+          String(tweet.user_id),
         ]);
 
         // optimistic update
@@ -90,44 +95,35 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             }),
           };
         });
+        queryClient.setQueryData(
+          ["profiletweets", String(tweet.user_id)],
+          (old: any) => {
+            if (!old) return;
+            // Map over the pages
+            return {
+              ...old,
+              pages: old.pages.map((page: { data: any[] }) => {
+                // Map over the tweets in the page
+                return {
+                  ...page,
+                  data: page.data.map((tweet) =>
+                    tweet.id === Number(postID)
+                      ? {
+                          ...tweet,
+                          liked_by_user: !isDislike,
+                          disliked_by_user: isDislike,
+                          likes_count: tweet.likes_count + likeDelta,
+                        }
+                      : tweet
+                  ),
+                };
+              }),
+            };
+          }
+        );
 
         // return a context object with the snapshotted values
-        return { previousTweets, previousTweet };
-      },
-      onSuccess: (data) => {
-        // update the single tweet in the cache
-        queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
-          return {
-            ...old,
-            liked_by_user: !data.newLike.is_dislike,
-            disliked_by_user: data.newLike.is_dislike,
-            likes_count: data.updatedPost.likes_count,
-          };
-        });
-        // update the list of tweets in the cache
-        queryClient.setQueryData(["infinitetweets"], (old: any) => {
-          if (!old) return;
-          // Map over the pages
-          return {
-            ...old,
-            pages: old.pages.map((page: { data: any[] }) => {
-              // Map over the tweets in the page
-              return {
-                ...page,
-                data: page.data.map((tweet) =>
-                  tweet.id === data.newLike.post_id
-                    ? {
-                        ...tweet,
-                        liked_by_user: !data.newLike.is_dislike,
-                        disliked_by_user: data.newLike.is_dislike,
-                        likes_count: data.updatedPost.likes_count,
-                      }
-                    : tweet
-                ),
-              };
-            }),
-          };
-        });
+        return { previousTweets, previousTweet, previousProfileTweets };
       },
       onError: (error, _, context) => {
         Sentry.Native.captureException(error);
@@ -141,6 +137,12 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           queryClient.setQueryData(
             ["tweets", String(tweet.id)],
             context.previousTweet
+          );
+        }
+        if (context?.previousProfileTweets) {
+          queryClient.setQueryData(
+            ["profiletweets", String(tweet.user_id)],
+            context.previousProfileTweets
           );
         }
       },
@@ -157,6 +159,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
           queryClient.cancelQueries(["infinitetweets"]),
+          queryClient.cancelQueries(["profiletweets", String(tweet.user_id)]),
         ]);
 
         // snapshot the previous values
@@ -164,6 +167,10 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         const previousTweet = queryClient.getQueryData([
           "tweets",
           String(tweet.id),
+        ]);
+        const previousProfileTweets = queryClient.getQueryData([
+          "profiletweets",
+          String(user.id),
         ]);
 
         // optimistic updates
@@ -175,7 +182,6 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             likes_count: old?.likes_count - likeDelta,
           };
         });
-
         queryClient.setQueryData(["infinitetweets"], (old: any) => {
           if (!old) return;
           // Map over the pages
@@ -199,44 +205,35 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             }),
           };
         });
+        queryClient.setQueryData(
+          ["profiletweets", String(tweet.user_id)],
+          (old: any) => {
+            if (!old) return;
+            // Map over the pages
+            return {
+              ...old,
+              pages: old.pages.map((page: { data: any[] }) => {
+                // Map over the tweets in the page
+                return {
+                  ...page,
+                  data: page.data.map((tweet) =>
+                    tweet.id === Number(postID)
+                      ? {
+                          ...tweet,
+                          liked_by_user: false,
+                          disliked_by_user: false,
+                          likes_count: tweet.likes_count - likeDelta,
+                        }
+                      : tweet
+                  ),
+                };
+              }),
+            };
+          }
+        );
 
         // return a context object with the snapshotted values
-        return { previousTweets, previousTweet };
-      },
-      onSuccess: (data) => {
-        // update the single tweet in the cache
-        queryClient.setQueryData(["tweets", String(tweet.id)], (old: any) => {
-          return {
-            ...old,
-            liked_by_user: false,
-            disliked_by_user: false,
-            likes_count: data.updatedPost.likes_count,
-          };
-        });
-        // update the list of tweets in the cache
-        queryClient.setQueryData(["infinitetweets"], (old: any) => {
-          if (!old) return;
-          // Map over the pages
-          return {
-            ...old,
-            pages: old.pages.map((page: { data: any[] }) => {
-              // Map over the tweets in the page
-              return {
-                ...page,
-                data: page.data.map((tweet) =>
-                  tweet.id === data.newUnlike.post_id
-                    ? {
-                        ...tweet,
-                        liked_by_user: false,
-                        disliked_by_user: false,
-                        likes_count: data.updatedPost.likes_count,
-                      }
-                    : tweet
-                ),
-              };
-            }),
-          };
-        });
+        return { previousTweets, previousTweet, previousProfileTweets };
       },
       onError: (error, _, context) => {
         Sentry.Native.captureException(error);
@@ -249,6 +246,12 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           queryClient.setQueryData(
             ["tweets", String(tweet.id)],
             context.previousTweet
+          );
+        }
+        if (context?.previousProfileTweets) {
+          queryClient.setQueryData(
+            ["profiletweets", String(tweet.user_id)],
+            context.previousProfileTweets
           );
         }
       },
@@ -273,6 +276,23 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           }),
         };
       });
+      queryClient.setQueryData(
+        ["profiletweets", String(tweet.user_id)],
+        (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.filter((tweet) => tweet.id !== data.id),
+              };
+            }),
+          };
+        }
+      );
       // if the tweet is open, go back to the feed
       const segLen = segments.length;
       if (

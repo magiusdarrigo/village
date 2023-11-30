@@ -84,6 +84,28 @@ const NewTweet = () => {
           ],
         };
       });
+      queryClient.setQueryData(
+        ["profiletweets", String(user?.id)],
+        (old: any) => {
+          if (!old) {
+            return {
+              pageParams: [],
+              pages: [{ data: [newData], nextCursor: null, prevCursor: null }],
+            };
+          }
+
+          return {
+            ...old,
+            pages: [
+              {
+                ...old.pages[0],
+                data: [newData, ...old.pages[0].data],
+              },
+              ...old.pages.slice(1),
+            ],
+          };
+        }
+      );
     },
     onError: async (error: any) => {
       const err = await error.json();

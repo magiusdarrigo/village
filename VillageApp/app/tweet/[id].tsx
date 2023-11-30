@@ -138,6 +138,30 @@ const TweetScreen = () => {
           }),
         };
       });
+      // update the profile tweets list cache with a +1 total comments count for the tweet
+      queryClient.setQueryData(
+        ["profiletweets", String(data?.user_id)],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => {
+              return {
+                ...page,
+                data: page.data.map((tweet: any) => {
+                  if (tweet.id === Number(id)) {
+                    return {
+                      ...tweet,
+                      comments_count: tweet.comments_count + 1,
+                    };
+                  }
+                  return tweet;
+                }),
+              };
+            }),
+          };
+        }
+      );
       // update the comments cache with the new comment
       queryClient.setQueryData(["comments", String(id)], (old: any) => {
         if (!old) {

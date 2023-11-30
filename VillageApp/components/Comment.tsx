@@ -249,6 +249,29 @@ const Comment = ({
           }),
         };
       });
+      queryClient.setQueryData(
+        ["profiletweets", String(user.id)],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => {
+              return {
+                ...page,
+                data: page.data.map((tweet: any) => {
+                  if (tweet.id === comment.post_id) {
+                    return {
+                      ...tweet,
+                      comments_count: tweet.comments_count - 1,
+                    };
+                  }
+                  return tweet;
+                }),
+              };
+            }),
+          };
+        }
+      );
       // update the list of comments in the cache
       queryClient.setQueryData(
         ["comments", String(comment.post_id)],

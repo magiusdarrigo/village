@@ -118,28 +118,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
           ),
-          headerRight: () => (
-            <Link
-              // TODO: I notice that logging out will keep the home page in the history stack. If I
-              // add the replace={true} prop, then the home page will not be in the history stack when I log out,
-              // but then I can't go back to the home page when I'm logged in.
-              href={{
-                pathname: `/profile/you`,
-              }}
-              asChild
-            >
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="user"
-                    size={25}
-                    color={Colors.light.text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
         }}
         listeners={{
           focus: (_) => {
