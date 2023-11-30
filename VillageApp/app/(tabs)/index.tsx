@@ -17,7 +17,7 @@ import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
 import { useState } from "react";
 
-export default function FeedScreen() {
+const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
   const { flatListRef } = useUser();
@@ -111,7 +111,7 @@ export default function FeedScreen() {
       </Link>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   page: {
@@ -140,3 +140,5 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 });
+
+export default FeedScreen;

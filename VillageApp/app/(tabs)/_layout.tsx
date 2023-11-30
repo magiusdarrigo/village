@@ -1,4 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Octicons } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
 import { Pressable, AppState } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -7,11 +8,26 @@ import Colors from "../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
 
-function TabBarIcon(props: {
+function TabBarIconFontAwesome(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return (
+    <FontAwesome
+      size={24}
+      style={{ marginBottom: -3, marginTop: 2 }}
+      {...props}
+    />
+  );
+}
+
+function TabBarIconOcticons(props: {
+  name: React.ComponentProps<typeof Octicons>["name"];
+  color: string;
+}) {
+  return (
+    <Octicons size={22} style={{ marginBottom: -5, marginTop: 2 }} {...props} />
+  );
 }
 
 // listener for when a user TAPS on a notification
@@ -97,8 +113,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: user?.neighborhood?.name ?? "Home",
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color }) => (
+            <TabBarIconFontAwesome name="home" color={color} />
+          ),
           headerRight: () => (
             <Link
               // TODO: I notice that logging out will keep the home page in the history stack. If I
@@ -139,10 +157,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: user?.building?.address ?? "Chat",
+          title: "Building",
           tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="comments" color={color} />
+            <TabBarIconFontAwesome name="comments" color={color} />
           ),
         }}
         listeners={{
@@ -157,6 +175,24 @@ export default function TabLayout() {
               Sentry.Native.captureException(error);
             }
           },
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Activity",
+          tabBarIcon: ({ color }) => (
+            <TabBarIconOcticons name="bell-fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "You",
+          tabBarIcon: ({ color }) => (
+            <TabBarIconFontAwesome name="user" color={color} />
+          ),
         }}
       />
     </Tabs>
