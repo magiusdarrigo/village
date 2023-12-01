@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Text,
   RefreshControl,
+  Animated,
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
@@ -15,12 +16,50 @@ import { useUser } from "../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import FeedSwitch, { feedSwitchStyles } from "../../components/FeedSwitch";
 
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
+  const [isHot, setIsHot] = useState(true);
+  const [lastScrollPos, setLastScrollPos] = useState(0);
   const { flatListRef } = useUser();
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 100, // Duration of the fade-in animation
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeOut = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 100, // Duration of the fade-out animation
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: new Animated.Value(0) } } }],
+    {
+      listener: (event: any) => {
+        const currentOffset = event.nativeEvent.contentOffset.y;
+        const isScrollingUp = currentOffset < lastScrollPos;
+
+        if (isScrollingUp || currentOffset < 40) {
+          fadeIn();
+        } else {
+          fadeOut();
+        }
+        setLastScrollPos(currentOffset);
+      },
+      useNativeDriver: false,
+    }
+  );
 
   const {
     data,
@@ -83,6 +122,7 @@ const FeedScreen = () => {
   return (
     <View style={styles.page}>
       <FlatList
+        onScroll={handleScroll}
         keyExtractor={(item) => item.id}
         ref={flatListRef}
         data={uniqueItems}
@@ -103,7 +143,16 @@ const FeedScreen = () => {
         ListEmptyComponent={renderEmptyListComponent}
         contentContainerStyle={{ flexGrow: 1 }}
       />
-
+      <Animated.View
+        style={[
+          feedSwitchStyles.feedSwitch,
+          {
+            opacity: fadeAnim,
+          },
+        ]}
+      >
+        <FeedSwitch isHot={isHot} setIsHot={setIsHot} />
+      </Animated.View>
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>
           <Entypo name="plus" size={36} color="white" />
@@ -136,7 +185,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
-
     elevation: 3,
   },
 });
