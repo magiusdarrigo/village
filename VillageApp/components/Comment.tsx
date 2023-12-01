@@ -8,6 +8,8 @@ import { MaterialCommunityIcon, AntIcon } from "./Icons";
 import { useUser } from "../context/UserContext";
 import Colors from "../constants/Colors";
 import { useTweetsApi } from "../context/TweetContext";
+import Hyperlink from "react-native-hyperlink";
+import { handlePressButtonAsync } from "../lib/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Sentry from "sentry-expo";
 import postStyles from "../lib/styles/post";
@@ -464,7 +466,12 @@ const Comment = ({
               />
             </Pressable>
           </View>
-          <Text style={postStyles.textContent}>{comment.text_content}</Text>
+          <Hyperlink
+            linkStyle={{ color: "#2980b9" }}
+            onPress={handlePressButtonAsync}
+          >
+            <Text style={postStyles.textContent}>{comment.text_content}</Text>
+          </Hyperlink>
           <View style={postStyles.footer}>
             {comment.parent_comment_id === null && (
               <Pressable

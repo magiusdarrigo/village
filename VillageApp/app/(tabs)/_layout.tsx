@@ -9,6 +9,14 @@ import Colors from "../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { handlePressButtonAsync } from "../../lib/helpers";
+
+const TERMS_OF_SERVICE_URL =
+  "https://villagenyc.notion.site/Terms-of-Use-Sale-for-Village-1da7d1897d1e485e8f80125a3a3be087?pvs=4";
+const PRIVACY_POLICY_URL =
+  "https://villagenyc.notion.site/Privacy-Policy-for-Village-845fb113171045c3bdd26c828e8ccf26?pvs=4";
+const REPORT_A_BUG_URL =
+  "https://villagenyc.notion.site/Report-a-Bug-for-Village-a46e44e552cf4234b5a6fc9f5294559b?pvs=4";
 
 function TabBarIconFontAwesome(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -132,12 +140,21 @@ export default function TabLayout() {
       (selectedIndex: any) => {
         switch (selectedIndex) {
           case requestBuildingChangeIndex:
+            Alert.prompt(
+              "Building Change Request",
+              "What's the address of the building?",
+              (text) => console.log("Entered text: ", text),
+              "plain-text"
+            );
             break;
           case termsOfServiceIndex:
+            handlePressButtonAsync(TERMS_OF_SERVICE_URL);
             break;
           case privacyPolicyIndex:
+            handlePressButtonAsync(PRIVACY_POLICY_URL);
             break;
           case reportABugIndex:
+            handlePressButtonAsync(REPORT_A_BUG_URL);
             break;
           case destructiveButtonIndex:
             Alert.alert("Are you sure you want to log out?", "", [
