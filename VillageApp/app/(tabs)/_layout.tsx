@@ -10,6 +10,7 @@ import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { handlePressButtonAsync } from "../../lib/helpers";
+import { useTweetsApi } from "../../context/TweetContext";
 
 const TERMS_OF_SERVICE_URL =
   "https://villagenyc.notion.site/Terms-of-Use-Sale-for-Village-1da7d1897d1e485e8f80125a3a3be087?pvs=4";
@@ -58,6 +59,7 @@ export default function TabLayout() {
     getStreamChatClient,
   } = useUser();
   const { removeAuthToken } = useAuth();
+  const { addBuildingChangeRequest } = useTweetsApi();
   const [appState, setAppState] = useState(AppState.currentState);
   const [activeTab, setActiveTab] = useState("home");
   const streamChatClient = getStreamChatClient();
@@ -115,6 +117,22 @@ export default function TabLayout() {
     };
   }, []);
 
+  const handleBuildingChangeRequest = async (address: string) => {
+    try {
+      await addBuildingChangeRequest(address);
+      Alert.alert(
+        "Building Request Submitted",
+        "Your request has been submitted. We will notify you when it's been approved."
+      );
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "There was an error submitting your request. Please try again."
+      );
+      Sentry.Native.captureException(error);
+    }
+  };
+
   const onSettingsPress = () => {
     const options = [
       "Request Building Change",
@@ -143,7 +161,7 @@ export default function TabLayout() {
             Alert.prompt(
               "Building Change Request",
               "What's the address of the building?",
-              (text) => console.log("Entered text: ", text),
+              (text) => handleBuildingChangeRequest(text),
               "plain-text"
             );
             break;

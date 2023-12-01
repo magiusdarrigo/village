@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prisma from "../../clients/prismaClient";
 import streamChatClient from "../../clients/streamChatClient";
+import { AuthenticatedRequest } from "../../middleware/auth";
 
 const router = Router();
 
@@ -68,6 +69,31 @@ router.get("/", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: `error fetching building with address ${address}`,
+    });
+  }
+});
+
+// add building change request item for user
+router.put("/", async (req, res) => {
+  console.log("building change request called");
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const { address } = req.body;
+  try {
+    const newChangeRequest = await prisma.building_change_requests.create({
+      data: {
+        user: {
+          connect: {
+            id: currentUser.id,
+          },
+        },
+        address_request: address,
+      },
+    });
+    res.json(newChangeRequest);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: `error adding change request for building with address ${address}`,
     });
   }
 });

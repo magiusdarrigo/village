@@ -37,6 +37,7 @@ model users {
   tokens          tokens[]
   reported_posts  reported_posts[]
   reported_comments reported_comments[]
+  building_change_requests building_change_requests[]
 }
 
 model tokens {
@@ -186,4 +187,13 @@ model user_following {
   tags               Json?
 
   @@unique([follower_user_id, following_user_id], name: "idx_userfollowing_relationship")
+}
+
+model building_change_requests {
+  id                 Int             @id @default(autoincrement())
+  user               users           @relation(fields: [user_id], references: [id])
+  user_id             Int
+  address_request    String
+  created_at         DateTime        @default(now())
+  tags               Json?
 }

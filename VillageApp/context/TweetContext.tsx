@@ -55,6 +55,7 @@ interface TweetsApiContextType {
     buildingAddress: string,
     selectedNeighborhood: string
   ) => Promise<any>;
+  addBuildingChangeRequest: (address: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -79,6 +80,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   uploadProfileWithCustomPic: async () => {},
   getBuilding: async () => {},
   createBuilding: async () => {},
+  addBuildingChangeRequest: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -741,6 +743,37 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const addBuildingChangeRequest = async (address: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/buildings`;
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-type": "Application/json",
+      },
+      body: JSON.stringify({
+        address,
+      }),
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error adding building change request");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   return (
     <TweetsApiContext.Provider
       value={{
@@ -765,6 +798,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         uploadProfileWithCustomPic,
         getBuilding,
         createBuilding,
+        addBuildingChangeRequest,
       }}
     >
       {children}
