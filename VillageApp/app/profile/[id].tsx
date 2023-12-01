@@ -10,8 +10,6 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const { getUserProfile } = useTweetsApi();
 
-  console.log("profile screen rendering, userID: ", userID);
-
   // Set header title
   useEffect(() => {
     if (username) {

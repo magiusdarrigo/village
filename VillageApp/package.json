@@ -13,6 +13,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@expo/react-native-action-sheet": "^4.0.1",
     "@expo/vector-icons": "^13.0.0",
     "@notifee/react-native": "^7.8.0",
     "@react-native-community/netinfo": "9.3.10",
@@ -35,6 +36,7 @@
     "expo-file-system": "~15.4.4",
     "expo-font": "~11.4.0",
     "expo-haptics": "~12.4.0",
+    "expo-image": "~1.3.5",
     "expo-image-manipulator": "~11.3.0",
     "expo-image-picker": "~14.3.2",
     "expo-linking": "~5.0.2",
@@ -59,8 +61,7 @@
     "react-native-svg": "13.9.0",
     "react-native-web": "~0.19.6",
     "sentry-expo": "~7.0.0",
-    "stream-chat-expo": "^5.21.0",
-    "expo-image": "~1.3.5"
+    "stream-chat-expo": "^5.21.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -1,12 +1,14 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Octicons } from "@expo/vector-icons";
-import { Link, Tabs } from "expo-router";
-import { Pressable, AppState } from "react-native";
+import { Tabs } from "expo-router";
+import { Pressable, AppState, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/AuthContext";
 import Colors from "../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 
 function TabBarIconFontAwesome(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -47,9 +49,11 @@ export default function TabLayout() {
     updateChannel,
     getStreamChatClient,
   } = useUser();
+  const { removeAuthToken } = useAuth();
   const [appState, setAppState] = useState(AppState.currentState);
   const [activeTab, setActiveTab] = useState("home");
   const streamChatClient = getStreamChatClient();
+  const { showActionSheetWithOptions } = useActionSheet();
 
   // badge count for when chat tab comes into foreground from background state
   useEffect(() => {
@@ -102,6 +106,60 @@ export default function TabLayout() {
       unsubscribe();
     };
   }, []);
+
+  const onSettingsPress = () => {
+    const options = [
+      "Request Building Change",
+      "Terms of Service",
+      "Privacy Policy",
+      "Report A Bug",
+      "Log Out",
+      "Cancel",
+    ];
+    const requestBuildingChangeIndex = 0;
+    const termsOfServiceIndex = 1;
+    const privacyPolicyIndex = 2;
+    const reportABugIndex = 3;
+    const destructiveButtonIndex = 4;
+    const cancelButtonIndex = 5;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      (selectedIndex: any) => {
+        switch (selectedIndex) {
+          case requestBuildingChangeIndex:
+            break;
+          case termsOfServiceIndex:
+            break;
+          case privacyPolicyIndex:
+            break;
+          case reportABugIndex:
+            break;
+          case destructiveButtonIndex:
+            Alert.alert("Are you sure you want to log out?", "", [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Log out",
+                onPress: async () => {
+                  streamChatClient.disconnectUser();
+                  removeAuthToken();
+                },
+              },
+            ]);
+            break;
+          case cancelButtonIndex:
+            break;
+        }
+      }
+    );
+  };
 
   return (
     <Tabs
@@ -172,6 +230,18 @@ export default function TabLayout() {
           title: "You",
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="user" color={color} />
+          ),
+          headerRight: () => (
+            <Pressable onPress={onSettingsPress}>
+              {({ pressed }) => (
+                <FontAwesome
+                  name="gear"
+                  size={25}
+                  color={Colors.light.text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
           ),
         }}
       />

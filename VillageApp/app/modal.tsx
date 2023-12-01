@@ -28,6 +28,7 @@ import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../lib/api/pagination";
 import Tweet from "../components/Tweet";
 import { DynaPuffText } from "../components/StyledText";
 import postStyles from "../lib/styles/post";
+import Colors from "../constants/Colors";
 
 type ProfileProps = {
   user: User;
@@ -47,6 +48,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
   const [profileEditLoading, setProfileEditLoading] = React.useState(false);
   const flatListRef = useRef<FlatList>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const usersProfile = currentUser?.id === user.id;
 
@@ -161,20 +163,8 @@ const ModalScreen = ({ user }: ProfileProps) => {
     mutateUnfollowUser(String(user.id));
   };
 
-  const handleLogOut = () => {
-    Alert.alert("Are you sure you want to log out?", "", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Log out",
-        onPress: async () => {
-          streamChatClient.disconnectUser();
-          removeAuthToken();
-        },
-      },
-    ]);
+  const handleEditProfile = () => {
+    setIsEditingProfile(true);
   };
 
   const handleUpdateProfilePic = async () => {
@@ -189,12 +179,18 @@ const ModalScreen = ({ user }: ProfileProps) => {
         profileImage: newImage,
       });
       setProfileEditLoading(false);
+      setIsEditingProfile(false);
       updateUser(updatedUser);
     } catch (error) {
       setProfileEditLoading(false);
+      setIsEditingProfile(false);
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue uploading your image. Try again.");
     }
+  };
+
+  const handleCancelEditProfile = () => {
+    setIsEditingProfile(false);
   };
 
   const renderEmptyListComponent = () => (
@@ -221,7 +217,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
               contentFit="cover"
               style={{ width: 120, height: 120, borderRadius: 60 }}
             />
-            {usersProfile && (
+            {usersProfile && isEditingProfile && (
               <TouchableOpacity
                 style={[
                   styles.cameraIconContainer,
@@ -247,9 +243,23 @@ const ModalScreen = ({ user }: ProfileProps) => {
             </Text>
           </View>
           {usersProfile ? (
-            <Pressable style={styles.followButton} onPress={handleLogOut}>
-              <Text style={styles.followButtonText}>Log out</Text>
-            </Pressable>
+            <>
+              {!isEditingProfile ? (
+                <Pressable
+                  style={styles.followButton}
+                  onPress={handleEditProfile}
+                >
+                  <Text style={styles.followButtonText}>Edit Profile</Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  style={styles.cancelButton}
+                  onPress={handleCancelEditProfile}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </Pressable>
+              )}
+            </>
           ) : (
             <View style={styles.followButtonContainer}>
               {user.followed_by_user ? (
@@ -309,7 +319,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
-    width: 105,
+    width: 120,
     height: 32,
     alignItems: "center",
     justifyContent: "center",
@@ -320,13 +330,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   unfollowButton: {
+    marginVertical: 8,
     backgroundColor: "transparent",
     borderRadius: 50,
     padding: 5,
     paddingHorizontal: 15,
     borderColor: "lightgrey",
     borderWidth: 1,
-    width: 105,
+    width: 120,
     height: 32,
     alignItems: "center",
     justifyContent: "center",
@@ -334,6 +345,24 @@ const styles = StyleSheet.create({
   unfollowButtonText: {
     fontWeight: "600",
     color: "black",
+    fontSize: 14,
+  },
+  cancelButton: {
+    marginVertical: 8,
+    backgroundColor: "transparent",
+    borderRadius: 50,
+    padding: 5,
+    paddingHorizontal: 15,
+    borderColor: "lightgrey",
+    borderWidth: 1,
+    width: 120,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelButtonText: {
+    fontWeight: "600",
+    color: Colors.light.cancelRed,
     fontSize: 14,
   },
   container: {
@@ -348,7 +377,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "blue",
   },
   cameraIconContainer: {
     position: "absolute",

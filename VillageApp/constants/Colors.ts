@@ -13,6 +13,7 @@ export default {
     selectedCommentBackground: "#FCFCCF",
     mainBackground: "#f2f2f2",
     counterFontColor: "#b2b2b2",
+    cancelRed: "#C71717",
   },
   dark: {
     text: "#ffffff",
