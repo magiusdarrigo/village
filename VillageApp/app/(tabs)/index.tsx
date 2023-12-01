@@ -18,6 +18,7 @@ import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
 import { useRef, useState } from "react";
 import FeedSwitch, { feedSwitchStyles } from "../../components/FeedSwitch";
+import TransportMethod from "../../components/TranspotMethod";
 
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
@@ -145,13 +146,12 @@ const FeedScreen = () => {
       />
       <Animated.View
         style={[
-          feedSwitchStyles.feedSwitch,
           {
             opacity: fadeAnim,
           },
         ]}
       >
-        <FeedSwitch isHot={isHot} setIsHot={setIsHot} />
+        <TransportMethod isHot={isHot} setIsHot={setIsHot} />
       </Animated.View>
       <Link href="/new-tweet" asChild>
         <Pressable style={styles.floatingButton}>

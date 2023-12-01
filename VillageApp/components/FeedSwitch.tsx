@@ -44,6 +44,16 @@ const FeedSwitch = ({ isHot, setIsHot }: FeedSwitchProps) => (
 );
 
 export const feedSwitchStyles = StyleSheet.create({
+  backgroundSwitch: {
+    position: "absolute",
+    bottom: 20,
+    alignSelf: "center",
+    backgroundColor: "#F3F7F9",
+    height: 30,
+    width: 100,
+    borderRadius: 100,
+    justifyContent: "center",
+  },
   feedSwitch: {
     position: "absolute",
     bottom: 20,
