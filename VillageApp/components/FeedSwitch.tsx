@@ -1,95 +1,108 @@
-import React from "react";
-import { StyleSheet, Pressable, Text, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { StyleSheet, Text, View, TouchableWithoutFeedback } from "react-native";
+import * as Animatable from "react-native-animatable";
+
+let componentWidth = 100;
 
 type FeedSwitchProps = {
   isHot: boolean;
   setIsHot: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const FeedSwitch = ({ isHot, setIsHot }: FeedSwitchProps) => (
-  <View style={feedSwitchStyles.parentContainer}>
-    <Pressable
-      style={[
-        feedSwitchStyles.switchButton,
-        isHot ? feedSwitchStyles.active : null,
-      ]}
-      onPress={() => setIsHot(true)}
-    >
-      <Text
-        style={[
-          feedSwitchStyles.switchButtonText,
-          isHot ? feedSwitchStyles.activeText : null,
-        ]}
-      >
-        Hot
-      </Text>
-    </Pressable>
-    <Pressable
-      style={[
-        feedSwitchStyles.switchButton,
-        !isHot ? feedSwitchStyles.active : null,
-      ]}
-      onPress={() => setIsHot(false)}
-    >
-      <Text
-        style={[
-          feedSwitchStyles.switchButtonText,
-          !isHot ? feedSwitchStyles.activeText : null,
-        ]}
-      >
-        New
-      </Text>
-    </Pressable>
-  </View>
-);
+const FeedSwitch = ({ isHot, setIsHot }: FeedSwitchProps) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const updateIndex = () => {
+    if (activeIndex === 0) {
+      slideRight();
+      setActiveIndex(1);
+    } else {
+      slideLeft();
+      setActiveIndex(0);
+    }
+  };
 
-export const feedSwitchStyles = StyleSheet.create({
+  const handleViewRef = useRef<any>(null);
+
+  const slideRight = () => {
+    handleViewRef.current.animate({
+      0: {
+        translateX: 0,
+      },
+      0.5: {
+        translateX: componentWidth / 4,
+      },
+      1: {
+        translateX: componentWidth / 2 - 2,
+      },
+    });
+  };
+
+  const slideLeft = () => {
+    handleViewRef.current.animate({
+      0: {
+        translateX: componentWidth / 2 - 5,
+      },
+      0.5: {
+        translateX: componentWidth / 4,
+      },
+      1: {
+        translateX: 0,
+      },
+    });
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={updateIndex}>
+      <View
+        style={styles.backgroundSwitch}
+        onLayout={(event) => {
+          componentWidth = event.nativeEvent.layout.width;
+        }}
+      >
+        <Animatable.View
+          duration={500}
+          style={styles.buttonSwitch}
+          ref={handleViewRef}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={[styles.textOption]}>Hot</Text>
+          <Text style={[styles.textOption]}>New</Text>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+};
+
+const styles = StyleSheet.create({
   backgroundSwitch: {
     position: "absolute",
     bottom: 20,
     alignSelf: "center",
     backgroundColor: "#F3F7F9",
-    height: 30,
+    height: 32,
     width: 100,
     borderRadius: 100,
     justifyContent: "center",
   },
-  feedSwitch: {
-    position: "absolute",
-    bottom: 20,
-    alignSelf: "center",
-    flexDirection: "row",
-    borderRadius: 20,
-    overflow: "hidden",
-    // shadow
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-    borderColor: "grey",
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  parentContainer: {
-    flexDirection: "row",
-  },
-  switchButton: {
-    backgroundColor: "white",
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-  },
-  switchButtonText: {
+  textOption: {
     fontWeight: "bold",
-    color: "black",
+    width: "50%",
+    textAlign: "center",
   },
-  active: {
-    backgroundColor: "black",
-  },
-  activeText: {
-    color: "white",
+  buttonSwitch: {
+    position: "absolute",
+    backgroundColor: "white",
+    height: 27,
+    width: 46,
+    borderRadius: 100,
+    left: 3,
+    right: 3,
   },
 });
 

@@ -30,6 +30,7 @@ const NewTweet = () => {
   const queryClient = useQueryClient();
   const tweetTextRef = useRef<TextInput>(null);
   const [image, setImage] = useState<string | undefined>(undefined);
+  const [tweetUploading, setTweetUploading] = useState(false);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
   const isPostButtonDisabled = !image && text.length < 1;
@@ -142,16 +143,18 @@ const NewTweet = () => {
         Alert.alert("We had an issue making your post. Try again.");
         return;
       }
-
+      setTweetUploading(true);
       await mutateAsync({
         neighborhoodID: user?.neighborhood_id,
         textContent: text,
         imageURL: image,
       });
+      setTweetUploading(false);
       setText("");
       router.back();
       scrollToTop();
     } catch (error) {
+      setTweetUploading(false);
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue making your post.");
     }
@@ -173,9 +176,11 @@ const NewTweet = () => {
             onPress={onTweetPress}
             style={[
               styles.button,
-              isPostButtonDisabled ? styles.buttonDisabled : {},
+              isPostButtonDisabled || tweetUploading
+                ? styles.buttonDisabled
+                : {},
             ]}
-            disabled={isPostButtonDisabled}
+            disabled={isPostButtonDisabled || tweetUploading}
           >
             <Text style={styles.buttonText}>Post</Text>
           </Pressable>

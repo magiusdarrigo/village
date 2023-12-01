@@ -17,8 +17,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
 import { useRef, useState } from "react";
-import FeedSwitch, { feedSwitchStyles } from "../../components/FeedSwitch";
-import TransportMethod from "../../components/TranspotMethod";
+import FeedSwitch from "../../components/FeedSwitch";
 
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
@@ -26,10 +25,16 @@ const FeedScreen = () => {
   const [isHot, setIsHot] = useState(true);
   const [lastScrollPos, setLastScrollPos] = useState(0);
   const { flatListRef } = useUser();
-  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
+  const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
 
   const fadeIn = () => {
-    Animated.timing(fadeAnim, {
+    Animated.timing(fadeSwitchAnim, {
+      toValue: 1,
+      duration: 100, // Duration of the fade-in animation
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(fadeNewTweetButtonAnim, {
       toValue: 1,
       duration: 100, // Duration of the fade-in animation
       useNativeDriver: true,
@@ -37,9 +42,14 @@ const FeedScreen = () => {
   };
 
   const fadeOut = () => {
-    Animated.timing(fadeAnim, {
+    Animated.timing(fadeSwitchAnim, {
       toValue: 0,
       duration: 100, // Duration of the fade-out animation
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(fadeNewTweetButtonAnim, {
+      toValue: 0.75,
+      duration: 100, // Duration of the fade-in animation
       useNativeDriver: true,
     }).start();
   };
@@ -147,17 +157,25 @@ const FeedScreen = () => {
       <Animated.View
         style={[
           {
-            opacity: fadeAnim,
+            opacity: fadeSwitchAnim,
           },
         ]}
       >
-        <TransportMethod isHot={isHot} setIsHot={setIsHot} />
+        <FeedSwitch isHot={isHot} setIsHot={setIsHot} />
       </Animated.View>
-      <Link href="/new-tweet" asChild>
-        <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={36} color="white" />
-        </Pressable>
-      </Link>
+      <Animated.View
+        style={[
+          {
+            opacity: fadeNewTweetButtonAnim,
+          },
+        ]}
+      >
+        <Link href="/new-tweet" asChild>
+          <Pressable style={styles.floatingButton}>
+            <Entypo name="plus" size={36} color="white" />
+          </Pressable>
+        </Link>
+      </Animated.View>
     </View>
   );
 };
