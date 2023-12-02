@@ -18,6 +18,7 @@ import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
 import { useRef, useState } from "react";
 import FeedSwitch from "../../components/FeedSwitch";
+import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker";
 
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
@@ -27,29 +28,32 @@ const FeedScreen = () => {
   const { flatListRef } = useUser();
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
+  const [switchIsVisible, setSwitchIsVisible] = useState(true);
 
   const fadeIn = () => {
+    setSwitchIsVisible(true);
     Animated.timing(fadeSwitchAnim, {
       toValue: 1,
-      duration: 100, // Duration of the fade-in animation
+      duration: 200, // Duration of the fade-in animation
       useNativeDriver: true,
     }).start();
     Animated.timing(fadeNewTweetButtonAnim, {
       toValue: 1,
-      duration: 100, // Duration of the fade-in animation
+      duration: 200, // Duration of the fade-in animation
       useNativeDriver: true,
     }).start();
   };
 
   const fadeOut = () => {
+    setSwitchIsVisible(false);
     Animated.timing(fadeSwitchAnim, {
       toValue: 0,
-      duration: 100, // Duration of the fade-out animation
+      duration: 200, // Duration of the fade-out animation
       useNativeDriver: true,
     }).start();
     Animated.timing(fadeNewTweetButtonAnim, {
       toValue: 0.75,
-      duration: 100, // Duration of the fade-in animation
+      duration: 200, // Duration of the fade-in animation
       useNativeDriver: true,
     }).start();
   };
@@ -132,6 +136,7 @@ const FeedScreen = () => {
 
   return (
     <View style={styles.page}>
+      <NeighborhoodScrollPicker />
       <FlatList
         onScroll={handleScroll}
         keyExtractor={(item) => item.id}
@@ -155,6 +160,7 @@ const FeedScreen = () => {
         contentContainerStyle={{ flexGrow: 1 }}
       />
       <Animated.View
+        pointerEvents={switchIsVisible ? "auto" : "none"}
         style={[
           {
             opacity: fadeSwitchAnim,

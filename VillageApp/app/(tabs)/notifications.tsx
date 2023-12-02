@@ -1,11 +1,8 @@
 import { View, Text } from "react-native";
+import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker";
 
 const NotificationsScreen = () => {
-  return (
-    <View>
-      <Text>Notifications</Text>
-    </View>
-  );
+  return <NeighborhoodScrollPicker />;
 };
 
 export default NotificationsScreen;
