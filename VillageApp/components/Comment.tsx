@@ -413,7 +413,7 @@ const Comment = ({
               flexDirection: "row",
               borderBottomWidth: StyleSheet.hairlineWidth,
               borderColor: "lightgrey",
-              backgroundColor: Colors.light.replyBackground,
+              backgroundColor: Colors.light.switchBackgroundColor,
             }
       }
     >

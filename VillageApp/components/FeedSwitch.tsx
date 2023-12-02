@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { StyleSheet, Text, View, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from "react-native-animatable";
+import Colors from "../constants/Colors";
 
 let componentWidth = 100;
 
@@ -84,16 +85,26 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     alignSelf: "center",
-    backgroundColor: "#F3F7F9",
+    backgroundColor: Colors.light.switchBackgroundColor,
     height: 32,
     width: 100,
     borderRadius: 100,
     justifyContent: "center",
+    // shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   textOption: {
     fontWeight: "bold",
     width: "50%",
     textAlign: "center",
+    color: Colors.light.switchFontColor,
   },
   buttonSwitch: {
     position: "absolute",
