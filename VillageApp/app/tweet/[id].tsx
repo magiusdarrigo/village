@@ -305,6 +305,7 @@ const TweetScreen = () => {
           <View style={styles.postSeperatorContainer}></View>
         )}
         <FlatList
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           ref={flatListRef}
           data={uniqueItems}

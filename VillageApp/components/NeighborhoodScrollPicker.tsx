@@ -16,6 +16,7 @@ const NeighborhoodScrollPicker = () => {
     <View style={styles.scrollParentContainer}>
       <View style={{ height: 40 }}>
         <FlatList
+          showsHorizontalScrollIndicator={false}
           horizontal
           data={[
             { id: 1, label: "Lower East Side" },

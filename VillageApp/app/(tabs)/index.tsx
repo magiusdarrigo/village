@@ -138,6 +138,7 @@ const FeedScreen = () => {
     <View style={styles.page}>
       {/* <NeighborhoodScrollPicker /> */}
       <FlatList
+        showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
         keyExtractor={(item) => item.id}
         ref={flatListRef}

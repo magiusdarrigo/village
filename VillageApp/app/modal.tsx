@@ -283,6 +283,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
       )}
       <View style={styles.tweetsContainer}>
         <FlatList
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           ref={flatListRef}
           data={uniquePostItems}
