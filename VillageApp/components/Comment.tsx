@@ -8,6 +8,8 @@ import { MaterialCommunityIcon, AntIcon } from "./Icons";
 import { useUser } from "../context/UserContext";
 import Colors from "../constants/Colors";
 import { useTweetsApi } from "../context/TweetContext";
+import Hyperlink from "react-native-hyperlink";
+import { handlePressButtonAsync } from "../lib/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Sentry from "sentry-expo";
 import postStyles from "../lib/styles/post";
@@ -229,7 +231,7 @@ const Comment = ({
         }
       );
       // update the tweet list cache with a +1 total comments count for the tweet
-      queryClient.setQueryData(["tweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets"], (old: any) => {
         if (!old) return;
         return {
           ...old,
@@ -249,6 +251,29 @@ const Comment = ({
           }),
         };
       });
+      queryClient.setQueryData(
+        ["profiletweets", String(user.id)],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => {
+              return {
+                ...page,
+                data: page.data.map((tweet: any) => {
+                  if (tweet.id === comment.post_id) {
+                    return {
+                      ...tweet,
+                      comments_count: tweet.comments_count - 1,
+                    };
+                  }
+                  return tweet;
+                }),
+              };
+            }),
+          };
+        }
+      );
       // update the list of comments in the cache
       queryClient.setQueryData(
         ["comments", String(comment.post_id)],
@@ -388,7 +413,7 @@ const Comment = ({
               flexDirection: "row",
               borderBottomWidth: StyleSheet.hairlineWidth,
               borderColor: "lightgrey",
-              backgroundColor: Colors.light.replyBackground,
+              backgroundColor: Colors.light.switchBackgroundColor,
             }
       }
     >
@@ -441,7 +466,12 @@ const Comment = ({
               />
             </Pressable>
           </View>
-          <Text style={postStyles.textContent}>{comment.text_content}</Text>
+          <Hyperlink
+            linkStyle={{ color: "#2980b9" }}
+            onPress={handlePressButtonAsync}
+          >
+            <Text style={postStyles.textContent}>{comment.text_content}</Text>
+          </Hyperlink>
           <View style={postStyles.footer}>
             {comment.parent_comment_id === null && (
               <Pressable
@@ -465,7 +495,8 @@ const Comment = ({
               <Text
                 style={{
                   fontSize: 16,
-                  color: "grey",
+                  fontWeight: "bold",
+                  color: Colors.light.counterFontColor,
                   marginLeft: 5,
                   marginRight: 6,
                 }}

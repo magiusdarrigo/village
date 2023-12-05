@@ -1,45 +1,48 @@
-import { Alert } from "react-native";
+import { ActivityIndicator, Alert } from "react-native";
 import { useEffect } from "react";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import ModalScreen from "../modal";
-import { useUser, User } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
 
 const ProfileScreen = () => {
-  const { userID, image, username } = useGlobalSearchParams();
+  const { userID, username } = useGlobalSearchParams();
   const navigation = useNavigation();
   const { getUserProfile } = useTweetsApi();
-  const { user } = useUser();
 
   // Set header title
   useEffect(() => {
-    let headerTitle = `@${username}`;
-    // if userID is undefined then we are viewing our own profile
-    if (userID === undefined) {
-      headerTitle = "You";
+    if (username) {
+      let headerTitle = `@${username}`;
+      navigation.setOptions({
+        title: headerTitle,
+      });
     }
+  }, [username, navigation]);
 
-    navigation.setOptions({
-      title: headerTitle,
-    });
-  }, [navigation, userID]);
-
+  // Get user profile
   const { data, isLoading, error } = useQuery({
     queryKey: ["profiles", userID],
-    queryFn: () => {
-      if (userID === undefined) return null;
-      return getUserProfile(userID as string);
-    },
+    queryFn: () => (userID ? getUserProfile(String(userID)) : null),
+    enabled: !!userID, // This will prevent the query from running if userID is undefined
   });
 
+  // Handle loading and error states
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
   if (error) {
-    console.log(error);
     Alert.alert("We had an issue getting this profile.");
     return null;
   }
 
-  return <ModalScreen user={data ?? user} />;
+  // Handle case when userID is undefined or data is not available
+  if (!userID || !data) {
+    return null; // Or render some fallback UI
+  }
+
+  return <ModalScreen user={data} />;
 };
 
 export default ProfileScreen;

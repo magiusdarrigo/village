@@ -15,20 +15,22 @@ const postStyles = StyleSheet.create({
   timeContent: {
     fontSize: 16,
     color: "grey",
+    fontWeight: "500",
     marginLeft: 5,
   },
   footer: {
     flexDirection: "row",
     marginTop: 20,
     marginBottom: 10,
-    width: 150,
+    width: 175,
     justifyContent: "space-between",
     marginLeft: 70,
   },
   likesContainer: {
     flexDirection: "row",
-    marginLeft: "auto",
     alignItems: "center",
+    justifyContent: "space-between",
+    width: 80,
   },
   emptyPostsContainer: {
     flex: 1,

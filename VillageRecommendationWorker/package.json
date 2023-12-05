@@ -1,0 +1,23 @@
+{
+  "name": "villagerecommendationworker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "update-types": "npx supabase gen types typescript --project-id \"zgsgsszttvkptdpijrzb\" > src/types/supabase.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.3",
+    "supabase": "^1.115.4",
+    "typescript": "^5.3.2"
+  }
+}

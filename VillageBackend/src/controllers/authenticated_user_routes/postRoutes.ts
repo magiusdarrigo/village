@@ -190,6 +190,7 @@ router.get("/:id/comments", async (req, res) => {
         : undefined;
     const newLastCommentID =
       parentComments.length === 10 ? String(parentComments[9].id) : undefined;
+
     res.json({
       data: comments,
       lastLikesCount: newLastLikesCount,
