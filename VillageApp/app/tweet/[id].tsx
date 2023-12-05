@@ -29,8 +29,7 @@ import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
 import { ScrollView } from "react-native-gesture-handler";
 import Colors from "../../constants/Colors";
-
-const PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD = 200;
+import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../../lib/api/pagination";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -119,7 +118,7 @@ const TweetScreen = () => {
         };
       });
       // update the tweet list cache with a +1 total comments count for the tweet
-      queryClient.setQueryData(["tweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets"], (old: any) => {
         if (!old) return;
         return {
           ...old,
@@ -139,6 +138,30 @@ const TweetScreen = () => {
           }),
         };
       });
+      // update the profile tweets list cache with a +1 total comments count for the tweet
+      queryClient.setQueryData(
+        ["profiletweets", String(data?.user_id)],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => {
+              return {
+                ...page,
+                data: page.data.map((tweet: any) => {
+                  if (tweet.id === Number(id)) {
+                    return {
+                      ...tweet,
+                      comments_count: tweet.comments_count + 1,
+                    };
+                  }
+                  return tweet;
+                }),
+              };
+            }),
+          };
+        }
+      );
       // update the comments cache with the new comment
       queryClient.setQueryData(["comments", String(id)], (old: any) => {
         if (!old) {
@@ -241,7 +264,7 @@ const TweetScreen = () => {
   const renderEmptyListComponent = () => (
     <View style={postStyles.emptyCommentsContainer}>
       <DynaPuffText style={postStyles.emptyCommentsContainerText}>
-        Post something that’s on your mind.
+        No comments yet.
       </DynaPuffText>
     </View>
   );
@@ -269,7 +292,11 @@ const TweetScreen = () => {
       style={{ flex: 1 }}
       keyboardVerticalOffset={keyboardVerticalOffset}
     >
-      <ScrollView style={{ flex: 1 }} onScroll={handleScroll}>
+      <ScrollView
+        style={{ flex: 1 }}
+        onScroll={handleScroll}
+        scrollEventThrottle={500}
+      >
         <Tweet
           tweet={data}
           handleCommentIconClicked={handleCommentIconPressed}
@@ -278,6 +305,7 @@ const TweetScreen = () => {
           <View style={styles.postSeperatorContainer}></View>
         )}
         <FlatList
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           ref={flatListRef}
           data={uniqueItems}

@@ -7,6 +7,7 @@ import { usernameAllowed } from "../../utils/badwords";
 import { getUserProfileQuery } from "../../sql_queries/users";
 import streamChatClient from "../../clients/streamChatClient";
 import { upload } from "../../middleware/upload";
+import { MAX_INT4_VALUE } from "../../utils/constants";
 import {
   uploadImageToSupabase,
   convertFileIfNecessary,
@@ -210,6 +211,7 @@ router.get("/:id", async (req, res) => {
     const user = (await prisma.$queryRaw(getUserQuery)) as any[];
 
     if (user.length !== 1) {
+      console.log("user not found");
       return res.status(404).json({ error: "user not found" });
     }
 
@@ -268,14 +270,24 @@ router.get("/", async (req, res) => {
  * paginate by 10 for infinite scroll on the frontend
  */
 router.get("/:id/posts", async (req, res) => {
+  console.log("get posts by user id called, id: ", req.params.id);
+  const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
-  const cursor = getNumberFromQuery(req.query.cursor) || 0;
+  const currentUserID = currentUser.id;
+  const userID = getNumberFromQuery(id);
+  const cursor = getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
+
+  if (!userID) {
+    return res.status(400).json({ error: "id is required" });
+  }
 
   try {
-    const getPostsSqlQuery = getPostsByUserQuery(currentUser.id, cursor);
-    const posts = await prisma.$queryRaw(getPostsSqlQuery);
+    const getPostsSqlQuery = getPostsByUserQuery(userID, currentUserID, cursor);
+    const posts = (await prisma.$queryRaw(getPostsSqlQuery)) as any;
 
-    res.json(posts);
+    const nextCursor = posts.length < 10 ? undefined : posts[9].id;
+
+    res.json({ data: posts, nextCursor });
   } catch (error) {
     console.error(error);
     res.status(500).json({

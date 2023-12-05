@@ -35,6 +35,7 @@ interface TweetsApiContextType {
     lastLikesCount: string,
     lastCommentID: string
   ) => Promise<any>;
+  listTweetsForProfile: (userID: number, page: number) => Promise<any>;
   listTweets: (page: number) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
@@ -54,6 +55,7 @@ interface TweetsApiContextType {
     buildingAddress: string,
     selectedNeighborhood: string
   ) => Promise<any>;
+  addBuildingChangeRequest: (address: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -70,6 +72,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   unlikeComment: async () => {},
   unlikeTweet: async () => {},
   listComments: async () => {},
+  listTweetsForProfile: async () => {},
   listTweets: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
@@ -77,6 +80,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   uploadProfileWithCustomPic: async () => {},
   getBuilding: async () => {},
   createBuilding: async () => {},
+  addBuildingChangeRequest: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -457,6 +461,32 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const listTweetsForProfile = async (userID: number, page: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${userID}/posts?cursor=${page}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching posts for user");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   const listTweets = async (page: number) => {
     if (!authToken) {
       return {};
@@ -713,6 +743,37 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const addBuildingChangeRequest = async (address: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/buildings`;
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-type": "Application/json",
+      },
+      body: JSON.stringify({
+        address,
+      }),
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error adding building change request");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   return (
     <TweetsApiContext.Provider
       value={{
@@ -729,6 +790,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         unlikeComment,
         unlikeTweet,
         listComments,
+        listTweetsForProfile,
         listTweets,
         getTweet,
         createTweet,
@@ -736,6 +798,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         uploadProfileWithCustomPic,
         getBuilding,
         createBuilding,
+        addBuildingChangeRequest,
       }}
     >
       {children}

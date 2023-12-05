@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 export const getPostsByUserAndNeighborhoodQuery = (
   userID: number,
   neighborhoodID: number,
-  cursor: number
+  lastPostId: number // cursor
 ) => {
   return Prisma.sql`
             SELECT 
@@ -19,10 +19,10 @@ export const getPostsByUserAndNeighborhoodQuery = (
             LEFT JOIN 
                 post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
             WHERE 
-                posts.neighborhood_id = ${neighborhoodID}
+                posts.neighborhood_id = ${neighborhoodID} AND posts.id < ${lastPostId}
             ORDER BY 
-                posts.created_at DESC 
-            LIMIT 20 OFFSET ${cursor};
+                posts.id DESC
+            LIMIT 20;
         `;
 };
 
@@ -93,20 +93,28 @@ export const createPostWithTextAndImageQuery = (
               `;
 };
 
-export const getPostsByUserQuery = (userID: number, cursor: number) => {
+export const getPostsByUserQuery = (
+  userID: number,
+  currentUserID: number,
+  lastPostId: number // cursor
+) => {
   return Prisma.sql`
             SELECT 
                 posts.*, 
+                users.username, 
+                users.image AS profile_image,
                 CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
                 CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
             FROM 
                 posts 
+            INNER JOIN 
+                users ON posts.user_id = users.id
             LEFT JOIN 
-                post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID} 
+                post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${currentUserID} 
             WHERE 
-                posts.user_id = ${userID} 
+                posts.user_id = ${userID} AND posts.id < ${lastPostId}
             ORDER BY 
                 posts.created_at DESC 
-            LIMIT 10 OFFSET ${cursor};
+            LIMIT 10;
         `;
 };

@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Text,
   RefreshControl,
+  Animated,
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../components/Tweet";
@@ -15,12 +16,65 @@ import { useUser } from "../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import FeedSwitch from "../../components/FeedSwitch";
+import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker";
 
-export default function FeedScreen() {
+const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
+  const [isHot, setIsHot] = useState(true);
+  const [lastScrollPos, setLastScrollPos] = useState(0);
   const { flatListRef } = useUser();
+  const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
+  const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
+  const [switchIsVisible, setSwitchIsVisible] = useState(true);
+
+  const fadeIn = () => {
+    setSwitchIsVisible(true);
+    Animated.timing(fadeSwitchAnim, {
+      toValue: 1,
+      duration: 200, // Duration of the fade-in animation
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(fadeNewTweetButtonAnim, {
+      toValue: 1,
+      duration: 200, // Duration of the fade-in animation
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeOut = () => {
+    setSwitchIsVisible(false);
+    Animated.timing(fadeSwitchAnim, {
+      toValue: 0,
+      duration: 200, // Duration of the fade-out animation
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(fadeNewTweetButtonAnim, {
+      toValue: 0.75,
+      duration: 200, // Duration of the fade-in animation
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: new Animated.Value(0) } } }],
+    {
+      listener: (event: any) => {
+        const currentOffset = event.nativeEvent.contentOffset.y;
+        const isScrollingUp = currentOffset < lastScrollPos;
+
+        if (isScrollingUp || currentOffset < 40) {
+          fadeIn();
+        } else {
+          fadeOut();
+        }
+        setLastScrollPos(currentOffset);
+      },
+      useNativeDriver: false,
+    }
+  );
 
   const {
     data,
@@ -31,10 +85,9 @@ export default function FeedScreen() {
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["tweets"],
+    queryKey: ["infinitetweets"],
     queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
     getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
-    getPreviousPageParam: (firstPage, _) => firstPage.prevCursor,
   });
 
   const onRefresh = async () => {
@@ -82,7 +135,11 @@ export default function FeedScreen() {
 
   return (
     <View style={styles.page}>
+      {/* <NeighborhoodScrollPicker /> */}
       <FlatList
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        keyExtractor={(item) => item.id}
         ref={flatListRef}
         data={uniqueItems}
         renderItem={({ item }) => (
@@ -102,15 +159,32 @@ export default function FeedScreen() {
         ListEmptyComponent={renderEmptyListComponent}
         contentContainerStyle={{ flexGrow: 1 }}
       />
-
-      <Link href="/new-tweet" asChild>
-        <Pressable style={styles.floatingButton}>
-          <Entypo name="plus" size={32} color="white" />
-        </Pressable>
-      </Link>
+      <Animated.View
+        pointerEvents={switchIsVisible ? "auto" : "none"}
+        style={[
+          {
+            opacity: fadeSwitchAnim,
+          },
+        ]}
+      >
+        <FeedSwitch isHot={isHot} setIsHot={setIsHot} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          {
+            opacity: fadeNewTweetButtonAnim,
+          },
+        ]}
+      >
+        <Link href="/new-tweet" asChild>
+          <Pressable style={styles.floatingButton}>
+            <Entypo name="plus" size={36} color="white" />
+          </Pressable>
+        </Link>
+      </Animated.View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   page: {
@@ -122,9 +196,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 50,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     alignItems: "center",
     justifyContent: "center",
     // shadow
@@ -135,7 +209,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
-
     elevation: 3,
   },
 });
+
+export default FeedScreen;

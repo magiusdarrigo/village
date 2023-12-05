@@ -6,6 +6,7 @@ import {
   MaterialCommunityIcons,
   Ionicons,
 } from "@expo/vector-icons";
+import Colors from "../constants/Colors";
 
 type EvilIconProps = {
   icon: React.ComponentProps<typeof EvilIcons>["name"];
@@ -63,7 +64,13 @@ export const MaterialCommunityIcon = ({
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <MaterialCommunityIcons name={icon} size={size ?? 18} color={iconColor} />
       <Text
-        style={{ fontSize: 16, color: "grey", marginLeft: 5, paddingBottom: 2 }}
+        style={{
+          fontSize: 16,
+          fontWeight: "bold",
+          color: Colors.light.counterFontColor,
+          marginLeft: 5,
+          paddingBottom: 2,
+        }}
       >
         {text}
       </Text>

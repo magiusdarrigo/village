@@ -7,65 +7,65 @@ export const getTop10CommentsFromPostQuery = (
   lastCommentID: number
 ) => {
   return Prisma.sql`
-    WITH TopComments AS (
-      SELECT 
-          c.id,
-          c.post_id,
-          c.user_id,
-          c.text_content,
-          c.likes_count,
-          c.created_at,
-          c.tags,
-          c.parent_comment_id,
-          u.username,
-          u.image AS profile_image,
-          CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user,
-          CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
-      FROM 
-          comments c
-      LEFT JOIN
-          comment_likes cl ON c.id = cl.comment_id AND cl.user_id = ${userID}
-      LEFT JOIN
-          users u ON c.user_id = u.id
-      WHERE 
-          c.post_id = ${postID} AND 
-          c.parent_comment_id IS NULL AND
-          (c.likes_count, c.id) < (${lastLikesCount}, ${lastCommentID})
-      ORDER BY 
-          c.likes_count DESC, c.id DESC
-      LIMIT 10
+  WITH TopComments AS (
+    SELECT 
+        c.id,
+        c.post_id,
+        c.user_id,
+        c.text_content,
+        c.likes_count,
+        c.created_at,
+        c.tags,
+        c.parent_comment_id,
+        u.username,
+        u.image AS profile_image,
+        CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
+        CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user,
+        1 AS is_top_comment -- Add a marker to indicate a top comment
+    FROM 
+        comments c
+    LEFT JOIN
+        comment_likes cl ON c.id = cl.comment_id AND cl.user_id = ${userID}
+    LEFT JOIN
+        users u ON c.user_id = u.id
+    WHERE 
+        c.post_id = ${postID} AND 
+        c.parent_comment_id IS NULL AND
+        (c.likes_count, c.id) < (${lastLikesCount}, ${lastCommentID})
+    ORDER BY 
+        c.likes_count DESC, c.id DESC
+    LIMIT 10
+  ), Replies AS (
+    SELECT 
+        r.id,
+        r.post_id,
+        r.user_id,
+        r.text_content,
+        r.likes_count,
+        r.created_at,
+        r.tags,
+        r.parent_comment_id,
+        u.username,
+        u.image AS profile_image,
+        CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
+        CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user,
+        0 AS is_top_comment -- Add a marker to indicate a reply
+    FROM 
+        comments r
+    LEFT JOIN
+        comment_likes cl ON r.id = cl.comment_id AND cl.user_id = ${userID}
+    LEFT JOIN
+        users u ON r.user_id = u.id
+    WHERE 
+        r.parent_comment_id IN (SELECT id FROM TopComments)
+    ORDER BY 
+        r.created_at ASC
   )
   
-  SELECT 
-      * 
-  FROM 
-      TopComments
-  
+  SELECT * FROM TopComments
   UNION ALL
-  
-  SELECT 
-      r.id,
-      r.post_id,
-      r.user_id,
-      r.text_content,
-      r.likes_count,
-      r.created_at,
-      r.tags,
-      r.parent_comment_id,
-      u.username,
-      u.image AS profile_image,
-      CASE WHEN cl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user,
-      CASE WHEN cl.id IS NOT NULL AND cl.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
-  FROM 
-      comments r
-  LEFT JOIN
-      comment_likes cl ON r.id = cl.comment_id AND cl.user_id = ${userID}
-  LEFT JOIN
-      users u ON r.user_id = u.id
-  WHERE 
-      r.parent_comment_id IN (SELECT id FROM TopComments)
-
-  ORDER BY likes_count ASC, id DESC;
+  SELECT * FROM Replies
+  ORDER BY is_top_comment DESC, likes_count DESC, id DESC;
   `;
 };
 

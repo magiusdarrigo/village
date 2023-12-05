@@ -15,6 +15,7 @@ import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { STREAM_CHAT_API_KEY } from "../lib/api/config";
 import messaging from "@react-native-firebase/messaging";
 import { isIOSSimulator } from "../lib/helpers";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import * as Sentry from "sentry-expo";
 
 const queryClient = new QueryClient();
@@ -95,45 +96,47 @@ function RootLayoutNav() {
           <TweetsApiContextProvider>
             <QueryClientProvider client={queryClient}>
               <ThemeProvider value={DefaultTheme}>
-                <Stack>
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="profile/[id]"
-                    options={{ presentation: "modal" }}
-                  />
-                  <Stack.Screen name="tweet/[id]" options={{ title: "Post" }} />
-                  <Stack.Screen
-                    name="new-tweet"
-                    options={{ title: "New Post", headerShown: true }}
-                  />
-                  <Stack.Screen
-                    name="(auth)/signIn"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(auth)/authenticate"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(auth)/createProfile"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(auth)/pickBuilding"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(auth)/pickNeighborhood"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(auth)/showNeighborhood"
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
+                <ActionSheetProvider>
+                  <Stack>
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen name="profile/[id]" options={{}} />
+                    <Stack.Screen
+                      name="tweet/[id]"
+                      options={{ title: "Post" }}
+                    />
+                    <Stack.Screen
+                      name="new-tweet"
+                      options={{ title: "New Post", headerShown: true }}
+                    />
+                    <Stack.Screen
+                      name="(auth)/signIn"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)/authenticate"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)/createProfile"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)/pickBuilding"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)/pickNeighborhood"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)/showNeighborhood"
+                      options={{ headerShown: false }}
+                    />
+                  </Stack>
+                </ActionSheetProvider>
               </ThemeProvider>
             </QueryClientProvider>
           </TweetsApiContextProvider>
