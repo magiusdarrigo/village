@@ -7,6 +7,7 @@ import { usernameAllowed } from "../../utils/badwords";
 import { getUserProfileQuery } from "../../sql_queries/users";
 import streamChatClient from "../../clients/streamChatClient";
 import { upload } from "../../middleware/upload";
+import { MAX_INT4_VALUE } from "../../utils/constants";
 import {
   uploadImageToSupabase,
   convertFileIfNecessary,
@@ -274,7 +275,7 @@ router.get("/:id/posts", async (req, res) => {
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const currentUserID = currentUser.id;
   const userID = getNumberFromQuery(id);
-  const cursor = getNumberFromQuery(req.query.cursor) || 0;
+  const cursor = getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
 
   if (!userID) {
     return res.status(400).json({ error: "id is required" });
@@ -284,7 +285,7 @@ router.get("/:id/posts", async (req, res) => {
     const getPostsSqlQuery = getPostsByUserQuery(userID, currentUserID, cursor);
     const posts = (await prisma.$queryRaw(getPostsSqlQuery)) as any;
 
-    const nextCursor = posts.length < 10 ? undefined : cursor + 10;
+    const nextCursor = posts.length < 10 ? undefined : posts[9].id;
 
     res.json({ data: posts, nextCursor });
   } catch (error) {

@@ -88,7 +88,6 @@ const FeedScreen = () => {
     queryKey: ["infinitetweets"],
     queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
     getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
-    getPreviousPageParam: (firstPage, _) => firstPage.prevCursor,
   });
 
   const onRefresh = async () => {
