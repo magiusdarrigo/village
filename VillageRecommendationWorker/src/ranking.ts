@@ -1,5 +1,3 @@
-import { Database } from "./types/supabase";
-
 type Post = {
   id: number;
   created_at: string;

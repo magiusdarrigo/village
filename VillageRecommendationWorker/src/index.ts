@@ -1,12 +1,13 @@
-import supabaseClient from "./postgresClient";
+import supabaseClient from "./supabaseClient";
+import redisClient from "./redisClient";
 import { rankPosts } from "./ranking";
 
-async function fetchLikesCount() {
+const storePostsRankingsForNeighborhood = async (neighborhoodID: number) => {
   // get the 1000 newest posts from the neighborhood
   const { data: posts, error } = await supabaseClient
     .from("posts")
     .select("id,created_at,likes_count,comments_count")
-    .eq("neighborhood_id", 6)
+    .eq("neighborhood_id", neighborhoodID)
     .order("created_at", { ascending: false })
     .limit(1000);
 
@@ -17,6 +18,54 @@ async function fetchLikesCount() {
 
   // sort the posts by the ranking algorithm
   const rankedPostIDs = rankPosts(posts);
-}
 
-fetchLikesCount();
+  // store the sorted post IDs in Redis
+  const timestamp = Date.now();
+  const key = `neighborhood:${neighborhoodID}:${timestamp}`;
+  const value = JSON.stringify(rankedPostIDs);
+
+  redisClient.set(key, value, {
+    EX: 7200, // 2 hours
+  });
+
+  redisClient.zAdd(`neighborhood_index:${neighborhoodID}`, [
+    { score: timestamp, value: key },
+  ]);
+
+  // let's return the key used and the number of posts ranked
+  return { key, count: rankedPostIDs.length };
+};
+
+const getAllNeighborhoods = async () => {
+  const { data: neighborhoods, error } = await supabaseClient
+    .from("neighborhoods")
+    .select("id");
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return;
+  }
+
+  return neighborhoods;
+};
+
+const main = async () => {
+  const neighborhoods = await getAllNeighborhoods();
+  if (!neighborhoods) {
+    throw new Error("No neighborhoods found");
+  }
+  for (const neighborhood of neighborhoods) {
+    const result = await storePostsRankingsForNeighborhood(neighborhood.id);
+    if (!result) {
+      console.log(`error storing rankings for neighborhood ${neighborhood.id}`);
+      continue;
+    }
+    const { key, count } = result;
+    console.log(
+      `stored ${count} rankings for neighborhood: ${neighborhood.id}, under the key: ${key}`
+    );
+  }
+  // End the Redis connection
+  await redisClient.quit();
+};
+main();
