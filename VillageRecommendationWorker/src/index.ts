@@ -50,6 +50,9 @@ const getAllNeighborhoods = async () => {
 };
 
 const main = async () => {
+  // Start the Redis connection
+  await redisClient.connect();
+
   const neighborhoods = await getAllNeighborhoods();
   if (!neighborhoods) {
     throw new Error("No neighborhoods found");
