@@ -38,7 +38,7 @@ const storePostsRankingsForNeighborhood = async (
   // let's purge the sorted set of old keys
   await redisClient.zRemRangeByScore(
     `neighborhood_index:${neighborhoodID}`,
-    "-inf",
+    0,
     timestamp - 7200 * 1000 // 2 hours ago in milliseconds
   );
 
