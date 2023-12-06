@@ -27,14 +27,20 @@ const storePostsRankingsForNeighborhood = async (
   const timestamp = Date.now();
   const key = `neighborhood:${neighborhoodID}:${timestamp}`;
   const value = JSON.stringify(rankedPostIDs);
-
+  // store the key for 2 hours
   await redisClient.set(key, value, {
     EX: 7200, // 2 hours
   });
-
+  // add the key to the sorted set
   await redisClient.zAdd(`neighborhood_index:${neighborhoodID}`, [
     { score: timestamp, value: key },
   ]);
+  // let's purge the sorted set of old keys
+  await redisClient.zRemRangeByScore(
+    `neighborhood_index:${neighborhoodID}`,
+    "-inf",
+    timestamp - 7200 * 1000 // 2 hours ago in milliseconds
+  );
 
   // let's return the key used and the number of posts ranked
   return { key, count: rankedPostIDs.length };
