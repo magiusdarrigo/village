@@ -24,11 +24,11 @@ const storePostsRankingsForNeighborhood = async (neighborhoodID: number) => {
   const key = `neighborhood:${neighborhoodID}:${timestamp}`;
   const value = JSON.stringify(rankedPostIDs);
 
-  redisClient.set(key, value, {
+  await redisClient.set(key, value, {
     EX: 7200, // 2 hours
   });
 
-  redisClient.zAdd(`neighborhood_index:${neighborhoodID}`, [
+  await redisClient.zAdd(`neighborhood_index:${neighborhoodID}`, [
     { score: timestamp, value: key },
   ]);
 
