@@ -1,8 +1,12 @@
 import supabaseClient from "./supabaseClient";
-import redisClient from "./redisClient";
+import createRedisClient from "./redisClient";
 import { rankPosts } from "./ranking";
+import { RedisClientType } from "redis";
 
-const storePostsRankingsForNeighborhood = async (neighborhoodID: number) => {
+const storePostsRankingsForNeighborhood = async (
+  redisClient: RedisClientType<any, any, any>,
+  neighborhoodID: number
+) => {
   // get the 1000 newest posts from the neighborhood
   const { data: posts, error } = await supabaseClient
     .from("posts")
@@ -51,14 +55,17 @@ const getAllNeighborhoods = async () => {
 
 const main = async () => {
   // Start the Redis connection
-  await redisClient.connect();
+  const redisClient = await createRedisClient();
 
   const neighborhoods = await getAllNeighborhoods();
   if (!neighborhoods) {
     throw new Error("No neighborhoods found");
   }
   for (const neighborhood of neighborhoods) {
-    const result = await storePostsRankingsForNeighborhood(neighborhood.id);
+    const result = await storePostsRankingsForNeighborhood(
+      redisClient,
+      neighborhood.id
+    );
     if (!result) {
       console.log(`error storing rankings for neighborhood ${neighborhood.id}`);
       continue;
