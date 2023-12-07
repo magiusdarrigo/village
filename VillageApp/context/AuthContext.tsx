@@ -57,10 +57,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    // console.log("segments: ", segments);
-    // console.log("has authToken: ", !!authToken);
-    // console.log("has user: ", !!user);
-
+    console.log("authToken", authToken);
     if (authToken && !user) {
       const getCurrentUser = async () => {
         try {

@@ -1,5 +1,33 @@
 import { Prisma } from "@prisma/client";
 
+export const getPostsByUserAndPostIdsQuery = (
+  userID: number,
+  postIds: number[] // array of post IDs
+) => {
+  // Convert array of post IDs into a comma-separated string
+  const postIdsString = postIds.join(", ");
+
+  return Prisma.sql`
+              SELECT 
+                  posts.*, 
+                  users.username, 
+                  users.image AS profile_image,
+                  CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS FALSE THEN TRUE ELSE FALSE END AS liked_by_user,
+                  CASE WHEN post_likes.id IS NOT NULL AND post_likes.is_dislike IS TRUE THEN TRUE ELSE FALSE END AS disliked_by_user
+              FROM 
+                  posts
+              INNER JOIN 
+                  users ON posts.user_id = users.id
+              LEFT JOIN 
+                  post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
+              WHERE 
+                  posts.id IN (${Prisma.raw(postIdsString)})
+              ORDER BY 
+                  posts.id DESC
+              LIMIT 20;
+          `;
+};
+
 export const getPostsByUserAndNeighborhoodQuery = (
   userID: number,
   neighborhoodID: number,

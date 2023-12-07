@@ -1,9 +1,13 @@
 import { Router } from "express";
 import prisma from "../../clients/prismaClient";
-import { getPostsByUserAndNeighborhoodQuery } from "../../sql_queries/posts";
-import { getNumberFromQuery } from "../../utils/casting";
+import {
+  getPostsByUserAndNeighborhoodQuery,
+  getPostsByUserAndPostIdsQuery,
+} from "../../sql_queries/posts";
+import { getNumberFromQuery, getBooleanFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
 import { MAX_INT4_VALUE } from "../../utils/constants";
+import redisClient from "../../clients/redisClient";
 
 const router = Router();
 
@@ -15,21 +19,27 @@ const router = Router();
 router.get("/:id/posts", async (req, res) => {
   console.log("get posts by neighborhood id called, id: ", req.params.id);
   const { id } = req.params;
+  const { is_hot, cache_key } = req.query;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const neighborhoodID = getNumberFromQuery(id);
   const cursor = getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
+  const isHot = getBooleanFromQuery(is_hot);
+  const cacheKey = cache_key as string | undefined;
 
   if (!neighborhoodID) {
     return res.status(400).json({ error: "id is required" });
   }
 
   try {
-    const getPostsSqlQuery = getPostsByUserAndNeighborhoodQuery(
-      currentUser.id,
-      neighborhoodID,
-      cursor
-    );
-    const posts = (await prisma.$queryRaw(getPostsSqlQuery)) as any;
+    let sqlQuery = isHot
+      ? await getHotPostsSqlQuery(
+          currentUser.id,
+          neighborhoodID,
+          cursor,
+          cacheKey
+        )
+      : getNewPostsSqlQuery(currentUser.id, neighborhoodID, cursor);
+    const posts = (await prisma.$queryRaw(sqlQuery)) as any;
 
     const nextCursor = posts.length < 20 ? undefined : posts[19].id;
 
@@ -41,5 +51,57 @@ router.get("/:id/posts", async (req, res) => {
     });
   }
 });
+
+// get the sql query for getting hot posts (with pagination)
+const getHotPostsSqlQuery = async (
+  userID: number,
+  neighborhoodID: number,
+  cursor: number,
+  cacheKey: string | undefined
+) => {
+  let key = cacheKey;
+  if (!cacheKey || !cursor) {
+    // if cursor is MAX_INT4_VALUE, then we need to get the latest key in the redis sorted set
+    const newestKeys = await redisClient.zRange(
+      `neighborhood_index:${neighborhoodID}`,
+      0,
+      0,
+      {
+        REV: true,
+      }
+    );
+
+    key = newestKeys.length > 0 ? newestKeys[0] : undefined;
+  }
+
+  if (!key) {
+    console.log("NO KEY FOUND: FALLING BACK TO NEW POSTS");
+    return getNewPostsSqlQuery(userID, neighborhoodID, cursor);
+  }
+
+  const postIDs = await redisClient.get(key);
+  if (!postIDs) {
+    console.log("NO POST IDS FOUND: FALLING BACK TO NEW POSTS");
+    return getNewPostsSqlQuery(userID, neighborhoodID, cursor);
+  }
+
+  const parsedPostIDs = JSON.parse(postIDs) as number[];
+  console.log("parsedPostIDs: ", parsedPostIDs);
+  // get the post ids that are greater than the cursor. Limit it to 20
+  const postIDsToGet = parsedPostIDs
+    .filter((postID) => postID < cursor)
+    .slice(0, 20);
+
+  return getPostsByUserAndPostIdsQuery(userID, postIDsToGet);
+};
+
+// get the sql query for getting new posts (with pagination)
+const getNewPostsSqlQuery = (
+  userID: number,
+  neighborhoodID: number,
+  cursor: number
+) => {
+  return getPostsByUserAndNeighborhoodQuery(userID, neighborhoodID, cursor);
+};
 
 export default router;
