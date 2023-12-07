@@ -36,7 +36,7 @@ interface TweetsApiContextType {
     lastCommentID: string
   ) => Promise<any>;
   listTweetsForProfile: (userID: number, page: number) => Promise<any>;
-  listTweets: (page: number) => Promise<any>;
+  listTweets: (page: number, isHot: boolean) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
     neighborhoodID: number;
@@ -487,11 +487,12 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const listTweets = async (page: number) => {
+  const listTweets = async (page: number, isHot: boolean) => {
     if (!authToken) {
       return {};
     }
-    const url = `${API_URL}/v1/neighborhoods/${user?.neighborhood_id}/posts?cursor=${page}`;
+    console.log("isHot", isHot);
+    const url = `${API_URL}/v1/neighborhoods/${user?.neighborhood_id}/posts?cursor=${page}&is_hot=${isHot}`;
 
     const res = await fetch(url, {
       headers: {
