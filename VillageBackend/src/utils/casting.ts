@@ -4,3 +4,11 @@ export function getNumberFromQuery(queryParam: any): number | null {
   }
   return null;
 }
+
+export function getBooleanFromQuery(queryParam: any): boolean {
+  if (typeof queryParam === "string") {
+    return queryParam === "true";
+  }
+  // default to false
+  return false;
+}

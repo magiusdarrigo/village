@@ -16,7 +16,7 @@ import { useUser } from "../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DynaPuffText } from "../../components/StyledText";
 import postStyles from "../../lib/styles/post";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FeedSwitch from "../../components/FeedSwitch";
 import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker";
 
@@ -29,6 +29,14 @@ const FeedScreen = () => {
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await refetch();
+    };
+
+    fetchData();
+  }, [isHot]);
 
   const fadeIn = () => {
     setSwitchIsVisible(true);
@@ -76,6 +84,14 @@ const FeedScreen = () => {
     }
   );
 
+  const usePostsInfiniteQuery = (isHot: boolean) => {
+    return useInfiniteQuery({
+      queryKey: ["infinitetweets", isHot],
+      queryFn: async ({ pageParam = 0 }) => listTweets(pageParam, isHot),
+      getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
+    });
+  };
+
   const {
     data,
     isFetching,
@@ -84,11 +100,7 @@ const FeedScreen = () => {
     isFetchingNextPage,
     hasNextPage,
     refetch,
-  } = useInfiniteQuery({
-    queryKey: ["infinitetweets"],
-    queryFn: async ({ pageParam = 0 }) => listTweets(pageParam),
-    getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
-  });
+  } = usePostsInfiniteQuery(isHot);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -99,10 +111,6 @@ const FeedScreen = () => {
   const handleLoadMore = () => {
     if (hasNextPage) fetchNextPage();
   };
-
-  if (isFetching && !isFetchingNextPage) {
-    return <ActivityIndicator />;
-  }
 
   if (error) {
     return <Text>Couldn't Load Posts!</Text>;
