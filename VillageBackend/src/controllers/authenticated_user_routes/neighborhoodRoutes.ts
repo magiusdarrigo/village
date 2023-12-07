@@ -13,7 +13,6 @@ const router = Router();
 
 /**
  * get posts by neighborhood id
- * order by createdAt descending
  * paginate by 20 for infinite scroll on the frontend
  */
 router.get("/:id/posts", async (req, res) => {
@@ -31,17 +30,9 @@ router.get("/:id/posts", async (req, res) => {
   }
 
   try {
-    let sqlQuery = isHot
-      ? await getHotPostsSqlQuery(
-          currentUser.id,
-          neighborhoodID,
-          cursor,
-          cacheKey
-        )
-      : getNewPostsSqlQuery(currentUser.id, neighborhoodID, cursor);
-    const posts = (await prisma.$queryRaw(sqlQuery)) as any;
-
-    const nextCursor = posts.length < 20 ? undefined : posts[19].id;
+    const { posts, nextCursor } = isHot
+      ? await getHotPosts(currentUser.id, neighborhoodID, cursor, cacheKey)
+      : await getNewPosts(currentUser.id, neighborhoodID, cursor);
 
     res.json({ data: posts, nextCursor });
   } catch (error) {
@@ -52,8 +43,7 @@ router.get("/:id/posts", async (req, res) => {
   }
 });
 
-// get the sql query for getting hot posts (with pagination)
-const getHotPostsSqlQuery = async (
+const getHotPosts = async (
   userID: number,
   neighborhoodID: number,
   cursor: number,
@@ -75,33 +65,42 @@ const getHotPostsSqlQuery = async (
   }
 
   if (!key) {
-    console.log("NO KEY FOUND: FALLING BACK TO NEW POSTS");
-    return getNewPostsSqlQuery(userID, neighborhoodID, cursor);
+    throw new Error("No key found");
   }
 
   const postIDs = await redisClient.get(key);
   if (!postIDs) {
-    console.log("NO POST IDS FOUND: FALLING BACK TO NEW POSTS");
-    return getNewPostsSqlQuery(userID, neighborhoodID, cursor);
+    throw new Error("No post ids found");
   }
 
   const parsedPostIDs = JSON.parse(postIDs) as number[];
-  console.log("parsedPostIDs: ", parsedPostIDs);
   // get the post ids that are greater than the cursor. Limit it to 20
   const postIDsToGet = parsedPostIDs
     .filter((postID) => postID < cursor)
     .slice(0, 20);
 
-  return getPostsByUserAndPostIdsQuery(userID, postIDsToGet);
+  const sqlQuery = getPostsByUserAndPostIdsQuery(userID, postIDsToGet);
+  const posts = (await prisma.$queryRaw(sqlQuery)) as any;
+  const nextCursor = posts.length < 20 ? undefined : posts[19].id;
+  const sortedPosts = postIDsToGet
+    .map((id) => posts.find((post: any) => post.id === id))
+    .filter((post) => post !== undefined);
+  return { posts: sortedPosts, nextCursor };
 };
 
-// get the sql query for getting new posts (with pagination)
-const getNewPostsSqlQuery = (
+const getNewPosts = async (
   userID: number,
   neighborhoodID: number,
   cursor: number
 ) => {
-  return getPostsByUserAndNeighborhoodQuery(userID, neighborhoodID, cursor);
+  const sqlQuery = getPostsByUserAndNeighborhoodQuery(
+    userID,
+    neighborhoodID,
+    cursor
+  );
+  const posts = (await prisma.$queryRaw(sqlQuery)) as any;
+  const nextCursor = posts.length < 20 ? undefined : posts[19].id;
+  return { posts, nextCursor };
 };
 
 export default router;

@@ -11,14 +11,13 @@ type FeedSwitchProps = {
 };
 
 const FeedSwitch = ({ isHot, setIsHot }: FeedSwitchProps) => {
-  const [activeIndex, setActiveIndex] = useState(0);
   const updateIndex = () => {
-    if (activeIndex === 0) {
+    if (isHot) {
       slideRight();
-      setActiveIndex(1);
+      setIsHot(false);
     } else {
       slideLeft();
-      setActiveIndex(0);
+      setIsHot(true);
     }
   };
 
