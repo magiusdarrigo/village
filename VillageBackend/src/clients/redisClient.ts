@@ -8,8 +8,6 @@ if (!redisUrl) {
 
 let redisClient: RedisClientType<any, any, any>;
 
-// sleep for 5 seconds for DNS resolver? idk bruh
-
 redisClient = createClient({
   url: redisUrl,
 })
