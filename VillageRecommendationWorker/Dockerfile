@@ -27,4 +27,4 @@ RUN npm run build
 EXPOSE 3001
 
 # Define the command to run your app using the compiled JavaScript files
-CMD [ "node", "dist/index.js" ]
+CMD ["sh", "-c", "sleep 5 && node dist/index.js"]
