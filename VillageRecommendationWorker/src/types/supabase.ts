@@ -260,6 +260,74 @@ export interface Database {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          for_comment_id: number | null
+          for_post_id: number | null
+          for_user_id: number
+          from_user_id: number | null
+          id: number
+          message: string
+          read: boolean
+          tags: Json | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          for_comment_id?: number | null
+          for_post_id?: number | null
+          for_user_id: number
+          from_user_id?: number | null
+          id?: number
+          message: string
+          read?: boolean
+          tags?: Json | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          for_comment_id?: number | null
+          for_post_id?: number | null
+          for_user_id?: number
+          from_user_id?: number | null
+          id?: number
+          message?: string
+          read?: boolean
+          tags?: Json | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_for_comment_id_fkey"
+            columns: ["for_comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_for_post_id_fkey"
+            columns: ["for_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_for_user_id_fkey"
+            columns: ["for_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_from_user_id_fkey"
+            columns: ["from_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       post_likes: {
         Row: {
           id: number

@@ -79,6 +79,10 @@ const getHotPosts = async (
     .filter((postID) => postID < cursor)
     .slice(0, 20);
 
+  if (postIDsToGet.length === 0) {
+    return { posts: [], nextCursor: undefined };
+  }
+
   const sqlQuery = getPostsByUserAndPostIdsQuery(userID, postIDsToGet);
   const posts = (await prisma.$queryRaw(sqlQuery)) as any;
   const nextCursor = posts.length < 20 ? undefined : posts[19].id;
