@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 8,
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "600",
     marginRight: 10,
     color: Colors.light.switchFontColor,
     fontStyle: "italic",
