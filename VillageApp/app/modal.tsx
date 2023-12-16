@@ -19,6 +19,7 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
+import EmptyListView from "../components/EmptyListView";
 import { useUser } from "../context/UserContext";
 import { useAuth } from "../context/AuthContext";
 import { handleChooseCustomImage } from "../lib/helpers";
@@ -26,8 +27,6 @@ import { MaterialCommunityIcon } from "../components/Icons";
 import * as Sentry from "sentry-expo";
 import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../lib/api/pagination";
 import Tweet from "../components/Tweet";
-import { DynaPuffText } from "../components/StyledText";
-import postStyles from "../lib/styles/post";
 import Colors from "../constants/Colors";
 
 type ProfileProps = {
@@ -44,7 +43,6 @@ const ModalScreen = ({ user }: ProfileProps) => {
   } = useTweetsApi();
   const { user: currentUser, getStreamChatClient, updateUser } = useUser();
   const { removeAuthToken } = useAuth();
-  const streamChatClient = getStreamChatClient();
   const [profileEditLoading, setProfileEditLoading] = React.useState(false);
   const flatListRef = useRef<FlatList>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -193,14 +191,6 @@ const ModalScreen = ({ user }: ProfileProps) => {
     setIsEditingProfile(false);
   };
 
-  const renderEmptyListComponent = () => (
-    <View style={postStyles.emptyPostsContainer}>
-      <DynaPuffText style={postStyles.emptyPostsContainerText}>
-        No posts yet.
-      </DynaPuffText>
-    </View>
-  );
-
   return (
     <ScrollView
       style={styles.container}
@@ -301,7 +291,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          ListEmptyComponent={renderEmptyListComponent}
+          ListEmptyComponent={() => EmptyListView("No posts yet.")}
           contentContainerStyle={{ flexGrow: 1 }}
           scrollEnabled={false}
         />
