@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginRight: 10,
     color: Colors.light.switchFontColor,
-    fontStyle: "italic",
   },
   userImage: {
     width: 50,
