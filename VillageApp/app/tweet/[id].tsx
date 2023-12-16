@@ -30,6 +30,7 @@ import postStyles from "../../lib/styles/post";
 import { ScrollView } from "react-native-gesture-handler";
 import Colors from "../../constants/Colors";
 import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../../lib/api/pagination";
+import { useUser } from "../../context/UserContext";
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -37,6 +38,7 @@ const TweetScreen = () => {
   const queryClient = useQueryClient();
   const inputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
+  const { isFeedHot } = useUser();
 
   const [commentText, setCommentText] = useState("");
   const [selectedCommentID, setSelectedCommentID] = useState<
@@ -118,7 +120,7 @@ const TweetScreen = () => {
         };
       });
       // update the tweet list cache with a +1 total comments count for the tweet
-      queryClient.setQueryData(["infinitetweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
         if (!old) return;
         return {
           ...old,

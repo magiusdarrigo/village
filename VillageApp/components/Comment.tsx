@@ -27,7 +27,7 @@ const Comment = ({
   isSelected,
   index,
 }: CommentProps) => {
-  const { user } = useUser();
+  const { user, isFeedHot } = useUser();
   const { reportComment, deleteComment, likeComment, unlikeComment } =
     useTweetsApi();
   const queryClient = useQueryClient();
@@ -231,7 +231,7 @@ const Comment = ({
         }
       );
       // update the tweet list cache with a +1 total comments count for the tweet
-      queryClient.setQueryData(["infinitetweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
         if (!old) return;
         return {
           ...old,

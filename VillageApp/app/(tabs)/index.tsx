@@ -23,9 +23,8 @@ import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker"
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
-  const [isHot, setIsHot] = useState(true);
   const [lastScrollPos, setLastScrollPos] = useState(0);
-  const { flatListRef } = useUser();
+  const { flatListRef, isFeedHot, updateIsFeedHot } = useUser();
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
@@ -36,7 +35,7 @@ const FeedScreen = () => {
     };
 
     fetchData();
-  }, [isHot]);
+  }, [isFeedHot]);
 
   const fadeIn = () => {
     setSwitchIsVisible(true);
@@ -100,7 +99,7 @@ const FeedScreen = () => {
     isFetchingNextPage,
     hasNextPage,
     refetch,
-  } = usePostsInfiniteQuery(isHot);
+  } = usePostsInfiniteQuery(isFeedHot);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -175,7 +174,7 @@ const FeedScreen = () => {
           },
         ]}
       >
-        <FeedSwitch isHot={isHot} setIsHot={setIsHot} />
+        <FeedSwitch isHot={isFeedHot} setIsHot={updateIsFeedHot} />
       </Animated.View>
       <Animated.View
         style={[

@@ -44,7 +44,6 @@ const ModalScreen = ({ user }: ProfileProps) => {
   } = useTweetsApi();
   const { user: currentUser, getStreamChatClient, updateUser } = useUser();
   const { removeAuthToken } = useAuth();
-  const streamChatClient = getStreamChatClient();
   const [profileEditLoading, setProfileEditLoading] = React.useState(false);
   const flatListRef = useRef<FlatList>(null);
   const [refreshing, setRefreshing] = useState(false);
