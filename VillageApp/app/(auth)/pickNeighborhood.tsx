@@ -28,7 +28,7 @@ const PickNeighborhood = () => {
     "Little Italy",
     "Lower East Side",
     "Midtown",
-    "Midtown East",
+    "Murray Hill",
     "Nolita",
     "SoHo",
     "Tribeca",

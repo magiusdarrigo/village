@@ -217,4 +217,6 @@ model notifications {
   read           Boolean   @default(false)
   created_at     DateTime  @default(now())
   tags           Json?
+
+  @@index([for_user_id, created_at], name: "idx_notification_for_user_created_at")
 }
