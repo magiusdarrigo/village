@@ -491,7 +491,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     if (!authToken) {
       return {};
     }
-    console.log("isHot", isHot);
     const url = `${API_URL}/v1/neighborhoods/${user?.neighborhood_id}/posts?cursor=${page}&is_hot=${isHot}`;
 
     const res = await fetch(url, {
