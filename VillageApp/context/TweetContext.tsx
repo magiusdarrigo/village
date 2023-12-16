@@ -37,6 +37,7 @@ interface TweetsApiContextType {
   ) => Promise<any>;
   listTweetsForProfile: (userID: number, page: number) => Promise<any>;
   listTweets: (page: number, isHot: boolean) => Promise<any>;
+  listNotifications: (page: number) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
     neighborhoodID: number;
@@ -74,6 +75,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   listComments: async () => {},
   listTweetsForProfile: async () => {},
   listTweets: async () => {},
+  listNotifications: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
   updateUserAttributes: async () => {},
@@ -491,7 +493,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     if (!authToken) {
       return {};
     }
-    console.log("isHot", isHot);
     const url = `${API_URL}/v1/neighborhoods/${user?.neighborhood_id}/posts?cursor=${page}&is_hot=${isHot}`;
 
     const res = await fetch(url, {
@@ -507,6 +508,32 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (res.status !== 200) {
       throw new Error("Error fetching posts");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const listNotifications = async (page: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${user?.id}/notifications?cursor=${page}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error fetching notifications");
     }
 
     const body = await res.json();
@@ -793,6 +820,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         listComments,
         listTweetsForProfile,
         listTweets,
+        listNotifications,
         getTweet,
         createTweet,
         updateUserAttributes,

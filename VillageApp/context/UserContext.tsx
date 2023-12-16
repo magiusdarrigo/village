@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  PropsWithChildren,
-  useRef,
-} from "react";
+import React, { createContext, useContext, useState, useRef } from "react";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { FlatList } from "react-native";
 import notifee from "@notifee/react-native";
@@ -42,6 +36,8 @@ interface UserContextType {
   scrollToTop: () => void;
   updateChannel: (channel: ChannelType) => void;
   channel: ChannelType | null;
+  isFeedHot: boolean;
+  updateIsFeedHot: (isHot: boolean) => void;
 }
 
 interface UserContextProviderProps {
@@ -57,9 +53,14 @@ const UserContextProvider = ({
   streamChatClient,
 }: UserContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isFeedHot, setIsFeedHot] = useState(true);
   const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
   const flatListRef = useRef<FlatList>(null);
   const [channel, setChannel] = useState<ChannelType | null>(null);
+
+  const updateIsFeedHot = (isHot: boolean) => {
+    setIsFeedHot(isHot);
+  };
 
   const updateUser = (newUser: User) => {
     setUser(newUser);
@@ -100,6 +101,8 @@ const UserContextProvider = ({
         scrollToTop,
         updateChannel,
         channel,
+        isFeedHot,
+        updateIsFeedHot,
       }}
     >
       {children}

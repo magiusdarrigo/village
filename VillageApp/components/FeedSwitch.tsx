@@ -7,7 +7,7 @@ let componentWidth = 100;
 
 type FeedSwitchProps = {
   isHot: boolean;
-  setIsHot: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsHot: (isHot: boolean) => void;
 };
 
 const FeedSwitch = ({ isHot, setIsHot }: FeedSwitchProps) => {

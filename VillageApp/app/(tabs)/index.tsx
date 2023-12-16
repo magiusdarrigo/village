@@ -14,8 +14,8 @@ import { Link } from "expo-router";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useUser } from "../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { DynaPuffText } from "../../components/StyledText";
-import postStyles from "../../lib/styles/post";
+import EmptyListView from "../../components/EmptyListView";
+import pageStyles from "../../lib/styles/page";
 import { useEffect, useRef, useState } from "react";
 import FeedSwitch from "../../components/FeedSwitch";
 import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker";
@@ -23,9 +23,8 @@ import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker"
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
-  const [isHot, setIsHot] = useState(true);
   const [lastScrollPos, setLastScrollPos] = useState(0);
-  const { flatListRef } = useUser();
+  const { flatListRef, isFeedHot, updateIsFeedHot } = useUser();
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
@@ -36,7 +35,7 @@ const FeedScreen = () => {
     };
 
     fetchData();
-  }, [isHot]);
+  }, [isFeedHot]);
 
   const fadeIn = () => {
     setSwitchIsVisible(true);
@@ -100,7 +99,7 @@ const FeedScreen = () => {
     isFetchingNextPage,
     hasNextPage,
     refetch,
-  } = usePostsInfiniteQuery(isHot);
+  } = usePostsInfiniteQuery(isFeedHot);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -133,16 +132,8 @@ const FeedScreen = () => {
     return false;
   });
 
-  const renderEmptyListComponent = () => (
-    <View style={postStyles.emptyPostsContainer}>
-      <DynaPuffText style={postStyles.emptyPostsContainerText}>
-        Post something that’s on your mind.
-      </DynaPuffText>
-    </View>
-  );
-
   return (
-    <View style={styles.page}>
+    <View style={pageStyles.page}>
       {/* <NeighborhoodScrollPicker /> */}
       <FlatList
         showsVerticalScrollIndicator={false}
@@ -164,7 +155,9 @@ const FeedScreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        ListEmptyComponent={renderEmptyListComponent}
+        ListEmptyComponent={() =>
+          EmptyListView("Post something that’s on your mind.")
+        }
         contentContainerStyle={{ flexGrow: 1 }}
       />
       <Animated.View
@@ -175,7 +168,7 @@ const FeedScreen = () => {
           },
         ]}
       >
-        <FeedSwitch isHot={isHot} setIsHot={setIsHot} />
+        <FeedSwitch isHot={isFeedHot} setIsHot={updateIsFeedHot} />
       </Animated.View>
       <Animated.View
         style={[
@@ -195,10 +188,6 @@ const FeedScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: "white",
-  },
   floatingButton: {
     backgroundColor: "black",
     position: "absolute",

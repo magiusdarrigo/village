@@ -5,6 +5,7 @@ import { getNumberFromQuery } from "../../utils/casting";
 import { AuthenticatedRequest } from "../../middleware/auth";
 import { usernameAllowed } from "../../utils/badwords";
 import { getUserProfileQuery } from "../../sql_queries/users";
+import { getNotificationsByUserQuery } from "../../sql_queries/notifications";
 import streamChatClient from "../../clients/streamChatClient";
 import { upload } from "../../middleware/upload";
 import { MAX_INT4_VALUE } from "../../utils/constants";
@@ -204,6 +205,7 @@ router.delete("/:id/follow", async (req, res) => {
 
 // get one user
 router.get("/:id", async (req, res) => {
+  console.log("get user called, by id: ", req.params.id);
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
@@ -292,6 +294,48 @@ router.get("/:id/posts", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: "error fetching posts for profile",
+    });
+  }
+});
+
+/**
+ * get notifications for user
+ * order by createdAt descending
+ * paginate by 10 for infinite scroll on the frontend
+ */
+router.get("/:id/notifications", async (req, res) => {
+  console.log("get notifications by user id called, id: ", req.params.id);
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const currentUserID = currentUser.id;
+  const userID = getNumberFromQuery(id);
+  const cursor = getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
+
+  if (!userID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
+  if (currentUserID !== userID) {
+    return res.status(401).json({ error: "unauthorized" });
+  }
+
+  try {
+    const getNotificationsSqlQuery = getNotificationsByUserQuery(
+      currentUserID,
+      cursor
+    );
+    const notifications = (await prisma.$queryRaw(
+      getNotificationsSqlQuery
+    )) as any;
+
+    const nextCursor =
+      notifications.length < 10 ? undefined : notifications[9].id;
+
+    res.json({ data: notifications, nextCursor });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching notifications for user",
     });
   }
 });

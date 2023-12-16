@@ -27,7 +27,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
   const segments = useSegments();
-  const { user } = useUser();
+  const { user, isFeedHot } = useUser();
   if (!user) {
     Alert.alert("Something went wrong. Try again.");
     return null;
@@ -48,12 +48,15 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         // cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
-          queryClient.cancelQueries(["infinitetweets"]),
+          queryClient.cancelQueries(["infinitetweets", isFeedHot]),
           queryClient.cancelQueries(["profiletweets", String(tweet.user_id)]),
         ]);
 
         // snapshot the previous value
-        const previousTweets = queryClient.getQueryData(["infinitetweets"]);
+        const previousTweets = queryClient.getQueryData([
+          "infinitetweets",
+          isFeedHot,
+        ]);
         const previousTweet = queryClient.getQueryData([
           "tweets",
           String(tweet.id),
@@ -72,7 +75,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             likes_count: old?.likes_count + likeDelta,
           };
         });
-        queryClient.setQueryData(["infinitetweets"], (old: any) => {
+        queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
           if (!old) return;
           // Map over the pages
           return {
@@ -131,7 +134,10 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
 
         // revert to the previous value
         if (context?.previousTweets) {
-          queryClient.setQueryData(["infinitetweets"], context.previousTweets);
+          queryClient.setQueryData(
+            ["infinitetweets", isFeedHot],
+            context.previousTweets
+          );
         }
         if (context?.previousTweet) {
           queryClient.setQueryData(
@@ -158,12 +164,15 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         const likeDelta = isDislike ? -1 : 1;
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
-          queryClient.cancelQueries(["infinitetweets"]),
+          queryClient.cancelQueries(["infinitetweets", isFeedHot]),
           queryClient.cancelQueries(["profiletweets", String(tweet.user_id)]),
         ]);
 
         // snapshot the previous values
-        const previousTweets = queryClient.getQueryData(["infinitetweets"]);
+        const previousTweets = queryClient.getQueryData([
+          "infinitetweets",
+          isFeedHot,
+        ]);
         const previousTweet = queryClient.getQueryData([
           "tweets",
           String(tweet.id),
@@ -182,7 +191,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             likes_count: old?.likes_count - likeDelta,
           };
         });
-        queryClient.setQueryData(["infinitetweets"], (old: any) => {
+        queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
           if (!old) return;
           // Map over the pages
           return {
@@ -240,7 +249,10 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
         Alert.alert("We couldn't like this post. Try again.");
         // revert to the previous value
         if (context?.previousTweets) {
-          queryClient.setQueryData(["infinitetweets"], context.previousTweets);
+          queryClient.setQueryData(
+            ["infinitetweets", isFeedHot],
+            context.previousTweets
+          );
         }
         if (context?.previousTweet) {
           queryClient.setQueryData(
@@ -262,7 +274,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   const { mutate: mutateDelete } = useMutation(deleteTweet, {
     onSuccess: (data) => {
       // update the list of tweets in the cache
-      queryClient.setQueryData(["infinitetweets"], (old: any) => {
+      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
         if (!old) return;
         // Map over the pages
         return {
@@ -403,28 +415,9 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   };
 
   return (
-    <View
-      style={{
-        flexDirection: "column",
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderColor: "lightgrey",
-        backgroundColor: "white",
-      }}
-      onLayout={onLayout}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: "white",
-          flex: 1,
-        }}
-      >
-        <View
-          style={{
-            width: 60,
-            flexDirection: "column",
-          }}
-        >
+    <View style={postStyles.parentContainer} onLayout={onLayout}>
+      <View style={postStyles.imageParentContainer}>
+        <View style={postStyles.imageContainer}>
           <Link
             href={{
               pathname: `/profile/${tweet.user_id}`,
