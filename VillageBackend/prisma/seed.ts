@@ -20,7 +20,7 @@ async function main() {
     "Little Italy",
     "Lower East Side",
     "Midtown",
-    "Midtown East",
+    "Murray Hill",
     "Nolita",
     "SoHo",
     "Tribeca",
