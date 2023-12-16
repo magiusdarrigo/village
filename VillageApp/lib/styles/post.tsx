@@ -1,6 +1,21 @@
 import { StyleSheet } from "react-native";
 
 const postStyles = StyleSheet.create({
+  parentContainer: {
+    flexDirection: "column",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "lightgrey",
+    backgroundColor: "white",
+  },
+  imageParentContainer: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    flex: 1,
+  },
+  imageContainer: {
+    width: 60,
+    flexDirection: "column",
+  },
   username: {
     fontSize: 16,
     fontWeight: "bold",

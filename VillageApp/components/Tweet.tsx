@@ -415,28 +415,9 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   };
 
   return (
-    <View
-      style={{
-        flexDirection: "column",
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderColor: "lightgrey",
-        backgroundColor: "white",
-      }}
-      onLayout={onLayout}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: "white",
-          flex: 1,
-        }}
-      >
-        <View
-          style={{
-            width: 60,
-            flexDirection: "column",
-          }}
-        >
+    <View style={postStyles.parentContainer} onLayout={onLayout}>
+      <View style={postStyles.imageParentContainer}>
+        <View style={postStyles.imageContainer}>
           <Link
             href={{
               pathname: `/profile/${tweet.user_id}`,

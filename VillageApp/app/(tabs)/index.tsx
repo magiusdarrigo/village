@@ -14,8 +14,8 @@ import { Link } from "expo-router";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useUser } from "../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { DynaPuffText } from "../../components/StyledText";
-import postStyles from "../../lib/styles/post";
+import EmptyListView from "../../components/EmptyListView";
+import pageStyles from "../../lib/styles/page";
 import { useEffect, useRef, useState } from "react";
 import FeedSwitch from "../../components/FeedSwitch";
 import NeighborhoodScrollPicker from "../../components/NeighborhoodScrollPicker";
@@ -132,16 +132,8 @@ const FeedScreen = () => {
     return false;
   });
 
-  const renderEmptyListComponent = () => (
-    <View style={postStyles.emptyPostsContainer}>
-      <DynaPuffText style={postStyles.emptyPostsContainerText}>
-        Post something that’s on your mind.
-      </DynaPuffText>
-    </View>
-  );
-
   return (
-    <View style={styles.page}>
+    <View style={pageStyles.page}>
       {/* <NeighborhoodScrollPicker /> */}
       <FlatList
         showsVerticalScrollIndicator={false}
@@ -163,7 +155,9 @@ const FeedScreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        ListEmptyComponent={renderEmptyListComponent}
+        ListEmptyComponent={() =>
+          EmptyListView("Post something that’s on your mind.")
+        }
         contentContainerStyle={{ flexGrow: 1 }}
       />
       <Animated.View
@@ -194,10 +188,6 @@ const FeedScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: "white",
-  },
   floatingButton: {
     backgroundColor: "black",
     position: "absolute",
