@@ -18,6 +18,11 @@ import {
 
 let areNotificationsEnabled = false;
 
+const setTokenForUser = async (token: string) => {
+  await SecureStore.setItemAsync("current_push_token", token);
+  // store the token in the DB
+};
+
 // TODO: This should probably happen in the app's entrypoint file. Reason:
 // https://stackoverflow.com/questions/66998305/warn-no-task-registered-for-key-reactnativefirebasemessagingheadlesstask-in-reac#:~:text=without%20mounting%20your
 const setBackgroundMessageHandlerIfAndroid = async (
@@ -124,7 +129,7 @@ const ChatScreen = () => {
         push_provider,
         push_provider_name,
       });
-      await SecureStore.setItemAsync("current_push_token", token);
+      setTokenForUser(token);
 
       const removeOldToken = async () => {
         const oldToken = await SecureStore.getItemAsync("current_push_token");
@@ -143,7 +148,7 @@ const ChatScreen = () => {
               String(user?.id),
               push_provider_name
             ),
-            SecureStore.setItemAsync("current_push_token", newToken),
+            setTokenForUser(newToken),
           ]);
         }
       );
