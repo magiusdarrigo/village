@@ -49,6 +49,7 @@ interface TweetsApiContextType {
     profileImage?: string;
     buildingID?: string;
     neighborhoodID?: string;
+    fcmToken?: string;
   }) => Promise<any>;
   uploadProfileWithCustomPic: (formData: FormData) => Promise<any>;
   getBuilding: (address: string) => Promise<any>;
@@ -621,6 +622,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     profileImage?: string;
     buildingID?: string;
     neighborhoodID?: string;
+    fcmToken?: string;
   }) => {
     if (!authToken) {
       return {};
@@ -656,6 +658,10 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (data.neighborhoodID) {
       formData.append("neighborhoodID", data.neighborhoodID);
+    }
+
+    if (data.fcmToken) {
+      formData.append("fcmToken", data.fcmToken);
     }
 
     const url = `${API_URL}/v1/users`;

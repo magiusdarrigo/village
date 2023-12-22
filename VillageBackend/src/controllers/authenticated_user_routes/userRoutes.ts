@@ -22,7 +22,8 @@ router.put("/", upload.single("image"), async (req, res) => {
   console.log("update user profile called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
-  let { username, buildingID, neighborhoodID, defaultImage } = req.body;
+  let { username, buildingID, neighborhoodID, defaultImage, fcmToken } =
+    req.body;
   // ensure username is not racist
   if (username && !usernameAllowed(username)) {
     return res.status(400).json({
@@ -67,6 +68,7 @@ router.put("/", upload.single("image"), async (req, res) => {
         image: uploadedFilePath,
         building_id: buildingID,
         neighborhood_id: neighborhoodID,
+        fcm_token: fcmToken,
       },
       select: {
         id: true,

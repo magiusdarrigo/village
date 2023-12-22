@@ -1,6 +1,7 @@
 import { ActivityIndicator, Alert, Platform } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../context/UserContext";
+import { useTweetsApi } from "../../context/TweetContext";
 import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
@@ -17,11 +18,6 @@ import {
 } from "stream-chat-expo";
 
 let areNotificationsEnabled = false;
-
-const setTokenForUser = async (token: string) => {
-  await SecureStore.setItemAsync("current_push_token", token);
-  // store the token in the DB
-};
 
 // TODO: This should probably happen in the app's entrypoint file. Reason:
 // https://stackoverflow.com/questions/66998305/warn-no-task-registered-for-key-reactnativefirebasemessagingheadlesstask-in-reac#:~:text=without%20mounting%20your
@@ -91,6 +87,7 @@ const requestPermission = async () => {
 
 const ChatScreen = () => {
   const [isReady, setIsReady] = useState(false);
+  const { updateUserAttributes } = useTweetsApi();
   const {
     user,
     getStreamChatClient,
@@ -100,6 +97,12 @@ const ChatScreen = () => {
   } = useUser();
   const streamChatClient = getStreamChatClient();
   const unsubscribeTokenRefreshListenerRef = useRef<() => void>();
+
+  const setTokenForUser = async (token: string) => {
+    await SecureStore.setItemAsync("current_push_token", token);
+    // store the token in the DB
+    await updateUserAttributes({ fcmToken: token });
+  };
 
   const setBackgroundMessageHandlerIfIOS = async () => {
     if (Platform.OS !== "ios") {
