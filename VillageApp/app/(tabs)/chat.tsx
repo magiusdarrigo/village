@@ -1,11 +1,4 @@
-import {
-  ActivityIndicator,
-  Alert,
-  ImageStyle,
-  Platform,
-  StyleProp,
-} from "react-native";
-import { Channel as ChannelType } from "stream-chat";
+import { ActivityIndicator, Alert, Platform } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../context/UserContext";
 import messaging from "@react-native-firebase/messaging";
