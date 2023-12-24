@@ -1,4 +1,14 @@
-import { ActivityIndicator, Alert, Platform } from "react-native";
+import {
+  View,
+  Keyboard,
+  ActivityIndicator,
+  Alert,
+  Platform,
+} from "react-native";
+import {
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+} from "react-native-gesture-handler";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
@@ -6,7 +16,6 @@ import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
 import notifee from "@notifee/react-native";
-import { isIOSSimulator } from "../../lib/helpers";
 import * as Sentry from "sentry-expo";
 
 import {
@@ -18,6 +27,14 @@ import {
 } from "stream-chat-expo";
 
 let areNotificationsEnabled = false;
+
+const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
+  const { translationY } = event.nativeEvent;
+  if (translationY > 50) {
+    // Threshold for swipe down gesture
+    Keyboard.dismiss();
+  }
+};
 
 // TODO: This should probably happen in the app's entrypoint file. Reason:
 // https://stackoverflow.com/questions/66998305/warn-no-task-registered-for-key-reactnativefirebasemessagingheadlesstask-in-reac#:~:text=without%20mounting%20your
@@ -75,9 +92,6 @@ const setBackgroundMessageHandlerIfAndroid = async (
 
 // Request Push Notification permission from device.
 const requestPermission = async () => {
-  // if (isIOSSimulator()) {
-  //   return;
-  // }
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -118,9 +132,6 @@ const ChatScreen = () => {
   useEffect(() => {
     // Register FCM token with stream chat server.
     const registerPushToken = async () => {
-      // if (isIOSSimulator()) {
-      //   return;
-      // }
       // unsubscribe any previous listener
       unsubscribeTokenRefreshListenerRef.current?.();
       const token = await messaging().getToken();
@@ -223,8 +234,12 @@ const ChatScreen = () => {
     <OverlayProvider>
       <Chat client={streamChatClient}>
         <Channel channel={channel}>
-          <MessageList />
-          <MessageInput />
+          <PanGestureHandler onGestureEvent={onGestureEvent}>
+            <View style={{ flex: 1 }}>
+              <MessageList />
+              <MessageInput />
+            </View>
+          </PanGestureHandler>
         </Channel>
       </Chat>
     </OverlayProvider>
