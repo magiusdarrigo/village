@@ -75,9 +75,9 @@ const setBackgroundMessageHandlerIfAndroid = async (
 
 // Request Push Notification permission from device.
 const requestPermission = async () => {
-  if (isIOSSimulator()) {
-    return;
-  }
+  // if (isIOSSimulator()) {
+  //   return;
+  // }
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -118,9 +118,9 @@ const ChatScreen = () => {
   useEffect(() => {
     // Register FCM token with stream chat server.
     const registerPushToken = async () => {
-      if (isIOSSimulator()) {
-        return;
-      }
+      // if (isIOSSimulator()) {
+      //   return;
+      // }
       // unsubscribe any previous listener
       unsubscribeTokenRefreshListenerRef.current?.();
       const token = await messaging().getToken();
