@@ -5,10 +5,7 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import {
-  PanGestureHandler,
-  PanGestureHandlerGestureEvent,
-} from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
@@ -27,14 +24,6 @@ import {
 } from "stream-chat-expo";
 
 let areNotificationsEnabled = false;
-
-const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
-  const { translationY } = event.nativeEvent;
-  if (translationY > 50) {
-    // Threshold for swipe down gesture
-    Keyboard.dismiss();
-  }
-};
 
 // TODO: This should probably happen in the app's entrypoint file. Reason:
 // https://stackoverflow.com/questions/66998305/warn-no-task-registered-for-key-reactnativefirebasemessagingheadlesstask-in-reac#:~:text=without%20mounting%20your
@@ -234,12 +223,8 @@ const ChatScreen = () => {
     <OverlayProvider>
       <Chat client={streamChatClient}>
         <Channel channel={channel}>
-          <PanGestureHandler onGestureEvent={onGestureEvent}>
-            <View style={{ flex: 1 }}>
-              <MessageList />
-              <MessageInput />
-            </View>
-          </PanGestureHandler>
+          <MessageList />
+          <MessageInput />
         </Channel>
       </Chat>
     </OverlayProvider>
