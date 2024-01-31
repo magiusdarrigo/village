@@ -1,10 +1,4 @@
-import {
-  View,
-  Keyboard,
-  ActivityIndicator,
-  Alert,
-  Platform,
-} from "react-native";
+import { ActivityIndicator, Alert, Platform } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../context/UserContext";

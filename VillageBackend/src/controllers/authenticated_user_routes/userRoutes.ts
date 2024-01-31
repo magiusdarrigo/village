@@ -161,6 +161,28 @@ router.post("/:id/follow", async (req, res) => {
     ]);
 
     res.status(200).json(user);
+
+    // send a notification to the user being followed
+    // get current user's username
+    const currentUserData = await prisma.users.findUnique({
+      where: {
+        id: currentUser.id,
+      },
+      select: {
+        username: true,
+      },
+    });
+    // create a notification record
+    const notification = await prisma.notifications.create({
+      data: {
+        title: "You've got a new follower!",
+        message: `${currentUserData?.username} is now following you.`,
+        for_user_id: Number(id),
+        from_user_id: currentUser.id,
+      },
+    });
+    // send a push notification
+    await getMessaging().send();
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error following the user." });
