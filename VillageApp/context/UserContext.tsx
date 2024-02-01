@@ -2,32 +2,11 @@ import React, { createContext, useContext, useState, useRef } from "react";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { FlatList } from "react-native";
 import notifee from "@notifee/react-native";
-
-export type User = {
-  neighborhood_id?: number;
-  neighborhood?: {
-    name: string;
-  };
-  building?: {
-    address: string;
-  };
-  building_id?: number;
-  id: number;
-  username: string;
-  created_at?: string;
-  followers_count?: number;
-  following_count?: number;
-  phone_number?: string;
-  chat_token?: string;
-  tags?: any;
-  is_verified?: boolean;
-  image?: string;
-  followed_by_user?: boolean;
-};
+import { UserType } from "../types/index";
 
 interface UserContextType {
-  user: User | null;
-  updateUser: (user: User) => void;
+  user: UserType | null;
+  updateUser: (user: UserType) => void;
   removeUser: () => void;
   getStreamChatClient: () => StreamChat<any>;
   chatTabBadgeCount: number;
@@ -52,7 +31,7 @@ const UserContextProvider = ({
   children,
   streamChatClient,
 }: UserContextProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [isFeedHot, setIsFeedHot] = useState(true);
   const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
   const flatListRef = useRef<FlatList>(null);
@@ -62,7 +41,7 @@ const UserContextProvider = ({
     setIsFeedHot(isHot);
   };
 
-  const updateUser = (newUser: User) => {
+  const updateUser = (newUser: UserType) => {
     setUser(newUser);
   };
 

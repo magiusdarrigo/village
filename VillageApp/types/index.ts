@@ -1,3 +1,26 @@
+export type UserType = {
+  neighborhood_id?: number;
+  neighborhood?: {
+    name: string;
+  };
+  building?: {
+    address: string;
+  };
+  building_id?: number;
+  id: number;
+  username: string;
+  created_at?: string;
+  followers_count?: number;
+  following_count?: number;
+  phone_number?: string;
+  chat_token?: string;
+  fcm_token?: string;
+  tags?: any;
+  is_verified?: boolean;
+  image?: string;
+  followed_by_user?: boolean;
+};
+
 export type TweetType = {
   id: number;
   user_id: number;

@@ -24,6 +24,7 @@ model users {
   followers_count Int            @default(0)
   following_count Int            @default(0)
   chat_token      String?
+  fcm_token       String?
   created_at      DateTime       @default(now())
   tags            Json?
 

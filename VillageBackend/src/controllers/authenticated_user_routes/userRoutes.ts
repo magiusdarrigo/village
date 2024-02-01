@@ -7,6 +7,7 @@ import { usernameAllowed } from "../../utils/badwords";
 import { getUserProfileQuery } from "../../sql_queries/users";
 import { getNotificationsByUserQuery } from "../../sql_queries/notifications";
 import streamChatClient from "../../clients/streamChatClient";
+import { sendNotification } from "../../clients/firebaseClient";
 import { upload } from "../../middleware/upload";
 import { MAX_INT4_VALUE } from "../../utils/constants";
 import {
@@ -22,7 +23,8 @@ router.put("/", upload.single("image"), async (req, res) => {
   console.log("update user profile called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
-  let { username, buildingID, neighborhoodID, defaultImage } = req.body;
+  let { username, buildingID, neighborhoodID, defaultImage, fcmToken } =
+    req.body;
   // ensure username is not racist
   if (username && !usernameAllowed(username)) {
     return res.status(400).json({
@@ -67,6 +69,7 @@ router.put("/", upload.single("image"), async (req, res) => {
         image: uploadedFilePath,
         building_id: buildingID,
         neighborhood_id: neighborhoodID,
+        fcm_token: fcmToken,
       },
       select: {
         id: true,
@@ -152,13 +155,37 @@ router.post("/:id/follow", async (req, res) => {
       data: { followers_count: { increment: 1 } },
     });
 
-    const [userFollowing, _, user] = await prisma.$transaction([
+    const [userFollowing, _, followedUser] = await prisma.$transaction([
       createFollowing,
       incrementFollowingCount,
       incrementFollowersCount,
     ]);
 
-    res.status(200).json(user);
+    res.status(200).json(followedUser);
+
+    // send a notification to the user being followed
+    // get current user's username
+    const currentUserData = await prisma.users.findUnique({
+      where: {
+        id: currentUser.id,
+      },
+      select: {
+        username: true,
+      },
+    });
+    const title = "You've got a new follower!";
+    const message = `${currentUserData?.username} is now following you.`;
+    // create a notification record
+    await prisma.notifications.create({
+      data: {
+        title,
+        message,
+        for_user_id: Number(id),
+        from_user_id: currentUser.id,
+      },
+    });
+    // send a push notification
+    await sendNotification(title, message, followedUser?.fcm_token || "");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error following the user." });

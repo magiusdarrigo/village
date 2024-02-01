@@ -58,9 +58,6 @@ export default function RootLayout() {
   useEffect(() => {
     // call register device for push notifications here
     const registerDeviceForPushNotifications = async () => {
-      if (isIOSSimulator()) {
-        return;
-      }
       try {
         await messaging().registerDeviceForRemoteMessages();
       } catch (error) {
@@ -77,7 +74,8 @@ export default function RootLayout() {
         );
       }
     };
-    registerDeviceForPushNotifications();
+    // console warning says that this is not needed
+    // registerDeviceForPushNotifications();
     checkVersion();
   }, [loaded]);
 

@@ -1,18 +1,12 @@
-import {
-  ActivityIndicator,
-  Alert,
-  ImageStyle,
-  Platform,
-  StyleProp,
-} from "react-native";
-import { Channel as ChannelType } from "stream-chat";
+import { ActivityIndicator, Alert, Platform } from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../context/UserContext";
+import { useTweetsApi } from "../../context/TweetContext";
 import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
 import notifee from "@notifee/react-native";
-import { isIOSSimulator } from "../../lib/helpers";
 import * as Sentry from "sentry-expo";
 
 import {
@@ -81,9 +75,6 @@ const setBackgroundMessageHandlerIfAndroid = async (
 
 // Request Push Notification permission from device.
 const requestPermission = async () => {
-  if (isIOSSimulator()) {
-    return;
-  }
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -93,6 +84,7 @@ const requestPermission = async () => {
 
 const ChatScreen = () => {
   const [isReady, setIsReady] = useState(false);
+  const { updateUserAttributes } = useTweetsApi();
   const {
     user,
     getStreamChatClient,
@@ -102,6 +94,12 @@ const ChatScreen = () => {
   } = useUser();
   const streamChatClient = getStreamChatClient();
   const unsubscribeTokenRefreshListenerRef = useRef<() => void>();
+
+  const setTokenForUser = async (token: string) => {
+    await SecureStore.setItemAsync("current_push_token", token);
+    // store the token in the DB
+    await updateUserAttributes({ fcmToken: token });
+  };
 
   const setBackgroundMessageHandlerIfIOS = async () => {
     if (Platform.OS !== "ios") {
@@ -117,9 +115,6 @@ const ChatScreen = () => {
   useEffect(() => {
     // Register FCM token with stream chat server.
     const registerPushToken = async () => {
-      if (isIOSSimulator()) {
-        return;
-      }
       // unsubscribe any previous listener
       unsubscribeTokenRefreshListenerRef.current?.();
       const token = await messaging().getToken();
@@ -131,7 +126,7 @@ const ChatScreen = () => {
         push_provider,
         push_provider_name,
       });
-      await SecureStore.setItemAsync("current_push_token", token);
+      setTokenForUser(token);
 
       const removeOldToken = async () => {
         const oldToken = await SecureStore.getItemAsync("current_push_token");
@@ -150,7 +145,7 @@ const ChatScreen = () => {
               String(user?.id),
               push_provider_name
             ),
-            SecureStore.setItemAsync("current_push_token", newToken),
+            setTokenForUser(newToken),
           ]);
         }
       );
