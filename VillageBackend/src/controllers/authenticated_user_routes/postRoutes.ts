@@ -11,6 +11,8 @@ import {
   convertFileIfNecessary,
   deleteFileFromFS,
 } from "../../utils/uploads";
+import { sendNotification } from "../../clients/firebaseClient";
+import { truncateNotificationMessage } from "../../utils/truncate";
 
 const router = Router();
 const MAX_SIGNED_FOUR_BYTE_INT = 2147483647;
@@ -235,6 +237,44 @@ router.post("/:id/likes", async (req, res) => {
     ]);
 
     res.status(200).json({ newLike, updatedPost });
+
+    // if the post was liked, send a notification to the post author
+    if (is_dislike === "true") {
+      return;
+    }
+    // query for the post author
+    const postAuthor = await prisma.users.findUnique({
+      where: {
+        id: updatedPost.user_id,
+      },
+      select: {
+        id: true,
+        fcm_token: true,
+      },
+    });
+    // query for the current user
+    const currentUserData = await prisma.users.findUnique({
+      where: {
+        id: currentUser.id,
+      },
+      select: {
+        username: true,
+      },
+    });
+    const title = `@${currentUserData?.username} liked your post!`;
+    const message = truncateNotificationMessage(updatedPost.text_content ?? "");
+    // create a notification record
+    await prisma.notifications.create({
+      data: {
+        title,
+        message,
+        for_user_id: Number(updatedPost.user_id),
+        from_user_id: currentUser.id,
+        for_post_id: Number(id),
+      },
+    });
+    // send a push notification
+    await sendNotification(title, message, postAuthor?.fcm_token || "");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error liking the post." });

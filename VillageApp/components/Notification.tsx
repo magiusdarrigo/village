@@ -11,6 +11,7 @@ type NotificationProps = {
 };
 
 const Notification = ({ notification }: NotificationProps) => {
+  const disablePostPressable = notification.for_post_id === null;
   return (
     <View style={postStyles.parentContainer}>
       <View style={postStyles.imageParentContainer}>
@@ -40,11 +41,14 @@ const Notification = ({ notification }: NotificationProps) => {
             </Pressable>
           </Link>
           <Link href={`/tweet/${notification.for_post_id}`} asChild>
-            <Pressable style={{ flex: 1 }}></Pressable>
+            <Pressable
+              style={{ flex: 1 }}
+              disabled={disablePostPressable}
+            ></Pressable>
           </Link>
         </View>
         <Link href={`/tweet/${notification.for_post_id}`} asChild>
-          <Pressable style={styles.container}>
+          <Pressable style={styles.container} disabled={disablePostPressable}>
             <View style={styles.mainContainer}>
               <View style={{ flexDirection: "row" }}>
                 <Text style={styles.titleContent}>{notification.title}</Text>
