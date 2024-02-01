@@ -174,7 +174,7 @@ router.post("/:id/follow", async (req, res) => {
       },
     });
     const title = "You've got a new follower!";
-    const message = `${currentUserData?.username} is now following you.`;
+    const message = `@${currentUserData?.username} is now following you.`;
     // create a notification record
     await prisma.notifications.create({
       data: {

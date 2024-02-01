@@ -47,7 +47,7 @@ const Notification = ({ notification }: NotificationProps) => {
           <Pressable style={styles.container}>
             <View style={styles.mainContainer}>
               <View style={{ flexDirection: "row" }}>
-                <Text style={postStyles.username}>{notification.title}</Text>
+                <Text style={styles.titleContent}>{notification.title}</Text>
               </View>
               <Text style={styles.messageContent}>{notification.message}</Text>
             </View>
@@ -59,10 +59,14 @@ const Notification = ({ notification }: NotificationProps) => {
 };
 
 const styles = StyleSheet.create({
+  titleContent: {
+    fontSize: 17,
+    fontWeight: "bold",
+  },
   messageContent: {
     lineHeight: 20,
-    marginTop: 8,
-    fontSize: 16,
+    marginTop: 5,
+    fontSize: 15,
     fontWeight: "600",
     marginRight: 10,
     color: Colors.light.switchFontColor,
@@ -84,7 +88,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 5,
     backgroundColor: "white",
-    marginBottom: 10,
+    marginBottom: 25,
   },
 });
 
