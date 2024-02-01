@@ -20,3 +20,21 @@ const serviceAccount: ServiceAccount = {
 initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
+export const sendNotification = async (
+  title: string,
+  body: string,
+  token: string
+) => {
+  try {
+    await admin.messaging().send({
+      notification: {
+        title,
+        body,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
