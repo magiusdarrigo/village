@@ -7,6 +7,7 @@ import {
   authenticateAdminToken,
 } from "./middleware/auth";
 import redisClient from "./clients/redisClient";
+import "./clients/firebaseClient";
 
 const app = express();
 app.use(express.json());
