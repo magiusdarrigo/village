@@ -1,8 +1,8 @@
 import { ActivityIndicator, Alert, Platform } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../context/UserContext";
-import { useTweetsApi } from "../../context/TweetContext";
+import { useUser } from "../../../context/UserContext";
+import { useTweetsApi } from "../../../context/TweetContext";
 import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";

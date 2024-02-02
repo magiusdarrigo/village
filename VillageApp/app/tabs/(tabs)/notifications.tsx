@@ -5,12 +5,12 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import pageStyles from "../../lib/styles/page";
-import EmptyListView from "../../components/EmptyListView";
+import pageStyles from "../../../lib/styles/page";
+import EmptyListView from "../../../components/EmptyListView";
 import { useState, useRef } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useTweetsApi } from "../../context/TweetContext";
-import Notification from "../../components/Notification";
+import { useTweetsApi } from "../../../context/TweetContext";
+import Notification from "../../../components/Notification";
 
 const NotificationsScreen = () => {
   const { listNotifications } = useTweetsApi();

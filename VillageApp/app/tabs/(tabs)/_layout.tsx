@@ -3,14 +3,14 @@ import { Octicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Pressable, AppState, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
-import { useUser } from "../../context/UserContext";
-import { useAuth } from "../../context/AuthContext";
-import Colors from "../../constants/Colors";
+import { useUser } from "../../../context/UserContext";
+import { useAuth } from "../../../context/AuthContext";
+import Colors from "../../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { handlePressButtonAsync } from "../../lib/helpers";
-import { useTweetsApi } from "../../context/TweetContext";
+import { handlePressButtonAsync } from "../../../lib/helpers";
+import { useTweetsApi } from "../../../context/TweetContext";
 
 const TERMS_OF_SERVICE_URL =
   "https://villagenyc.notion.site/Terms-of-Use-Sale-for-Village-1da7d1897d1e485e8f80125a3a3be087?pvs=4";
