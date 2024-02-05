@@ -261,7 +261,7 @@ router.post("/:id/likes", async (req, res) => {
         username: true,
       },
     });
-    const title = `@${currentUserData?.username} liked your post!`;
+    const title = `@${currentUserData?.username} liked your post`;
     const message = truncateNotificationMessage(updatedPost.text_content ?? "");
     // create a notification record
     await prisma.notifications.create({

@@ -2,7 +2,7 @@ import "react-native-gesture-handler";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
+import { Stack, SplashScreen } from "expo-router";
 import { useEffect } from "react";
 import { Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
@@ -97,7 +97,7 @@ function RootLayoutNav() {
                 <ActionSheetProvider>
                   <Stack>
                     <Stack.Screen
-                      name="(tabs)"
+                      name="tabs/(tabs)"
                       options={{ headerShown: false }}
                     />
                     <Stack.Screen name="profile/[id]" options={{}} />

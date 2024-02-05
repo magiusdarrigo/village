@@ -17,6 +17,8 @@ interface UserContextType {
   channel: ChannelType | null;
   isFeedHot: boolean;
   updateIsFeedHot: (isHot: boolean) => void;
+  activeTab: string;
+  updateActiveTab: (tab: string) => void;
 }
 
 interface UserContextProviderProps {
@@ -36,6 +38,11 @@ const UserContextProvider = ({
   const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
   const flatListRef = useRef<FlatList>(null);
   const [channel, setChannel] = useState<ChannelType | null>(null);
+  const [activeTab, setActiveTab] = useState("home");
+
+  const updateActiveTab = (tab: string) => {
+    setActiveTab(tab);
+  };
 
   const updateIsFeedHot = (isHot: boolean) => {
     setIsFeedHot(isHot);
@@ -82,6 +89,8 @@ const UserContextProvider = ({
         channel,
         isFeedHot,
         updateIsFeedHot,
+        activeTab,
+        updateActiveTab,
       }}
     >
       {children}

@@ -173,7 +173,7 @@ router.post("/:id/follow", async (req, res) => {
         username: true,
       },
     });
-    const title = "You've got a new follower!";
+    const title = "You've got a new follower";
     const message = `@${currentUserData?.username} is now following you.`;
     // create a notification record
     await prisma.notifications.create({
@@ -363,6 +363,47 @@ router.get("/:id/notifications", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: "error fetching notifications for user",
+    });
+  }
+});
+
+/**
+ * update notifications for user.
+ */
+router.put("/:id/notifications", async (req, res) => {
+  console.log("update notifications by user id called, id: ", req.params.id);
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const currentUserID = currentUser.id;
+  const userID = getNumberFromQuery(id);
+  const notificationIds = req.body.notificationIDs;
+  const read = req.body.read;
+
+  if (!userID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
+  if (currentUserID !== userID) {
+    return res.status(401).json({ error: "unauthorized" });
+  }
+
+  try {
+    await prisma.notifications.updateMany({
+      where: {
+        id: {
+          in: notificationIds,
+        },
+      },
+      data: {
+        read,
+      },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error updating notifications for user",
     });
   }
 });

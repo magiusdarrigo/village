@@ -5,15 +5,15 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import pageStyles from "../../lib/styles/page";
-import EmptyListView from "../../components/EmptyListView";
-import { useState, useRef } from "react";
+import pageStyles from "../../../lib/styles/page";
+import EmptyListView from "../../../components/EmptyListView";
+import { useState, useRef, useEffect } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useTweetsApi } from "../../context/TweetContext";
-import Notification from "../../components/Notification";
+import { useTweetsApi } from "../../../context/TweetContext";
+import Notification from "../../../components/Notification";
 
 const NotificationsScreen = () => {
-  const { listNotifications } = useTweetsApi();
+  const { listNotifications, updateNotifications } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
@@ -34,6 +34,17 @@ const NotificationsScreen = () => {
     hasNextPage,
     refetch,
   } = useNotificationsInfiniteQuery();
+
+  useEffect(() => {
+    // Find all unread notifications
+    const unreadNotifications = uniqueItems
+      .filter((item) => !item.read)
+      .map((item) => item.id);
+
+    if (unreadNotifications.length > 0) {
+      updateNotifications({ notificationIDs: unreadNotifications, read: true });
+    }
+  }, [data]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -63,7 +74,6 @@ const NotificationsScreen = () => {
 
   return (
     <View style={pageStyles.page}>
-      {/* <NeighborhoodScrollPicker /> */}
       <FlatList
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}

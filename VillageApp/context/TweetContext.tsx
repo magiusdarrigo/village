@@ -38,6 +38,10 @@ interface TweetsApiContextType {
   listTweetsForProfile: (userID: number, page: number) => Promise<any>;
   listTweets: (page: number, isHot: boolean) => Promise<any>;
   listNotifications: (page: number) => Promise<any>;
+  updateNotifications: (data: {
+    notificationIDs: number[];
+    read: boolean;
+  }) => Promise<any>;
   getTweet: (id: string) => Promise<any>;
   createTweet: (data: {
     neighborhoodID: number;
@@ -77,6 +81,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   listTweetsForProfile: async () => {},
   listTweets: async () => {},
   listNotifications: async () => {},
+  updateNotifications: async () => {},
   getTweet: async () => {},
   createTweet: async () => {},
   updateUserAttributes: async () => {},
@@ -541,6 +546,37 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const updateNotifications = async (data: {
+    notificationIDs: number[];
+    read: boolean;
+  }) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${user?.id}/notifications`;
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-type": "Application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error updating notifications");
+    }
+
+    return await res.json();
+  };
+
   const getTweet = async (id: string) => {
     if (!authToken) {
       return {};
@@ -827,6 +863,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         listTweetsForProfile,
         listTweets,
         listNotifications,
+        updateNotifications,
         getTweet,
         createTweet,
         updateUserAttributes,
