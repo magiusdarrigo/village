@@ -101,17 +101,6 @@ const ChatScreen = () => {
     await updateUserAttributes({ fcmToken: token });
   };
 
-  const setBackgroundMessageHandlerIfIOS = async () => {
-    if (Platform.OS !== "ios") {
-      return;
-    }
-
-    messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
-      const badgeCount = await notifee.getBadgeCount();
-      updateChatTabBadgeCount(badgeCount);
-    });
-  };
-
   useEffect(() => {
     // Register FCM token with stream chat server.
     const registerPushToken = async () => {
@@ -165,8 +154,6 @@ const ChatScreen = () => {
           user?.chat_token,
           getStreamChatClient()
         );
-        // set background message handler for ios
-        // await setBackgroundMessageHandlerIfIOS();
         // connect user to chat
         await streamChatClient.connectUser(
           {

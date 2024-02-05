@@ -12,9 +12,17 @@ type NotificationProps = {
 
 const Notification = ({ notification }: NotificationProps) => {
   const disablePostPressable = notification.for_post_id === null;
+  const notificationHasBeenSeen = notification.read;
   return (
     <View style={postStyles.parentContainer}>
-      <View style={postStyles.imageParentContainer}>
+      <View
+        style={[
+          styles.imageParentContainer,
+          notificationHasBeenSeen
+            ? { backgroundColor: "white" }
+            : { backgroundColor: Colors.light.switchBackgroundColor },
+        ]}
+      >
         <View style={postStyles.imageContainer}>
           <Link
             href={{
@@ -48,8 +56,11 @@ const Notification = ({ notification }: NotificationProps) => {
           </Link>
         </View>
         <Link href={`/tweet/${notification.for_post_id}`} asChild>
-          <Pressable style={styles.container} disabled={disablePostPressable}>
-            <View style={styles.mainContainer}>
+          <Pressable
+            style={styles.parentContainer}
+            disabled={disablePostPressable}
+          >
+            <View style={[styles.mainContainer]}>
               <View style={{ flexDirection: "row" }}>
                 <Text style={styles.titleContent}>{notification.title}</Text>
               </View>
@@ -80,19 +91,21 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 50,
   },
-  container: {
+  parentContainer: {
     flexDirection: "row",
     paddingTop: 10,
     paddingLeft: 5,
     paddingRight: 5,
     flex: 1,
-    backgroundColor: "white",
   },
   mainContainer: {
     flex: 1,
     marginLeft: 5,
-    backgroundColor: "white",
     marginBottom: 25,
+  },
+  imageParentContainer: {
+    flexDirection: "row",
+    flex: 1,
   },
 });
 

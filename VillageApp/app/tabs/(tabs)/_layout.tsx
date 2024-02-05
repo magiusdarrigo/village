@@ -57,11 +57,12 @@ export default function TabLayout() {
     channel,
     updateChannel,
     getStreamChatClient,
+    activeTab,
+    updateActiveTab,
   } = useUser();
   const { removeAuthToken } = useAuth();
   const { addBuildingChangeRequest } = useTweetsApi();
   const [appState, setAppState] = useState(AppState.currentState);
-  const [activeTab, setActiveTab] = useState("home");
   const streamChatClient = getStreamChatClient();
   const { showActionSheetWithOptions } = useActionSheet();
 
@@ -214,7 +215,7 @@ export default function TabLayout() {
         }}
         listeners={{
           focus: (_) => {
-            setActiveTab("home");
+            updateActiveTab("home");
           },
           tabPress: (_) => {
             try {
@@ -238,7 +239,7 @@ export default function TabLayout() {
         }}
         listeners={{
           focus: (_) => {
-            setActiveTab("chat");
+            updateActiveTab("chat");
           },
           tabPress: (_) => {
             try {
@@ -257,6 +258,11 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIconOcticons name="bell-fill" color={color} />
           ),
+        }}
+        listeners={{
+          focus: (_) => {
+            updateActiveTab("activity");
+          },
         }}
       />
       <Tabs.Screen
@@ -278,6 +284,11 @@ export default function TabLayout() {
               )}
             </Pressable>
           ),
+        }}
+        listeners={{
+          focus: (_) => {
+            updateActiveTab("profile");
+          },
         }}
       />
     </Tabs>
