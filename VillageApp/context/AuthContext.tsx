@@ -1,9 +1,5 @@
-import {
-  useRouter,
-  useSegments,
-  SplashScreen,
-  useNavigation,
-} from "expo-router";
+// import * as SplashScreen from "expo-splash-screen";
+import { useRouter, useSegments } from "expo-router";
 import {
   PropsWithChildren,
   createContext,
@@ -28,18 +24,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const { user, updateUser } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const segments = useSegments();
   const router = useRouter();
 
-  const getUser = async () => {
-    if (!authToken) {
+  const getUser = async (token: string) => {
+    if (!token) {
+      console.log("no authToken");
       return {};
     }
     const url = `${API_URL}/v1/users`;
 
     const res = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${authToken}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -57,48 +55,45 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    if (authToken && !user) {
-      const getCurrentUser = async () => {
-        try {
-          const currentUser = await getUser();
-          updateUser(currentUser);
-        } catch (error) {
-          Sentry.Native.captureException(error);
-          Alert.alert("We couldn't sign you in. Try again.");
-        }
-      };
-
-      getCurrentUser();
+    if (!isLoaded) {
       return;
     }
 
-    if ((!authToken || !user?.neighborhood?.name) && segments[0] !== "(auth)") {
+    if (
+      (!authToken || !user?.neighborhood?.name) &&
+      (segments[0] !== "(auth)" ||
+        (segments[0] === "(auth)" && segments[1] === "[...missing]"))
+    ) {
       router.replace("/signIn");
       return;
     }
 
     if (authToken && user?.neighborhood?.name && segments[0] === "(auth)") {
-      router.replace("/");
+      router.replace("/tabs");
       return;
     }
-  }, [segments, authToken, user]);
+  }, [segments, authToken, user, isLoaded]);
 
   useEffect(() => {
     const loadAuthToken = async () => {
-      const res = await SecureStore.getItemAsync("authToken");
-      if (res) {
-        setAuthToken(res);
+      const token = await SecureStore.getItemAsync("authToken");
+      if (token) {
+        setAuthToken(token);
+        if (!user) {
+          try {
+            console.log("fetching user");
+            const currentUser = await getUser(token);
+            updateUser(currentUser);
+          } catch (error) {
+            Sentry.Native.captureException(error);
+            Alert.alert("We couldn't sign you in. Try again.");
+          }
+        }
       }
+      setIsLoaded(true);
     };
-    loadAuthToken();
-  }, []);
 
-  // set a timeout to go off in 1 second
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      SplashScreen.hideAsync();
-    }, 1000);
-    return () => clearTimeout(timeout);
+    loadAuthToken();
   }, []);
 
   const updateAuthToken = async (newToken: string) => {

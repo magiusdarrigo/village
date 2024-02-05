@@ -1,8 +1,8 @@
 import { ActivityIndicator, Alert, Platform } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../context/UserContext";
-import { useTweetsApi } from "../../context/TweetContext";
+import { useUser } from "../../../context/UserContext";
+import { useTweetsApi } from "../../../context/TweetContext";
 import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
@@ -101,17 +101,6 @@ const ChatScreen = () => {
     await updateUserAttributes({ fcmToken: token });
   };
 
-  const setBackgroundMessageHandlerIfIOS = async () => {
-    if (Platform.OS !== "ios") {
-      return;
-    }
-
-    messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
-      const badgeCount = await notifee.getBadgeCount();
-      updateChatTabBadgeCount(badgeCount);
-    });
-  };
-
   useEffect(() => {
     // Register FCM token with stream chat server.
     const registerPushToken = async () => {
@@ -165,8 +154,6 @@ const ChatScreen = () => {
           user?.chat_token,
           getStreamChatClient()
         );
-        // set background message handler for ios
-        // await setBackgroundMessageHandlerIfIOS();
         // connect user to chat
         await streamChatClient.connectUser(
           {

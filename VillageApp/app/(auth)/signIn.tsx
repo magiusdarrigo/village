@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, SplashScreen, useGlobalSearchParams } from "expo-router";
 import { login } from "../../lib/api/auth";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
@@ -32,12 +32,19 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const splashScreenTimer = setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 1000);
+
+    const phoneNumberTimer = setTimeout(() => {
       // Check if the input is currently mounted before calling focus
       phoneNumberInputRef.current?.focus();
-    }, 1000); // 1000 milliseconds delay
+    }, 1500);
 
-    return () => clearTimeout(timer); // Clear timeout if component unmounts
+    return () => {
+      clearTimeout(phoneNumberTimer);
+      clearTimeout(splashScreenTimer);
+    };
   }, []);
 
   const onSignIn = async () => {
