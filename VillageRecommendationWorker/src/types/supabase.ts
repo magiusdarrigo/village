@@ -587,6 +587,7 @@ export interface Database {
           building_id: number | null
           chat_token: string | null
           created_at: string
+          fcm_token: string | null
           followers_count: number
           following_count: number
           id: number
@@ -601,6 +602,7 @@ export interface Database {
           building_id?: number | null
           chat_token?: string | null
           created_at?: string
+          fcm_token?: string | null
           followers_count?: number
           following_count?: number
           id?: number
@@ -615,6 +617,7 @@ export interface Database {
           building_id?: number | null
           chat_token?: string | null
           created_at?: string
+          fcm_token?: string | null
           followers_count?: number
           following_count?: number
           id?: number

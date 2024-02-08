@@ -1,4 +1,10 @@
-import { ActivityIndicator, Alert, Platform } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+} from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../../context/UserContext";
@@ -202,14 +208,28 @@ const ChatScreen = () => {
 
   return (
     <OverlayProvider>
-      <Chat client={streamChatClient}>
-        <Channel channel={channel}>
-          <MessageList />
-          <MessageInput />
-        </Channel>
-      </Chat>
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"} // 'padding' on iOS, 'height' on Android
+          keyboardVerticalOffset={Platform.select({ ios: 100, android: 80 })} // Adjust the offset as needed
+        >
+          <Chat client={streamChatClient}>
+            <Channel channel={channel}>
+              <MessageList />
+              <MessageInput />
+            </Channel>
+          </Chat>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </OverlayProvider>
   );
+};
+
+const styles = {
+  container: {
+    flex: 1,
+  },
 };
 
 export default ChatScreen;
