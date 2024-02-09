@@ -120,7 +120,7 @@ const CreateProfile = () => {
               value={username}
               onChangeText={setUsername}
               style={styles.input}
-              placeholderTextColor={"lightgrey"}
+              placeholderTextColor={"grey"}
             />
             <Text style={styles.inputLabel}>Profile Picture</Text>
             <View style={styles.customProfilePictureParentContainer}>
