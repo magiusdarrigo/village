@@ -140,6 +140,7 @@ export default function TabLayout() {
       "Terms of Service",
       "Privacy Policy",
       "Report A Bug",
+      "Delete Account",
       "Log Out",
       "Cancel",
     ];
@@ -147,14 +148,16 @@ export default function TabLayout() {
     const termsOfServiceIndex = 1;
     const privacyPolicyIndex = 2;
     const reportABugIndex = 3;
-    const destructiveButtonIndex = 4;
-    const cancelButtonIndex = 5;
+    const deleteAccountIndex = 4;
+    const logOutIndex = 5;
+    const destructiveButtonIndexes = [deleteAccountIndex, logOutIndex];
+    const cancelButtonIndex = 6;
 
     showActionSheetWithOptions(
       {
         options,
         cancelButtonIndex,
-        destructiveButtonIndex,
+        destructiveButtonIndex: destructiveButtonIndexes,
       },
       (selectedIndex: any) => {
         switch (selectedIndex) {
@@ -175,7 +178,36 @@ export default function TabLayout() {
           case reportABugIndex:
             handlePressButtonAsync(REPORT_A_BUG_URL);
             break;
-          case destructiveButtonIndex:
+          case deleteAccountIndex:
+            Alert.alert(
+              "Are you sure you want to delete your account?",
+              "All related data will be permanently deleted within 48 hours. This action cannot be undone.",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Delete Account",
+                  onPress: async () => {
+                    try {
+                      // delete account request submitted
+
+                      streamChatClient.disconnectUser();
+                      removeAuthToken();
+                    } catch (error) {
+                      Sentry.Native.captureException(error);
+                      Alert.alert(
+                        "Error",
+                        "There was an error deleting your account. Please try again."
+                      );
+                    }
+                  },
+                },
+              ]
+            );
+            break;
+          case logOutIndex:
             Alert.alert("Are you sure you want to log out?", "", [
               {
                 text: "Cancel",

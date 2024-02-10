@@ -41,6 +41,7 @@ model users {
   building_change_requests building_change_requests[]
   notification_for_user    notifications[]            @relation("for_user_id")
   notification_from_user   notifications[]            @relation("from_user_id")
+  account_deletion_request account_deletion_requests[]
 }
 
 model tokens {
@@ -220,4 +221,13 @@ model notifications {
   tags           Json?
 
   @@index([for_user_id, created_at], name: "idx_notification_for_user_created_at")
+}
+
+model account_deletion_requests {
+  id         Int      @id @default(autoincrement())
+  user       users    @relation(fields: [user_id], references: [id])
+  user_id    Int
+  reason     String?
+  created_at DateTime @default(now())
+  tags       Json?
 }
