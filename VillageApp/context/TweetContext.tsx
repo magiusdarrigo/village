@@ -62,6 +62,7 @@ interface TweetsApiContextType {
     selectedNeighborhood: string
   ) => Promise<any>;
   addBuildingChangeRequest: (address: string) => Promise<any>;
+  accountDeletionRequest: () => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -89,6 +90,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   getBuilding: async () => {},
   createBuilding: async () => {},
   addBuildingChangeRequest: async () => {},
+  accountDeletionRequest: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -844,6 +846,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const accountDeletionRequest = async () => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error requesting account deletion");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   return (
     <TweetsApiContext.Provider
       value={{
@@ -871,6 +900,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         getBuilding,
         createBuilding,
         addBuildingChangeRequest,
+        accountDeletionRequest,
       }}
     >
       {children}

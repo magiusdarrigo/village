@@ -41,7 +41,6 @@ model users {
   building_change_requests building_change_requests[]
   notification_for_user    notifications[]            @relation("for_user_id")
   notification_from_user   notifications[]            @relation("from_user_id")
-  account_deletion_request account_deletion_requests[]
 }
 
 model tokens {
@@ -55,7 +54,7 @@ model tokens {
   tags        Json?
 
   user_id Int
-  user    users @relation(fields: [user_id], references: [id])
+  user    users @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 enum TokenType {
@@ -87,7 +86,7 @@ model buildings {
 
 model posts {
   id              Int           @id @default(autoincrement())
-  user            users         @relation(fields: [user_id], references: [id])
+  user            users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id         Int
   neighborhood    neighborhoods @relation(fields: [neighborhood_id], references: [id])
   neighborhood_id Int
@@ -111,7 +110,7 @@ model reported_posts {
   id                Int      @id @default(autoincrement())
   post              posts    @relation(fields: [post_id], references: [id], onDelete: Cascade)
   post_id           Int
-  user              users    @relation(fields: [user_id_reporting], references: [id])
+  user              users    @relation(fields: [user_id_reporting], references: [id], onDelete: Cascade)
   user_id_reporting Int
   reason            String?
   created_at        DateTime @default(now())
@@ -123,7 +122,7 @@ model post_likes {
   user_id    Int
   post_id    Int
   is_dislike Boolean @default(false)
-  user       users   @relation(fields: [user_id], references: [id])
+  user       users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
   post       posts   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, post_id])
@@ -133,7 +132,7 @@ model comments {
   id                Int                 @id @default(autoincrement())
   post              posts               @relation(fields: [post_id], references: [id], onDelete: Cascade)
   post_id           Int
-  user              users               @relation(fields: [user_id], references: [id])
+  user              users               @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id           Int
   text_content      String
   likes_count       Int                 @default(0)
@@ -154,7 +153,7 @@ model reported_comments {
   id                Int      @id @default(autoincrement())
   comment           comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
   comment_id        Int
-  user              users    @relation(fields: [user_id_reporting], references: [id])
+  user              users    @relation(fields: [user_id_reporting], references: [id], onDelete: Cascade)
   user_id_reporting Int
   reason            String?
   created_at        DateTime @default(now())
@@ -166,7 +165,7 @@ model comment_likes {
   user_id    Int
   comment_id Int
   is_dislike Boolean  @default(false)
-  user       users    @relation(fields: [user_id], references: [id])
+  user       users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   comment    comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, comment_id])
@@ -174,7 +173,7 @@ model comment_likes {
 
 model chat_messages {
   id           Int       @id @default(autoincrement())
-  user         users     @relation(fields: [user_id], references: [id])
+  user         users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id      Int
   building     buildings @relation(fields: [building_id], references: [id])
   building_id  Int
@@ -185,9 +184,9 @@ model chat_messages {
 
 model user_following {
   id                Int      @id @default(autoincrement())
-  follower_user     users    @relation("follower_user_id", fields: [follower_user_id], references: [id])
+  follower_user     users    @relation("follower_user_id", fields: [follower_user_id], references: [id], onDelete: Cascade)
   follower_user_id  Int
-  following_user    users    @relation("following_user_id", fields: [following_user_id], references: [id])
+  following_user    users    @relation("following_user_id", fields: [following_user_id], references: [id], onDelete: Cascade)
   following_user_id Int
   created_at        DateTime @default(now())
   tags              Json?
@@ -197,7 +196,7 @@ model user_following {
 
 model building_change_requests {
   id              Int      @id @default(autoincrement())
-  user            users    @relation(fields: [user_id], references: [id])
+  user            users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id         Int
   address_request String
   created_at      DateTime @default(now())
@@ -206,7 +205,7 @@ model building_change_requests {
 
 model notifications {
   id             Int       @id @default(autoincrement())
-  for_user       users     @relation("for_user_id", fields: [for_user_id], references: [id])
+  for_user       users     @relation("for_user_id", fields: [for_user_id], references: [id], onDelete: Cascade)
   for_user_id    Int
   for_post       posts?    @relation("for_post_id", fields: [for_post_id], references: [id])
   for_post_id    Int?
@@ -225,8 +224,8 @@ model notifications {
 
 model account_deletion_requests {
   id         Int      @id @default(autoincrement())
-  user       users    @relation(fields: [user_id], references: [id])
   user_id    Int
+  username   String?
   reason     String?
   created_at DateTime @default(now())
   tags       Json?

@@ -61,7 +61,7 @@ export default function TabLayout() {
     updateActiveTab,
   } = useUser();
   const { removeAuthToken } = useAuth();
-  const { addBuildingChangeRequest } = useTweetsApi();
+  const { addBuildingChangeRequest, accountDeletionRequest } = useTweetsApi();
   const [appState, setAppState] = useState(AppState.currentState);
   const streamChatClient = getStreamChatClient();
   const { showActionSheetWithOptions } = useActionSheet();
@@ -192,7 +192,7 @@ export default function TabLayout() {
                   onPress: async () => {
                     try {
                       // delete account request submitted
-
+                      await accountDeletionRequest();
                       streamChatClient.disconnectUser();
                       removeAuthToken();
                     } catch (error) {

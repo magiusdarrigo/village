@@ -408,4 +408,32 @@ router.put("/:id/notifications", async (req, res) => {
   }
 });
 
+/**
+ * Account deletion request by user
+ */
+router.delete("/", async (req, res) => {
+  console.log("delete user called");
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  try {
+    await prisma.account_deletion_requests.create({
+      data: {
+        user_id: currentUser.id,
+      },
+    });
+
+    await prisma.users.delete({
+      where: {
+        id: currentUser.id,
+      },
+    });
+    console.log("user deleted: ", currentUser.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error deleting user account",
+    });
+  }
+});
+
 export default router;
