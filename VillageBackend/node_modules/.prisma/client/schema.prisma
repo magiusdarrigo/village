@@ -27,7 +27,7 @@ model users {
   fcm_token       String?
   created_at      DateTime       @default(now())
   tags            Json?
-  blocked_users   Json?
+  blocked_users   Int[]          @default([])
 
   posts                    posts[]
   comments                 comments[]
@@ -95,7 +95,7 @@ model posts {
   image_url         String        @default("")
   likes_count       Int           @default(0)
   comments_count    Int           @default(0)
-  hidden_from_users Json?
+  hidden_from_users Int[]         @default([])
   created_at        DateTime      @default(now())
   tags              Json?
 

@@ -20,6 +20,7 @@ interface TweetsApiContextType {
   reportTweet: (id: string) => Promise<any>;
   deleteComment: (data: { id: string; postID: string }) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
+  hideTweet: (id: string) => Promise<any>;
   likeComment: (data: {
     commentID: string;
     isDislike: boolean;
@@ -74,6 +75,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   reportTweet: async () => {},
   deleteComment: async () => {},
   deleteTweet: async () => {},
+  hideTweet: async () => {},
   likeComment: async () => {},
   likeTweet: async () => {},
   unlikeComment: async () => {},
@@ -318,6 +320,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (res.status !== 200) {
       throw new Error("Error deleting post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const hideTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}/hide`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error hiding post");
     }
 
     const body = await res.json();
@@ -884,6 +913,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         reportTweet,
         deleteComment,
         deleteTweet,
+        hideTweet,
         likeComment,
         likeTweet,
         unlikeComment,

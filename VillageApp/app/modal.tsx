@@ -80,16 +80,20 @@ const ModalScreen = ({ user }: ProfileProps) => {
   const uniquePostIds = new Set();
   const uniquePostItems = postItems.filter((tweet) => {
     if (!tweet) return false;
-    const isDuplicate = uniquePostIds.has(tweet.id);
 
+    // if post has the user ID in the hide list, don't show it
+    if (tweet.hidden_from_users.includes(user?.id)) {
+      return false;
+    }
+
+    const isDuplicate = uniquePostIds.has(tweet.id);
     // Add the ID to the Set if it's not already there
     if (!isDuplicate) {
       uniquePostIds.add(tweet.id);
       return true;
+    } else {
+      return false;
     }
-
-    // If it's a duplicate, filter it out
-    return false;
   });
 
   const handleLoadMore = () => {
