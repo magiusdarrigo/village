@@ -426,6 +426,10 @@ router.delete("/", async (req, res) => {
         id: currentUser.id,
       },
     });
+
+    // delete user from stream chat
+    await streamChatClient.deleteUser(currentUser.id.toString());
+
     console.log("user deleted: ", currentUser.id);
     res.json({ success: true });
   } catch (error) {

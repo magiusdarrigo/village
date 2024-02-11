@@ -22,6 +22,8 @@ import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
 import { MaterialCommunityIcon } from "../../components/Icons";
 import { defaultImages } from "../../lib/api/onboarding";
+import Hyperlink from "react-native-hyperlink";
+import { handlePressButtonAsync } from "../../lib/helpers";
 
 const CreateProfile = () => {
   const { updateUser } = useUser();
@@ -149,16 +151,50 @@ const CreateProfile = () => {
               {renderColorOptions()}
             </View>
           </View>
-          <Pressable
-            style={[
-              onboardingStyles.button,
-              isButtonDisabled ? onboardingStyles.buttonDisabled : {},
-            ]}
-            onPress={onSave}
-            disabled={isButtonDisabled}
-          >
-            <Text style={onboardingStyles.buttonText}>Save</Text>
-          </Pressable>
+          <View>
+            <Hyperlink
+              linkStyle={{ color: "#2980b9" }}
+              linkText={(url) => {
+                if (
+                  url ===
+                  "https://villagenyc.notion.site/Privacy-Policy-for-Village-845fb113171045c3bdd26c828e8ccf26"
+                ) {
+                  return "Privacy Policy";
+                } else if (
+                  url ===
+                  "https://villagenyc.notion.site/Terms-of-Service-for-Village-1da7d1897d1e485e8f80125a3a3be087"
+                ) {
+                  return "Terms of Service";
+                } else if (
+                  url ===
+                  "https://villagenyc.notion.site/End-User-License-Agreement-for-Village-2c9b62dc0bbc40c48e8eaf0194f9c30c"
+                ) {
+                  return "End User License Agreement";
+                } else {
+                  return url;
+                }
+              }}
+              onPress={handlePressButtonAsync}
+            >
+              <Text style={styles.optInText}>
+                By selecting Create, you agree to Village's
+                https://villagenyc.notion.site/Privacy-Policy-for-Village-845fb113171045c3bdd26c828e8ccf26,
+                https://villagenyc.notion.site/Terms-of-Service-for-Village-1da7d1897d1e485e8f80125a3a3be087,
+                and
+                https://villagenyc.notion.site/End-User-License-Agreement-for-Village-2c9b62dc0bbc40c48e8eaf0194f9c30c.
+              </Text>
+            </Hyperlink>
+            <Pressable
+              style={[
+                onboardingStyles.button,
+                isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+              ]}
+              onPress={onSave}
+              disabled={isButtonDisabled}
+            >
+              <Text style={onboardingStyles.buttonText}>Create</Text>
+            </Pressable>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
@@ -236,6 +272,11 @@ const styles = StyleSheet.create({
   selectedColor: {
     borderWidth: 2,
     borderColor: "#000",
+  },
+  optInText: {
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 12,
   },
 });
 
