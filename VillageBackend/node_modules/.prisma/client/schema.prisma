@@ -27,6 +27,7 @@ model users {
   fcm_token       String?
   created_at      DateTime       @default(now())
   tags            Json?
+  blocked_users   Json?
 
   posts                    posts[]
   comments                 comments[]
@@ -85,17 +86,18 @@ model buildings {
 }
 
 model posts {
-  id              Int           @id @default(autoincrement())
-  user            users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id         Int
-  neighborhood    neighborhoods @relation(fields: [neighborhood_id], references: [id])
-  neighborhood_id Int
-  text_content    String?
-  image_url       String        @default("")
-  likes_count     Int           @default(0)
-  comments_count  Int           @default(0)
-  created_at      DateTime      @default(now())
-  tags            Json?
+  id                Int           @id @default(autoincrement())
+  user              users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id           Int
+  neighborhood      neighborhoods @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id   Int
+  text_content      String?
+  image_url         String        @default("")
+  likes_count       Int           @default(0)
+  comments_count    Int           @default(0)
+  hidden_from_users Json?
+  created_at        DateTime      @default(now())
+  tags              Json?
 
   comments       comments[]
   likes          post_likes[]
