@@ -57,6 +57,7 @@ router.post("/login", async (req, res) => {
             neighborhood_id: true,
             building_id: true,
             chat_token: true,
+            blocked_users: true,
             neighborhood: {
               select: {
                 name: true,

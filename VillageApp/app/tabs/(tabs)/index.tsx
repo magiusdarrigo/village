@@ -24,7 +24,12 @@ const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
   const [lastScrollPos, setLastScrollPos] = useState(0);
-  const { flatListRef, isFeedHot, updateIsFeedHot, user } = useUser();
+  const {
+    flatListRef,
+    isFeedHot,
+    updateIsFeedHot,
+    user: currentUser,
+  } = useUser();
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
@@ -128,7 +133,12 @@ const FeedScreen = () => {
     if (!tweet) return false;
 
     // if post has the user ID in the hide list, don't show it
-    if (tweet.hidden_from_users.includes(user?.id)) {
+    if (tweet.hidden_from_users.includes(currentUser?.id)) {
+      return false;
+    }
+
+    // if post is from a blocked user, don't show it
+    if (currentUser?.blocked_users.includes(tweet.user_id)) {
       return false;
     }
 

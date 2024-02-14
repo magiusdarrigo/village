@@ -81,6 +81,7 @@ router.put("/", upload.single("image"), async (req, res) => {
         neighborhood_id: true,
         building_id: true,
         chat_token: true,
+        blocked_users: true,
         neighborhood: {
           select: {
             name: true,
@@ -270,6 +271,7 @@ router.get("/", async (req, res) => {
         followers_count: true,
         following_count: true,
         neighborhood_id: true,
+        blocked_users: true,
         building_id: true,
         chat_token: true,
         neighborhood: {

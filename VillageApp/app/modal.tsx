@@ -79,8 +79,13 @@ const ModalScreen = ({ user }: ProfileProps) => {
   const uniquePostItems = postItems.filter((tweet) => {
     if (!tweet) return false;
 
-    // if post has the user ID in the hide list, don't show it
-    if (tweet.hidden_from_users.includes(user?.id)) {
+    // if post has the current user ID in the hide list, don't show it
+    if (tweet.hidden_from_users.includes(currentUser?.id)) {
+      return false;
+    }
+
+    // if post is from a blocked user, don't show it
+    if (currentUser?.blocked_users.includes(tweet.user_id)) {
       return false;
     }
 

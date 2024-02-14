@@ -14,7 +14,7 @@ const ProfileScreen = () => {
   const { user: currentUser } = useUser();
   const { userID, username } = useGlobalSearchParams();
   const navigation = useNavigation();
-  const { getUserProfile } = useTweetsApi();
+  const { getUserProfile, blockUser } = useTweetsApi();
   const { showActionSheetWithOptions } = useActionSheet();
 
   const onOtherUserSettingsPress = () => {
@@ -42,7 +42,7 @@ const ProfileScreen = () => {
                   text: "Block User",
                   onPress: async () => {
                     try {
-                      // await blockUser();
+                      await blockUser(Number(userID));
                     } catch (error) {
                       Sentry.Native.captureException(error);
                       Alert.alert(
