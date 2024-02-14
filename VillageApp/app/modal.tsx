@@ -12,7 +12,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
-import { User } from "../context/UserContext";
+import { UserType } from "../types/index";
 import {
   useMutation,
   useQueryClient,
@@ -21,7 +21,6 @@ import {
 import { useTweetsApi } from "../context/TweetContext";
 import EmptyListView from "../components/EmptyListView";
 import { useUser } from "../context/UserContext";
-import { useAuth } from "../context/AuthContext";
 import { handleChooseCustomImage } from "../lib/helpers";
 import { MaterialCommunityIcon } from "../components/Icons";
 import * as Sentry from "sentry-expo";
@@ -30,7 +29,7 @@ import Tweet from "../components/Tweet";
 import Colors from "../constants/Colors";
 
 type ProfileProps = {
-  user: User;
+  user: UserType;
 };
 
 const ModalScreen = ({ user }: ProfileProps) => {
@@ -41,8 +40,7 @@ const ModalScreen = ({ user }: ProfileProps) => {
     updateUserAttributes,
     listTweetsForProfile,
   } = useTweetsApi();
-  const { user: currentUser, getStreamChatClient, updateUser } = useUser();
-  const { removeAuthToken } = useAuth();
+  const { user: currentUser, updateUser } = useUser();
   const [profileEditLoading, setProfileEditLoading] = React.useState(false);
   const flatListRef = useRef<FlatList>(null);
   const [refreshing, setRefreshing] = useState(false);
