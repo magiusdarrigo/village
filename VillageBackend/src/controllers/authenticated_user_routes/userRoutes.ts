@@ -442,4 +442,48 @@ router.delete("/", async (req, res) => {
   }
 });
 
+/**
+ * Block user request by user
+ */
+router.post("/:id/block", async (req, res) => {
+  console.log("block user called");
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const targetUserID = getNumberFromQuery(id);
+  if (!targetUserID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+  try {
+    await prisma.users.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        blocked_users: {
+          push: targetUserID,
+        },
+      },
+    });
+
+    // TODO: (Make this an asynchronous task) add blocked user ID to the "hidden_from_users" array for all posts by the current user
+    await prisma.posts.updateMany({
+      where: {
+        user_id: currentUser.id,
+      },
+      data: {
+        hidden_from_users: {
+          push: targetUserID,
+        },
+      },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error blocking user",
+    });
+  }
+});
+
 export default router;

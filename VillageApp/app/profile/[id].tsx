@@ -11,10 +11,10 @@ import * as Sentry from "sentry-expo";
 import { useUser } from "../../context/UserContext";
 
 const ProfileScreen = () => {
-  const { user: currentUser } = useUser();
+  const { user: currentUser, updateUser } = useUser();
   const { userID, username } = useGlobalSearchParams();
   const navigation = useNavigation();
-  const { getUserProfile, blockUser } = useTweetsApi();
+  const { getUserProfile, blockUser, unFollowUser } = useTweetsApi();
   const { showActionSheetWithOptions } = useActionSheet();
 
   const onOtherUserSettingsPress = () => {
@@ -42,7 +42,20 @@ const ProfileScreen = () => {
                   text: "Block User",
                   onPress: async () => {
                     try {
+                      await unFollowUser(userID.toString());
                       await blockUser(Number(userID));
+
+                      if (currentUser) {
+                        updateUser({
+                          ...currentUser,
+                          blocked_users: [
+                            ...currentUser.blocked_users,
+                            Number(userID),
+                          ],
+                        });
+                      }
+
+                      navigation.goBack();
                     } catch (error) {
                       Sentry.Native.captureException(error);
                       Alert.alert(
