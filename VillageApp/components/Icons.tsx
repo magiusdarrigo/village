@@ -5,6 +5,7 @@ import {
   AntDesign,
   MaterialCommunityIcons,
   Ionicons,
+  Octicons,
 } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
@@ -43,6 +44,21 @@ export const AntIcon = ({ icon, iconColor, size }: AntIconProps) => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <AntDesign name={icon} size={size} color={iconColor} />
+    </View>
+  );
+};
+
+type OcticonProps = {
+  icon: React.ComponentProps<typeof Octicons>["name"];
+  text?: string | number;
+  iconColor?: string;
+  size: number;
+};
+
+export const Octicon = ({ icon, iconColor, size }: OcticonProps) => {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <Octicons name={icon} size={size} color={iconColor} />
     </View>
   );
 };

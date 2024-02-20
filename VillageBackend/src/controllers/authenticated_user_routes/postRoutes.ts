@@ -69,6 +69,31 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// hide a post
+router.post("/:id/hide", async (req, res) => {
+  console.log("hide post called");
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+
+  try {
+    const hiddenPost = await prisma.posts.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        hidden_from_users: {
+          push: currentUser.id,
+        },
+      },
+    });
+
+    res.status(200).json(hiddenPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error hiding the post." });
+  }
+});
+
 // create post
 router.post("/", upload.single("image"), async (req, res) => {
   console.log("create post called");

@@ -24,7 +24,12 @@ const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
   const [lastScrollPos, setLastScrollPos] = useState(0);
-  const { flatListRef, isFeedHot, updateIsFeedHot } = useUser();
+  const {
+    flatListRef,
+    isFeedHot,
+    updateIsFeedHot,
+    user: currentUser,
+  } = useUser();
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
@@ -126,16 +131,25 @@ const FeedScreen = () => {
   const uniqueIds = new Set();
   const uniqueItems = items.filter((tweet) => {
     if (!tweet) return false;
-    const isDuplicate = uniqueIds.has(tweet.id);
 
+    // if post has the user ID in the hide list, don't show it
+    if (tweet.hidden_from_users.includes(currentUser?.id)) {
+      return false;
+    }
+
+    // if post is from a blocked user, don't show it
+    if (currentUser?.blocked_users.includes(tweet.user_id)) {
+      return false;
+    }
+
+    const isDuplicate = uniqueIds.has(tweet.id);
     // Add the ID to the Set if it's not already there
     if (!isDuplicate) {
       uniqueIds.add(tweet.id);
       return true;
+    } else {
+      return false;
     }
-
-    // If it's a duplicate, filter it out
-    return false;
   });
 
   return (
