@@ -38,7 +38,7 @@ const TweetScreen = () => {
   const queryClient = useQueryClient();
   const inputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
-  const { isFeedHot } = useUser();
+  const { isFeedHot, user: currentUser } = useUser();
 
   const [commentText, setCommentText] = useState("");
   const [selectedCommentID, setSelectedCommentID] = useState<
@@ -230,6 +230,11 @@ const TweetScreen = () => {
     if (!isDuplicate) {
       uniqueIds.add(comment.id);
       return true;
+    }
+
+    // if comment is from a blocked user, don't show it
+    if (currentUser?.blocked_users.includes(comment.user_id)) {
+      return false;
     }
 
     // If it's a duplicate, filter it out

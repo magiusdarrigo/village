@@ -19,6 +19,7 @@ export type UserType = {
   is_verified?: boolean;
   image?: string;
   followed_by_user?: boolean;
+  blocked_users: number[];
 };
 
 export type TweetType = {
@@ -34,6 +35,7 @@ export type TweetType = {
   created_at: string;
   liked_by_user: boolean;
   disliked_by_user: boolean;
+  hidden_from_users: number[];
 };
 
 export type CommentType = {

@@ -20,6 +20,7 @@ interface TweetsApiContextType {
   reportTweet: (id: string) => Promise<any>;
   deleteComment: (data: { id: string; postID: string }) => Promise<any>;
   deleteTweet: (id: string) => Promise<any>;
+  hideTweet: (id: string) => Promise<any>;
   likeComment: (data: {
     commentID: string;
     isDislike: boolean;
@@ -62,6 +63,8 @@ interface TweetsApiContextType {
     selectedNeighborhood: string
   ) => Promise<any>;
   addBuildingChangeRequest: (address: string) => Promise<any>;
+  accountDeletionRequest: () => Promise<any>;
+  blockUser: (userID: number) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -73,6 +76,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   reportTweet: async () => {},
   deleteComment: async () => {},
   deleteTweet: async () => {},
+  hideTweet: async () => {},
   likeComment: async () => {},
   likeTweet: async () => {},
   unlikeComment: async () => {},
@@ -89,6 +93,8 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   getBuilding: async () => {},
   createBuilding: async () => {},
   addBuildingChangeRequest: async () => {},
+  accountDeletionRequest: async () => {},
+  blockUser: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -316,6 +322,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (res.status !== 200) {
       throw new Error("Error deleting post");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const hideTweet = async (id: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/posts/${id}/hide`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error hiding post");
     }
 
     const body = await res.json();
@@ -844,6 +877,60 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const accountDeletionRequest = async () => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error requesting account deletion");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const blockUser = async (userID: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users/${userID}/block`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error blocking user");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   return (
     <TweetsApiContext.Provider
       value={{
@@ -855,6 +942,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         reportTweet,
         deleteComment,
         deleteTweet,
+        hideTweet,
         likeComment,
         likeTweet,
         unlikeComment,
@@ -871,6 +959,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         getBuilding,
         createBuilding,
         addBuildingChangeRequest,
+        accountDeletionRequest,
+        blockUser,
       }}
     >
       {children}

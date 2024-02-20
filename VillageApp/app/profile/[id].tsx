@@ -1,21 +1,105 @@
-import { ActivityIndicator, Alert } from "react-native";
+import { ActivityIndicator, Alert, Pressable } from "react-native";
 import { useEffect } from "react";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import ModalScreen from "../modal";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
+import { useActionSheet } from "@expo/react-native-action-sheet";
+import { Entypo } from "@expo/vector-icons";
+import Colors from "../../constants/Colors";
+import * as Sentry from "sentry-expo";
+import { useUser } from "../../context/UserContext";
 
 const ProfileScreen = () => {
+  const { user: currentUser, updateUser } = useUser();
   const { userID, username } = useGlobalSearchParams();
   const navigation = useNavigation();
-  const { getUserProfile } = useTweetsApi();
+  const { getUserProfile, blockUser, unFollowUser } = useTweetsApi();
+  const { showActionSheetWithOptions } = useActionSheet();
+
+  const onOtherUserSettingsPress = () => {
+    const options = ["Block", "Cancel"];
+    const blockUserIndex = 0;
+    const cancelButtonIndex = 1;
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex: blockUserIndex,
+      },
+      (selectedIndex: any) => {
+        switch (selectedIndex) {
+          case blockUserIndex:
+            Alert.alert(
+              "Are you sure you want block this user?",
+              "This action cannot be undone.",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Block User",
+                  onPress: async () => {
+                    try {
+                      await unFollowUser(userID.toString());
+                      await blockUser(Number(userID));
+
+                      if (currentUser) {
+                        updateUser({
+                          ...currentUser,
+                          blocked_users: [
+                            ...currentUser.blocked_users,
+                            Number(userID),
+                          ],
+                        });
+                      }
+
+                      navigation.goBack();
+                    } catch (error) {
+                      Sentry.Native.captureException(error);
+                      Alert.alert(
+                        "Error",
+                        "There was an error blocking the user. Please try again."
+                      );
+                    }
+                  },
+                },
+              ]
+            );
+            break;
+        }
+      }
+    );
+  };
 
   // Set header title
   useEffect(() => {
     if (username) {
+      if (username === currentUser?.username) {
+        navigation.setOptions({
+          title: "You",
+        });
+        return;
+      }
       let headerTitle = `@${username}`;
       navigation.setOptions({
         title: headerTitle,
+        headerRight: () => (
+          <Pressable onPress={onOtherUserSettingsPress}>
+            {({ pressed }) => (
+              <Entypo
+                name="dots-three-horizontal"
+                size={25}
+                color={Colors.light.text}
+                style={{
+                  marginRight: 15,
+                  opacity: pressed ? 0.5 : 1,
+                }}
+              />
+            )}
+          </Pressable>
+        ),
       });
     }
   }, [username, navigation]);

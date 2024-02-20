@@ -81,6 +81,7 @@ router.put("/", upload.single("image"), async (req, res) => {
         neighborhood_id: true,
         building_id: true,
         chat_token: true,
+        blocked_users: true,
         neighborhood: {
           select: {
             name: true,
@@ -270,6 +271,7 @@ router.get("/", async (req, res) => {
         followers_count: true,
         following_count: true,
         neighborhood_id: true,
+        blocked_users: true,
         building_id: true,
         chat_token: true,
         neighborhood: {
@@ -404,6 +406,82 @@ router.put("/:id/notifications", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: "error updating notifications for user",
+    });
+  }
+});
+
+/**
+ * Account deletion request by user
+ */
+router.delete("/", async (req, res) => {
+  console.log("delete user called");
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  try {
+    await prisma.account_deletion_requests.create({
+      data: {
+        user_id: currentUser.id,
+      },
+    });
+
+    await prisma.users.delete({
+      where: {
+        id: currentUser.id,
+      },
+    });
+
+    // delete user from stream chat
+    await streamChatClient.deleteUser(currentUser.id.toString());
+
+    console.log("user deleted: ", currentUser.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error deleting user account",
+    });
+  }
+});
+
+/**
+ * Block user request by user
+ */
+router.post("/:id/block", async (req, res) => {
+  console.log("block user called");
+  const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
+  const targetUserID = getNumberFromQuery(id);
+  if (!targetUserID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+  try {
+    await prisma.users.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        blocked_users: {
+          push: targetUserID,
+        },
+      },
+    });
+
+    // TODO: (Make this an asynchronous task) add blocked user ID to the "hidden_from_users" array for all posts by the current user
+    await prisma.posts.updateMany({
+      where: {
+        user_id: currentUser.id,
+      },
+      data: {
+        hidden_from_users: {
+          push: targetUserID,
+        },
+      },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error blocking user",
     });
   }
 });

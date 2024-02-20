@@ -21,7 +21,9 @@ import {
   Channel,
   MessageInput,
   MessageList,
+  messageActions as defaultMessageActions,
 } from "stream-chat-expo";
+import { Octicon } from "../../../components/Icons";
 
 let areNotificationsEnabled = false;
 
@@ -215,7 +217,19 @@ const ChatScreen = () => {
           keyboardVerticalOffset={Platform.select({ ios: 100, android: 80 })} // Adjust the offset as needed
         >
           <Chat client={streamChatClient}>
-            <Channel channel={channel}>
+            <Channel
+              channel={channel}
+              messageActions={(param) => {
+                const { isMyMessage, muteUser } = param;
+                const actions = defaultMessageActions({ ...param }) as any[];
+
+                if (!isMyMessage) {
+                  actions.push(muteUser);
+                }
+
+                return actions;
+              }}
+            >
               <MessageList />
               <MessageInput />
             </Channel>

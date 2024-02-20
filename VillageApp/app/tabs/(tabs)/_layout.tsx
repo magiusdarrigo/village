@@ -11,6 +11,7 @@ import * as Sentry from "sentry-expo";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { handlePressButtonAsync } from "../../../lib/helpers";
 import { useTweetsApi } from "../../../context/TweetContext";
+import { Linking } from "react-native";
 
 const TERMS_OF_SERVICE_URL =
   "https://villagenyc.notion.site/Terms-of-Use-Sale-for-Village-1da7d1897d1e485e8f80125a3a3be087?pvs=4";
@@ -61,7 +62,7 @@ export default function TabLayout() {
     updateActiveTab,
   } = useUser();
   const { removeAuthToken } = useAuth();
-  const { addBuildingChangeRequest } = useTweetsApi();
+  const { addBuildingChangeRequest, accountDeletionRequest } = useTweetsApi();
   const [appState, setAppState] = useState(AppState.currentState);
   const streamChatClient = getStreamChatClient();
   const { showActionSheetWithOptions } = useActionSheet();
@@ -140,6 +141,8 @@ export default function TabLayout() {
       "Terms of Service",
       "Privacy Policy",
       "Report A Bug",
+      "Contact Us",
+      "Delete Account",
       "Log Out",
       "Cancel",
     ];
@@ -147,14 +150,17 @@ export default function TabLayout() {
     const termsOfServiceIndex = 1;
     const privacyPolicyIndex = 2;
     const reportABugIndex = 3;
-    const destructiveButtonIndex = 4;
-    const cancelButtonIndex = 5;
+    const contactUsIndex = 4;
+    const deleteAccountIndex = 5;
+    const logOutIndex = 6;
+    const destructiveButtonIndexes = [deleteAccountIndex, logOutIndex];
+    const cancelButtonIndex = 7;
 
     showActionSheetWithOptions(
       {
         options,
         cancelButtonIndex,
-        destructiveButtonIndex,
+        destructiveButtonIndex: destructiveButtonIndexes,
       },
       (selectedIndex: any) => {
         switch (selectedIndex) {
@@ -175,7 +181,39 @@ export default function TabLayout() {
           case reportABugIndex:
             handlePressButtonAsync(REPORT_A_BUG_URL);
             break;
-          case destructiveButtonIndex:
+          case contactUsIndex:
+            Linking.openURL("mailto:magiusdarrigo@gmail.com");
+            break;
+          case deleteAccountIndex:
+            Alert.alert(
+              "Are you sure you want to delete your account?",
+              "All related data will be permanently deleted within 48 hours. This action cannot be undone.",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Delete Account",
+                  onPress: async () => {
+                    try {
+                      // delete account request submitted
+                      await accountDeletionRequest();
+                      streamChatClient.disconnectUser();
+                      removeAuthToken();
+                    } catch (error) {
+                      Sentry.Native.captureException(error);
+                      Alert.alert(
+                        "Error",
+                        "There was an error deleting your account. Please try again."
+                      );
+                    }
+                  },
+                },
+              ]
+            );
+            break;
+          case logOutIndex:
             Alert.alert("Are you sure you want to log out?", "", [
               {
                 text: "Cancel",

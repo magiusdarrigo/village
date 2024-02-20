@@ -14,6 +14,7 @@ import postStyles from "../lib/styles/post";
 import Hyperlink from "react-native-hyperlink";
 import { handlePressButtonAsync } from "../lib/helpers";
 import Colors from "../constants/Colors";
+import { AlertButton } from "react-native";
 
 type TweetProps = {
   tweet: TweetType;
@@ -23,7 +24,8 @@ type TweetProps = {
 const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
   const [imageSize, setImageSize] = useState({ width: 1, height: 1 });
   const [postWidth, setPostWidth] = useState(1);
-  const { likeTweet, unlikeTweet, deleteTweet, reportTweet } = useTweetsApi();
+  const { likeTweet, unlikeTweet, deleteTweet, reportTweet, hideTweet } =
+    useTweetsApi();
   const queryClient = useQueryClient();
   const navigation = useNavigation();
   const segments = useSegments();
@@ -321,6 +323,57 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     },
   });
 
+  // hide a tweet
+  const { mutate: mutateHide } = useMutation(hideTweet, {
+    onSuccess: (data) => {
+      // update the list of tweets in the cache
+      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
+        if (!old) return;
+        // Map over the pages
+        return {
+          ...old,
+          pages: old.pages.map((page: { data: any[] }) => {
+            // Map over the tweets in the page
+            return {
+              ...page,
+              data: page.data.filter((tweet) => tweet.id !== data.id),
+            };
+          }),
+        };
+      });
+      queryClient.setQueryData(
+        ["profiletweets", String(tweet.user_id)],
+        (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.filter((tweet) => tweet.id !== data.id),
+              };
+            }),
+          };
+        }
+      );
+      // if the tweet is open, go back to the feed
+      const segLen = segments.length;
+      if (
+        segLen >= 2 &&
+        segments[segLen - 2] === "tweet" &&
+        segments[segLen - 1] === "[id]"
+      ) {
+        navigation.goBack();
+      }
+    },
+    onError: (error) => {
+      Sentry.Native.captureException(error);
+      Alert.alert("We couldn't delete this post. Try again.");
+    },
+  });
+
   const onReport = async (id: number) => {
     try {
       await reportTweet(String(id));
@@ -331,28 +384,45 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     }
   };
 
-  const handle3DotsPressed = (userID: number, tweet: TweetType) => {
-    if (userID !== tweet.user_id) {
-      Alert.alert("Report Post?", "", [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        { text: "Yes", onPress: () => onReport(tweet.id) },
-      ]);
-    } else {
-      Alert.alert(
-        "Delete Post?",
-        "Are you sure you want to delete this post?",
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
-          { text: "Yes", onPress: () => mutateDelete(String(tweet.id)) },
-        ]
-      );
+  const onHide = async (id: number) => {
+    try {
+      mutateHide(String(id));
+      Alert.alert("Post hidden.");
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We couldn't hide this post. Try again.");
     }
+  };
+
+  const handle3DotsPressed = (userID: number, tweet: TweetType) => {
+    const alertOptions: AlertButton[] = [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ];
+
+    if (userID !== tweet.user_id) {
+      // If the current user is not the author of the post
+      alertOptions.push(
+        { text: "Report", onPress: () => onReport(tweet.id) },
+        { text: "Hide", onPress: () => onHide(tweet.id) } // Add Hide option here
+      );
+    } else {
+      // If the current user is the author of the post
+      alertOptions.push({
+        text: "Delete",
+        onPress: () => mutateDelete(String(tweet.id)),
+      });
+    }
+
+    Alert.alert(
+      userID !== tweet.user_id ? "Harmful Post?" : "Delete Post?",
+      userID !== tweet.user_id
+        ? ""
+        : "Are you sure you want to delete this post?",
+      alertOptions
+    );
   };
 
   const handleToggleLike = async (isDislike: boolean) => {
