@@ -32,12 +32,6 @@ router.post("/", async (req, res) => {
     await channel.create();
     res.json(newBuilding);
   } catch (error) {
-    // delete building if chat creation fails
-    await prisma.buildings.delete({
-      where: {
-        address,
-      },
-    });
     console.error(error);
     res.status(500).json({
       error: `error creating building with address ${address}`,
