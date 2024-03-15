@@ -7,34 +7,41 @@ async function main() {
 
   // seed the neighborhoods table with the top New York neighborhoods
   const neighborhoods = [
+    "Battery Park City",
+    "Carnegie Hill",
+    "Central Harlem",
     "Chelsea",
     "Chinatown",
+    "East Harlem",
     "East Village",
     "Fidi",
     "Flatiron",
     "Gramercy",
     "Greenwich Village",
-    "Harlem",
     "Hell's Kitchen",
     "Hudson Yards",
+    "Kips Bay",
+    "Lenox Hill",
     "Little Italy",
     "Lower East Side",
+    "Manhattanville",
+    "Meatpacking District",
     "Midtown",
     "Murray Hill",
+    "NoHo",
     "Nolita",
+    "NoMad",
     "SoHo",
     "Tribeca",
+    "Turtle Bay",
+    "Two Bridges",
+    "Upper East Side",
     "Upper West Side",
+    "West Harlem",
     "West Village",
     "Williamsburg",
+    "Yorkville",
   ];
-
-  // enforce upper east side to be id 1
-  await prisma.neighborhoods.create({
-    data: {
-      name: "Upper East Side",
-    },
-  });
 
   const neighborhoodPromises = neighborhoods.map((neighborhood) => {
     return prisma.neighborhoods.create({

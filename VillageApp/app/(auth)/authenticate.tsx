@@ -74,6 +74,8 @@ const Authenticate = () => {
             style={styles.input}
             keyboardType="phone-pad"
             autoFocus={false}
+            multiline={true}
+            numberOfLines={1}
           />
           <Pressable
             style={[
@@ -108,6 +110,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     fontSize: 20,
     color: "black",
+    flex: 1,
   },
 });
 

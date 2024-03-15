@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       _prisma_migrations: {
@@ -39,6 +39,33 @@ export interface Database {
           migration_name?: string
           rolled_back_at?: string | null
           started_at?: string
+        }
+        Relationships: []
+      }
+      account_deletion_requests: {
+        Row: {
+          created_at: string
+          id: number
+          reason: string | null
+          tags: Json | null
+          user_id: number
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          reason?: string | null
+          tags?: Json | null
+          user_id: number
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          reason?: string | null
+          tags?: Json | null
+          user_id?: number
+          username?: string | null
         }
         Relationships: []
       }
@@ -368,6 +395,7 @@ export interface Database {
         Row: {
           comments_count: number
           created_at: string
+          hidden_from_users: number[] | null
           id: number
           image_url: string
           likes_count: number
@@ -379,6 +407,7 @@ export interface Database {
         Insert: {
           comments_count?: number
           created_at?: string
+          hidden_from_users?: number[] | null
           id?: number
           image_url?: string
           likes_count?: number
@@ -390,6 +419,7 @@ export interface Database {
         Update: {
           comments_count?: number
           created_at?: string
+          hidden_from_users?: number[] | null
           id?: number
           image_url?: string
           likes_count?: number
@@ -584,6 +614,7 @@ export interface Database {
       }
       users: {
         Row: {
+          blocked_users: number[] | null
           building_id: number | null
           chat_token: string | null
           created_at: string
@@ -599,6 +630,7 @@ export interface Database {
           username: string
         }
         Insert: {
+          blocked_users?: number[] | null
           building_id?: number | null
           chat_token?: string | null
           created_at?: string
@@ -614,6 +646,7 @@ export interface Database {
           username: string
         }
         Update: {
+          blocked_users?: number[] | null
           building_id?: number | null
           chat_token?: string | null
           created_at?: string
