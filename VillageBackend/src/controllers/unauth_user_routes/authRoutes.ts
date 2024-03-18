@@ -76,7 +76,7 @@ router.post("/login", async (req, res) => {
     const user = userWithToken.user;
 
     if (!user.chat_token) {
-      const chatToken = streamChatClient.createToken(user.id.toString());
+      const chatToken = streamChatClient.createToken(user.id);
       await prisma.users.update({
         where: {
           id: user.id,

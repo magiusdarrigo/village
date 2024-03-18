@@ -49,7 +49,7 @@ router.put("/", upload.single("image"), async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    return res.status(500).json({
       error: `error uploading image for user`,
     });
   }
@@ -142,7 +142,7 @@ router.post("/:id/follow", async (req, res) => {
     const createFollowing = prisma.user_following.create({
       data: {
         follower_user_id: currentUser.id,
-        following_user_id: Number(id),
+        following_user_id: id,
       },
     });
 
@@ -152,11 +152,11 @@ router.post("/:id/follow", async (req, res) => {
     });
 
     const incrementFollowersCount = prisma.users.update({
-      where: { id: Number(id) },
+      where: { id },
       data: { followers_count: { increment: 1 } },
     });
 
-    const [userFollowing, _, followedUser] = await prisma.$transaction([
+    const [_, __, followedUser] = await prisma.$transaction([
       createFollowing,
       incrementFollowingCount,
       incrementFollowersCount,
@@ -181,7 +181,7 @@ router.post("/:id/follow", async (req, res) => {
       data: {
         title,
         message,
-        for_user_id: Number(id),
+        for_user_id: id,
         from_user_id: currentUser.id,
       },
     });
@@ -204,7 +204,7 @@ router.delete("/:id/follow", async (req, res) => {
     const deleteFollowing = prisma.user_following.deleteMany({
       where: {
         follower_user_id: currentUser.id,
-        following_user_id: Number(id),
+        following_user_id: id,
       },
     });
 
@@ -214,7 +214,7 @@ router.delete("/:id/follow", async (req, res) => {
     });
 
     const decrementFollowersCount = prisma.users.update({
-      where: { id: Number(id) },
+      where: { id },
       data: { followers_count: { decrement: 1 } },
     });
 
@@ -237,7 +237,7 @@ router.get("/:id", async (req, res) => {
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    const getUserQuery = getUserProfileQuery(currentUser.id, Number(id));
+    const getUserQuery = getUserProfileQuery(currentUser.id, id);
     const user = (await prisma.$queryRaw(getUserQuery)) as any[];
 
     if (user.length !== 1) {
@@ -305,7 +305,7 @@ router.get("/:id/posts", async (req, res) => {
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const currentUserID = currentUser.id;
-  const userID = getNumberFromQuery(id);
+  const userID = id;
   const cursor = getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
 
   if (!userID) {
@@ -337,7 +337,7 @@ router.get("/:id/notifications", async (req, res) => {
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const currentUserID = currentUser.id;
-  const userID = getNumberFromQuery(id);
+  const userID = id;
   const cursor = getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
 
   if (!userID) {
@@ -377,7 +377,7 @@ router.put("/:id/notifications", async (req, res) => {
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const currentUserID = currentUser.id;
-  const userID = getNumberFromQuery(id);
+  const userID = id;
   const notificationIds = req.body.notificationIDs;
   const read = req.body.read;
 
@@ -449,7 +449,7 @@ router.post("/:id/block", async (req, res) => {
   console.log("block user called");
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
-  const targetUserID = getNumberFromQuery(id);
+  const targetUserID = id;
   if (!targetUserID) {
     return res.status(400).json({ error: "id is required" });
   }
