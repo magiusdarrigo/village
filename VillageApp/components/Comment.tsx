@@ -311,7 +311,7 @@ const Comment = ({
     }
   };
 
-  const handle3DotsPressed = (userID: number, comment: CommentType) => {
+  const handle3DotsPressed = (userID: string, comment: CommentType) => {
     if (userID !== comment.user_id) {
       Alert.alert("Report Comment?", "", [
         {

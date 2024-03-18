@@ -12,7 +12,8 @@ import { useUser } from "../../context/UserContext";
 
 const ProfileScreen = () => {
   const { user: currentUser, updateUser } = useUser();
-  const { userID, username } = useGlobalSearchParams();
+  const { userIDParam, username } = useGlobalSearchParams();
+  const userID = String(userIDParam);
   const navigation = useNavigation();
   const { getUserProfile, blockUser, unFollowUser } = useTweetsApi();
   const { showActionSheetWithOptions } = useActionSheet();
@@ -42,16 +43,13 @@ const ProfileScreen = () => {
                   text: "Block User",
                   onPress: async () => {
                     try {
-                      await unFollowUser(userID.toString());
-                      await blockUser(Number(userID));
+                      await unFollowUser(userID);
+                      await blockUser(userID);
 
                       if (currentUser) {
                         updateUser({
                           ...currentUser,
-                          blocked_users: [
-                            ...currentUser.blocked_users,
-                            Number(userID),
-                          ],
+                          blocked_users: [...currentUser.blocked_users, userID],
                         });
                       }
 
