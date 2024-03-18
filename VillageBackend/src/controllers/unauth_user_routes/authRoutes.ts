@@ -121,7 +121,6 @@ router.post("/authenticate", async (req, res) => {
       },
     });
 
-    // TODO: once i get twilio working, uncomment this
     if (!dbPhoneToken || !dbPhoneToken.valid) {
       console.log("Invalid OTP");
       return res.status(401).send("Invalid OTP.");

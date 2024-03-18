@@ -20,13 +20,14 @@ import onboardingStyles from "../../lib/styles/onboarding";
 
 const Authenticate = () => {
   const [code, setCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { phoneNumber } = useGlobalSearchParams();
   const router = useRouter();
   const { updateAuthToken } = useAuth();
   const { user } = useUser();
   const otpCodeRef = useRef<TextInput>(null);
 
-  const isButtonDisabled = code.length < 6;
+  const isCodeInvalid = code.length < 6;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -45,6 +46,7 @@ const Authenticate = () => {
       return;
     }
     try {
+      setIsLoading(true);
       Keyboard.dismiss();
       const res = await authenticate({ phoneNumber, phoneToken: code });
       updateAuthToken(res.token);
@@ -52,7 +54,11 @@ const Authenticate = () => {
         router.replace("/createProfile");
       }
     } catch (e) {
-      Alert.alert("Your OTP code doesn't match. Try again.");
+      Alert.alert("Your OTP code expired or doesn't match. Try again.");
+      // send the user back to the sign in page
+      router.replace("/signIn");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,10 +86,10 @@ const Authenticate = () => {
           <Pressable
             style={[
               onboardingStyles.button,
-              isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+              isCodeInvalid || isLoading ? onboardingStyles.buttonDisabled : {},
             ]}
             onPress={onConfirm}
-            disabled={isButtonDisabled}
+            disabled={isCodeInvalid || isLoading}
           >
             <Text style={onboardingStyles.buttonText}>Confirm</Text>
           </Pressable>

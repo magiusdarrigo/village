@@ -86,9 +86,7 @@ const CreateProfile = () => {
       });
       updateUser(updatedUser);
       router.replace("/pickBuilding");
-      setIsSaving(false);
     } catch (error: any) {
-      setIsSaving(false);
       // convert error to json
       const err = await error.json();
       if (err?.status === 400) {
@@ -97,6 +95,8 @@ const CreateProfile = () => {
       }
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue uploading your profile. Try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 

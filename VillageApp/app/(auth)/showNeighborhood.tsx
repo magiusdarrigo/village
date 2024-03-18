@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
 import { useGlobalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
@@ -12,6 +12,7 @@ const ShowNeighborhood = () => {
     useGlobalSearchParams();
   const { updateUserAttributes } = useTweetsApi();
   const { user, updateUser } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onEnter = async () => {
     try {
@@ -25,6 +26,7 @@ const ShowNeighborhood = () => {
       if (typeof buildingID !== "string") {
         throw new Error("Building ID is not a string");
       }
+      setIsLoading(true);
       const updatedUser = await updateUserAttributes({
         neighborhoodID: neighborhoodID,
         buildingID: buildingID,
@@ -33,6 +35,8 @@ const ShowNeighborhood = () => {
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,7 +46,14 @@ const ShowNeighborhood = () => {
         <Text style={styles.welcomeLabel}>
           Welcome to {neighborhoodName} on Village.
         </Text>
-        <Pressable style={onboardingStyles.button} onPress={onEnter}>
+        <Pressable
+          style={[
+            onboardingStyles.button,
+            isLoading ? onboardingStyles.buttonDisabled : {},
+          ]}
+          onPress={onEnter}
+          disabled={isLoading}
+        >
           <Text style={onboardingStyles.buttonText}>Enter</Text>
         </Pressable>
       </View>

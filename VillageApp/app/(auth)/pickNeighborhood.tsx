@@ -10,6 +10,7 @@ import * as Sentry from "sentry-expo";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { buildingAddress } = useGlobalSearchParams();
   const { createBuilding } = useTweetsApi();
   const { user } = useUser();
@@ -53,6 +54,7 @@ const PickNeighborhood = () => {
 
   const onSubmit = async () => {
     try {
+      setIsLoading(true);
       // create building and attach to neighborhood
       const building = await createBuilding(
         buildingAddress as string,
@@ -73,6 +75,8 @@ const PickNeighborhood = () => {
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,7 +100,14 @@ const PickNeighborhood = () => {
             />
           ))}
         </Picker>
-        <Pressable style={onboardingStyles.button} onPress={onSubmit}>
+        <Pressable
+          style={[
+            onboardingStyles.button,
+            isLoading ? onboardingStyles.buttonDisabled : {},
+          ]}
+          onPress={onSubmit}
+          disabled={isLoading}
+        >
           <Text style={onboardingStyles.buttonText}>Submit</Text>
         </Pressable>
       </View>
