@@ -12,7 +12,7 @@ import { useUser } from "../../context/UserContext";
 
 const ProfileScreen = () => {
   const { user: currentUser, updateUser } = useUser();
-  const { userIDParam, username } = useGlobalSearchParams();
+  const { userID: userIDParam, username } = useGlobalSearchParams();
   const userID = String(userIDParam);
   const navigation = useNavigation();
   const { getUserProfile, blockUser, unFollowUser } = useTweetsApi();
