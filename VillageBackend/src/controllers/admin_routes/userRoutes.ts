@@ -41,7 +41,7 @@ router.delete("/:id", async (req, res) => {
   try {
     const deletedUser = await prisma.users.delete({
       where: {
-        id: Number(id),
+        id,
       },
     });
     res.json(deletedUser);
@@ -86,7 +86,7 @@ router.put("/:id", async (req, res) => {
   try {
     const updatedUser = await prisma.users.update({
       where: {
-        id: Number(id),
+        id,
       },
       data: {
         image,
@@ -125,7 +125,7 @@ router.get("/:id", async (req, res) => {
   try {
     const user = await prisma.users.findUnique({
       where: {
-        id: Number(id),
+        id,
       },
     });
     res.json(user);

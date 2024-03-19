@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       _prisma_migrations: {
@@ -42,27 +42,54 @@ export interface Database {
         }
         Relationships: []
       }
+      account_deletion_requests: {
+        Row: {
+          created_at: string
+          id: number
+          reason: string | null
+          tags: Json | null
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          reason?: string | null
+          tags?: Json | null
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          reason?: string | null
+          tags?: Json | null
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       building_change_requests: {
         Row: {
           address_request: string
           created_at: string
           id: number
           tags: Json | null
-          user_id: number
+          user_id: string
         }
         Insert: {
           address_request: string
           created_at?: string
           id?: number
           tags?: Json | null
-          user_id: number
+          user_id: string
         }
         Update: {
           address_request?: string
           created_at?: string
           id?: number
           tags?: Json | null
-          user_id?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -113,7 +140,7 @@ export interface Database {
           id: number
           tags: Json | null
           text_content: string
-          user_id: number
+          user_id: string
         }
         Insert: {
           building_id: number
@@ -121,7 +148,7 @@ export interface Database {
           id?: number
           tags?: Json | null
           text_content: string
-          user_id: number
+          user_id: string
         }
         Update: {
           building_id?: number
@@ -129,7 +156,7 @@ export interface Database {
           id?: number
           tags?: Json | null
           text_content?: string
-          user_id?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -153,19 +180,19 @@ export interface Database {
           comment_id: number
           id: number
           is_dislike: boolean
-          user_id: number
+          user_id: string
         }
         Insert: {
           comment_id: number
           id?: number
           is_dislike?: boolean
-          user_id: number
+          user_id: string
         }
         Update: {
           comment_id?: number
           id?: number
           is_dislike?: boolean
-          user_id?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -193,7 +220,7 @@ export interface Database {
           post_id: number
           tags: Json | null
           text_content: string
-          user_id: number
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -203,7 +230,7 @@ export interface Database {
           post_id: number
           tags?: Json | null
           text_content: string
-          user_id: number
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -213,7 +240,7 @@ export interface Database {
           post_id?: number
           tags?: Json | null
           text_content?: string
-          user_id?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -265,8 +292,8 @@ export interface Database {
           created_at: string
           for_comment_id: number | null
           for_post_id: number | null
-          for_user_id: number
-          from_user_id: number | null
+          for_user_id: string
+          from_user_id: string | null
           id: number
           message: string
           read: boolean
@@ -277,8 +304,8 @@ export interface Database {
           created_at?: string
           for_comment_id?: number | null
           for_post_id?: number | null
-          for_user_id: number
-          from_user_id?: number | null
+          for_user_id: string
+          from_user_id?: string | null
           id?: number
           message: string
           read?: boolean
@@ -289,8 +316,8 @@ export interface Database {
           created_at?: string
           for_comment_id?: number | null
           for_post_id?: number | null
-          for_user_id?: number
-          from_user_id?: number | null
+          for_user_id?: string
+          from_user_id?: string | null
           id?: number
           message?: string
           read?: boolean
@@ -333,19 +360,19 @@ export interface Database {
           id: number
           is_dislike: boolean
           post_id: number
-          user_id: number
+          user_id: string
         }
         Insert: {
           id?: number
           is_dislike?: boolean
           post_id: number
-          user_id: number
+          user_id: string
         }
         Update: {
           id?: number
           is_dislike?: boolean
           post_id?: number
-          user_id?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -368,35 +395,38 @@ export interface Database {
         Row: {
           comments_count: number
           created_at: string
+          hidden_from_users: string[] | null
           id: number
           image_url: string
           likes_count: number
           neighborhood_id: number
           tags: Json | null
           text_content: string | null
-          user_id: number
+          user_id: string
         }
         Insert: {
           comments_count?: number
           created_at?: string
+          hidden_from_users?: string[] | null
           id?: number
           image_url?: string
           likes_count?: number
           neighborhood_id: number
           tags?: Json | null
           text_content?: string | null
-          user_id: number
+          user_id: string
         }
         Update: {
           comments_count?: number
           created_at?: string
+          hidden_from_users?: string[] | null
           id?: number
           image_url?: string
           likes_count?: number
           neighborhood_id?: number
           tags?: Json | null
           text_content?: string | null
-          user_id?: number
+          user_id?: string
         }
         Relationships: [
           {
@@ -422,7 +452,7 @@ export interface Database {
           id: number
           reason: string | null
           tags: Json | null
-          user_id_reporting: number
+          user_id_reporting: string
         }
         Insert: {
           comment_id: number
@@ -430,7 +460,7 @@ export interface Database {
           id?: number
           reason?: string | null
           tags?: Json | null
-          user_id_reporting: number
+          user_id_reporting: string
         }
         Update: {
           comment_id?: number
@@ -438,7 +468,7 @@ export interface Database {
           id?: number
           reason?: string | null
           tags?: Json | null
-          user_id_reporting?: number
+          user_id_reporting?: string
         }
         Relationships: [
           {
@@ -464,7 +494,7 @@ export interface Database {
           post_id: number
           reason: string | null
           tags: Json | null
-          user_id_reporting: number
+          user_id_reporting: string
         }
         Insert: {
           created_at?: string
@@ -472,7 +502,7 @@ export interface Database {
           post_id: number
           reason?: string | null
           tags?: Json | null
-          user_id_reporting: number
+          user_id_reporting: string
         }
         Update: {
           created_at?: string
@@ -480,7 +510,7 @@ export interface Database {
           post_id?: number
           reason?: string | null
           tags?: Json | null
-          user_id_reporting?: number
+          user_id_reporting?: string
         }
         Relationships: [
           {
@@ -508,7 +538,7 @@ export interface Database {
           tags: Json | null
           type: Database["public"]["Enums"]["TokenType"]
           updated_at: string
-          user_id: number
+          user_id: string
           valid: boolean
         }
         Insert: {
@@ -519,7 +549,7 @@ export interface Database {
           tags?: Json | null
           type: Database["public"]["Enums"]["TokenType"]
           updated_at: string
-          user_id: number
+          user_id: string
           valid?: boolean
         }
         Update: {
@@ -530,7 +560,7 @@ export interface Database {
           tags?: Json | null
           type?: Database["public"]["Enums"]["TokenType"]
           updated_at?: string
-          user_id?: number
+          user_id?: string
           valid?: boolean
         }
         Relationships: [
@@ -546,22 +576,22 @@ export interface Database {
       user_following: {
         Row: {
           created_at: string
-          follower_user_id: number
-          following_user_id: number
+          follower_user_id: string
+          following_user_id: string
           id: number
           tags: Json | null
         }
         Insert: {
           created_at?: string
-          follower_user_id: number
-          following_user_id: number
+          follower_user_id: string
+          following_user_id: string
           id?: number
           tags?: Json | null
         }
         Update: {
           created_at?: string
-          follower_user_id?: number
-          following_user_id?: number
+          follower_user_id?: string
+          following_user_id?: string
           id?: number
           tags?: Json | null
         }
@@ -584,13 +614,14 @@ export interface Database {
       }
       users: {
         Row: {
+          blocked_users: string[] | null
           building_id: number | null
           chat_token: string | null
           created_at: string
           fcm_token: string | null
           followers_count: number
           following_count: number
-          id: number
+          id: string
           image: string | null
           is_verified: boolean
           neighborhood_id: number | null
@@ -599,13 +630,14 @@ export interface Database {
           username: string
         }
         Insert: {
+          blocked_users?: string[] | null
           building_id?: number | null
           chat_token?: string | null
           created_at?: string
           fcm_token?: string | null
           followers_count?: number
           following_count?: number
-          id?: number
+          id: string
           image?: string | null
           is_verified?: boolean
           neighborhood_id?: number | null
@@ -614,13 +646,14 @@ export interface Database {
           username: string
         }
         Update: {
+          blocked_users?: string[] | null
           building_id?: number | null
           chat_token?: string | null
           created_at?: string
           fcm_token?: string | null
           followers_count?: number
           following_count?: number
-          id?: number
+          id?: string
           image?: string | null
           is_verified?: boolean
           neighborhood_id?: number | null

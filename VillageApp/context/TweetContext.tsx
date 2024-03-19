@@ -36,7 +36,7 @@ interface TweetsApiContextType {
     lastLikesCount: string,
     lastCommentID: string
   ) => Promise<any>;
-  listTweetsForProfile: (userID: number, page: number) => Promise<any>;
+  listTweetsForProfile: (userID: string, page: number) => Promise<any>;
   listTweets: (page: number, isHot: boolean) => Promise<any>;
   listNotifications: (page: number) => Promise<any>;
   updateNotifications: (data: {
@@ -64,7 +64,7 @@ interface TweetsApiContextType {
   ) => Promise<any>;
   addBuildingChangeRequest: (address: string) => Promise<any>;
   accountDeletionRequest: () => Promise<any>;
-  blockUser: (userID: number) => Promise<any>;
+  blockUser: (userID: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -502,7 +502,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const listTweetsForProfile = async (userID: number, page: number) => {
+  const listTweetsForProfile = async (userID: string, page: number) => {
     if (!authToken) {
       return {};
     }
@@ -904,7 +904,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const blockUser = async (userID: number) => {
+  const blockUser = async (userID: string) => {
     if (!authToken) {
       return {};
     }

@@ -394,7 +394,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     }
   };
 
-  const handle3DotsPressed = (userID: number, tweet: TweetType) => {
+  const handle3DotsPressed = (userID: string, tweet: TweetType) => {
     const alertOptions: AlertButton[] = [
       {
         text: "Cancel",
