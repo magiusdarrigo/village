@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 
 export const getNotificationsByUserQuery = (
-  currentUserID: number,
+  currentUserID: string,
   lastNotificationID: number // cursor
 ) => {
   return Prisma.sql`

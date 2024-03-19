@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-export const getUserProfileQuery = (userID: number, userToGetID: number) => {
+export const getUserProfileQuery = (userID: string, userToGetID: string) => {
   return Prisma.sql`
                   SELECT
                       users.id,

@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 
 export const getTop10CommentsFromPostQuery = (
   postID: number,
-  userID: number,
+  userID: string,
   lastLikesCount: number,
   lastCommentID: number
 ) => {
@@ -70,7 +70,7 @@ export const getTop10CommentsFromPostQuery = (
 };
 
 export const createCommentQuery = (
-  userID: number,
+  userID: string,
   postID: number,
   textContent: string,
   parentCommentID: number | null

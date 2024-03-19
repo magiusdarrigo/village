@@ -76,7 +76,7 @@ router.post("/login", async (req, res) => {
     const user = userWithToken.user;
 
     if (!user.chat_token) {
-      const chatToken = streamChatClient.createToken(user.id.toString());
+      const chatToken = streamChatClient.createToken(user.id);
       await prisma.users.update({
         where: {
           id: user.id,
@@ -121,7 +121,6 @@ router.post("/authenticate", async (req, res) => {
       },
     });
 
-    // TODO: once i get twilio working, uncomment this
     if (!dbPhoneToken || !dbPhoneToken.valid) {
       console.log("Invalid OTP");
       return res.status(401).send("Invalid OTP.");

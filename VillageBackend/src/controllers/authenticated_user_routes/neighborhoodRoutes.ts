@@ -44,7 +44,7 @@ router.get("/:id/posts", async (req, res) => {
 });
 
 const getHotPosts = async (
-  userID: number,
+  userID: string,
   neighborhoodID: number,
   cursor: number,
   cacheKey: string | undefined
@@ -93,7 +93,7 @@ const getHotPosts = async (
 };
 
 const getNewPosts = async (
-  userID: number,
+  userID: string,
   neighborhoodID: number,
   cursor: number
 ) => {

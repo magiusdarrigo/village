@@ -293,7 +293,7 @@ router.post("/:id/likes", async (req, res) => {
       data: {
         title,
         message,
-        for_user_id: Number(updatedPost.user_id),
+        for_user_id: updatedPost.user_id,
         from_user_id: currentUser.id,
         for_post_id: Number(id),
       },

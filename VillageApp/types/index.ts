@@ -7,7 +7,7 @@ export type UserType = {
     address: string;
   };
   building_id?: number;
-  id: number;
+  id: string;
   username: string;
   created_at?: string;
   followers_count?: number;
@@ -19,12 +19,12 @@ export type UserType = {
   is_verified?: boolean;
   image?: string;
   followed_by_user?: boolean;
-  blocked_users: number[];
+  blocked_users: string[];
 };
 
 export type TweetType = {
   id: number;
-  user_id: number;
+  user_id: string;
   username: string;
   profile_image?: string;
   neighborhood_id: number;
@@ -35,7 +35,7 @@ export type TweetType = {
   created_at: string;
   liked_by_user: boolean;
   disliked_by_user: boolean;
-  hidden_from_users: number[];
+  hidden_from_users: string[];
 };
 
 export type CommentType = {
@@ -43,7 +43,7 @@ export type CommentType = {
   username: string;
   profile_image?: string;
   post_id: number;
-  user_id: number;
+  user_id: string;
   text_content: string;
   likes_count: number;
   replies_count: number;
@@ -55,8 +55,8 @@ export type CommentType = {
 
 export type NotificationType = {
   id: number;
-  for_user_id: number;
-  from_user_id: number;
+  for_user_id: string;
+  from_user_id: string;
   from_username: string;
   from_profile_image?: string;
   for_post_id?: number;

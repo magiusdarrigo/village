@@ -10,36 +10,51 @@ import * as Sentry from "sentry-expo";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { buildingAddress } = useGlobalSearchParams();
   const { createBuilding } = useTweetsApi();
   const { user } = useUser();
 
   const neighborhoods = [
+    "Battery Park City",
+    "Carnegie Hill",
+    "Central Harlem",
     "Chelsea",
     "Chinatown",
+    "East Harlem",
     "East Village",
     "Fidi",
     "Flatiron",
     "Gramercy",
     "Greenwich Village",
-    "Harlem",
     "Hell's Kitchen",
     "Hudson Yards",
+    "Kips Bay",
+    "Lenox Hill",
     "Little Italy",
     "Lower East Side",
+    "Manhattanville",
+    "Meatpacking District",
     "Midtown",
     "Murray Hill",
+    "NoHo",
     "Nolita",
+    "NoMad",
     "SoHo",
     "Tribeca",
+    "Turtle Bay",
+    "Two Bridges",
     "Upper East Side",
     "Upper West Side",
+    "West Harlem",
     "West Village",
     "Williamsburg",
+    "Yorkville",
   ];
 
   const onSubmit = async () => {
     try {
+      setIsLoading(true);
       // create building and attach to neighborhood
       const building = await createBuilding(
         buildingAddress as string,
@@ -60,6 +75,8 @@ const PickNeighborhood = () => {
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,7 +100,14 @@ const PickNeighborhood = () => {
             />
           ))}
         </Picker>
-        <Pressable style={onboardingStyles.button} onPress={onSubmit}>
+        <Pressable
+          style={[
+            onboardingStyles.button,
+            isLoading ? onboardingStyles.buttonDisabled : {},
+          ]}
+          onPress={onSubmit}
+          disabled={isLoading}
+        >
           <Text style={onboardingStyles.buttonText}>Submit</Text>
         </Pressable>
       </View>

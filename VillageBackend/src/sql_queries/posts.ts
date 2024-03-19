@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 
 export const getPostsByUserAndPostIdsQuery = (
-  userID: number,
+  userID: string,
   postIds: number[] // array of post IDs
 ) => {
   // Convert array of post IDs into a comma-separated string
@@ -27,7 +27,7 @@ export const getPostsByUserAndPostIdsQuery = (
 };
 
 export const getPostsByUserAndNeighborhoodQuery = (
-  userID: number,
+  userID: string,
   neighborhoodID: number,
   lastPostId: number // cursor
 ) => {
@@ -52,7 +52,7 @@ export const getPostsByUserAndNeighborhoodQuery = (
         `;
 };
 
-export const getSinglePostQuery = (userID: number, postID: number) => {
+export const getSinglePostQuery = (userID: string, postID: number) => {
   return Prisma.sql`
                 SELECT 
                     posts.*, 
@@ -73,7 +73,7 @@ export const getSinglePostQuery = (userID: number, postID: number) => {
 
 // return the post as well as the user's username and profile image
 export const createPostQuery = (
-  userID: number,
+  userID: string,
   neighborhoodID: number,
   textContent: string,
   imageURL: string
@@ -97,7 +97,7 @@ export const createPostQuery = (
 
 // return the post as well as the user's username and profile image
 export const createPostWithTextAndImageQuery = (
-  userID: number,
+  userID: string,
   neighborhoodID: number,
   textContent: string,
   imageURL: string
@@ -120,8 +120,8 @@ export const createPostWithTextAndImageQuery = (
 };
 
 export const getPostsByUserQuery = (
-  userID: number,
-  currentUserID: number,
+  userID: string,
+  currentUserID: string,
   lastPostId: number // cursor
 ) => {
   return Prisma.sql`

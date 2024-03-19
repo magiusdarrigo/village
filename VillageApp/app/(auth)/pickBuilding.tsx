@@ -21,11 +21,13 @@ import * as Sentry from "sentry-expo";
 
 const PickBuilding = () => {
   const [address, setAddress] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { getBuilding } = useTweetsApi();
   const { user } = useUser();
 
   const onSubmit = async () => {
     try {
+      setIsLoading(true);
       const building = await getBuilding(address);
       const neighborhoodName = building?.neighborhood?.name;
       if (user === null) {
@@ -51,10 +53,12 @@ const PickBuilding = () => {
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding your building address. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const isButtonDisabled = address === "";
+  const isButtonDisabled = address === "" || isLoading;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>

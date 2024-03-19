@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter, SplashScreen, useGlobalSearchParams } from "expo-router";
+import { useRouter, SplashScreen } from "expo-router";
 import { login } from "../../lib/api/auth";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
@@ -20,12 +20,13 @@ import * as Sentry from "sentry-expo";
 
 const SignIn = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [lastKeyPressed, setLastKeyPressed] = useState("");
+  const [_, setLastKeyPressed] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { updateUser } = useUser();
   const phoneNumberInputRef = useRef<TextInput>(null);
 
-  const isButtonDisabled = phoneNumber.length < 14;
+  const isNumberInvalid = phoneNumber.length < 14;
 
   const onKeyPress = ({ nativeEvent }: { nativeEvent: any }) => {
     setLastKeyPressed(nativeEvent.key);
@@ -49,6 +50,7 @@ const SignIn = () => {
 
   const onSignIn = async () => {
     try {
+      setIsLoading(true);
       Keyboard.dismiss();
       const user = await login({ phoneNumber });
       updateUser(user);
@@ -56,6 +58,8 @@ const SignIn = () => {
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue signing you in. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -107,10 +111,12 @@ const SignIn = () => {
             <Pressable
               style={[
                 onboardingStyles.button,
-                isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+                isNumberInvalid || isLoading
+                  ? onboardingStyles.buttonDisabled
+                  : {},
               ]}
               onPress={onSignIn}
-              disabled={isButtonDisabled}
+              disabled={isNumberInvalid || isLoading}
             >
               <Text style={onboardingStyles.buttonText}>Get Code</Text>
             </Pressable>
