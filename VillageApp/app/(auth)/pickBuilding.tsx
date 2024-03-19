@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import {
+  GooglePlacesAutocomplete,
+  GooglePlacesAutocompleteRef,
+} from "react-native-google-places-autocomplete";
 import { GOOGLE_MAPS_API_KEY } from "../../lib/api/config";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useUser } from "../../context/UserContext";
@@ -24,6 +27,7 @@ const PickBuilding = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { getBuilding } = useTweetsApi();
   const { user } = useUser();
+  const ref = useRef<GooglePlacesAutocompleteRef>(null);
 
   const onSubmit = async () => {
     try {
@@ -61,25 +65,30 @@ const PickBuilding = () => {
   const isButtonDisabled = address === "" || isLoading;
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <TouchableWithoutFeedback onPress={ref.current?.focus} accessible={false}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+        style={{
+          backgroundColor: Colors.light.tertiary,
+          flex: 1,
+          paddingTop: 24, // for top space
+          paddingHorizontal: 24,
+        }}
       >
         <Text style={onboardingStyles.label}>Add your building address.</Text>
         <View
           style={{
             flex: 1,
-            justifyContent: "space-between",
           }}
         >
           <GooglePlacesAutocomplete
+            ref={ref}
             placeholder="Enter Building Address"
             fetchDetails={true}
             GooglePlacesSearchQuery={{
               rankby: "distance",
             }}
-            onPress={(data, details = null) => {
+            onPress={(data, _ = null) => {
               setAddress(data.structured_formatting.main_text);
             }}
             query={{
@@ -139,44 +148,6 @@ const PickBuilding = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  textInputContainer: {
-    padding: 0,
-    borderBottomWidth: 0,
-    borderTopWidth: 0,
-    marginBottom: 20,
-    backgroundColor: Colors.light.tertiary,
-  },
-  textInput: {
-    marginLeft: 0,
-    marginRight: 0,
-    height: 40,
-    color: "black",
-    fontSize: 16,
-    backgroundColor: "transparent",
-  },
-  error: {
-    marginVertical: 5,
-    color: "red",
-  },
-  container: {
-    backgroundColor: Colors.light.tertiary,
-    flex: 1,
-    paddingTop: 24, // for top space
-    paddingHorizontal: 24,
-  },
-  input: {
-    borderColor: "transparent", // no border
-    borderWidth: 0,
-    paddingTop: 10,
-    fontSize: 20,
-    color: "black",
-  },
-});
+const styles = StyleSheet.create({});
 
 export default PickBuilding;
