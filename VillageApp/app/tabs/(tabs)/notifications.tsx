@@ -27,7 +27,6 @@ const NotificationsScreen = () => {
 
   const {
     data,
-    isFetching,
     error,
     fetchNextPage,
     isFetchingNextPage,
