@@ -55,6 +55,72 @@ router.post("/", async (req, res) => {
     updatedNewComment.profile_image = newComment.user.image;
 
     res.json(updatedNewComment);
+
+    // send a notification to the post author if the comment is not a reply, else send a notification to the parent comment author
+    let targetUserID;
+    let targetFCMToken;
+    if (parentCommentID) {
+      const parentComment = await prisma.comments.findUnique({
+        where: {
+          id: Number(parentCommentID),
+        },
+        select: {
+          user_id: true,
+          user: {
+            select: {
+              fcm_token: true,
+            },
+          },
+        },
+      });
+      targetUserID = parentComment?.user_id;
+      targetFCMToken = parentComment?.user.fcm_token;
+    } else {
+      const post = await prisma.posts.findUnique({
+        where: {
+          id: Number(postID),
+        },
+        select: {
+          user_id: true,
+          user: {
+            select: {
+              fcm_token: true,
+            },
+          },
+        },
+      });
+      targetUserID = post?.user_id;
+      targetFCMToken = post?.user.fcm_token;
+    }
+
+    if (!targetUserID || targetUserID === currentUser.id) {
+      return;
+    }
+
+    // send a notification to the comment author
+    let title;
+    if (parentCommentID) {
+      title = `@${updatedNewComment.username} replied to your comment`;
+    } else {
+      title = `@${updatedNewComment.username} commented on your post`;
+    }
+    const message = truncateNotificationMessage(newComment.text_content ?? "");
+
+    // create a notification record
+    await prisma.notifications.create({
+      data: {
+        title,
+        message,
+        for_user_id: targetUserID,
+        from_user_id: currentUser.id,
+        for_comment_id: newComment.id,
+        for_post_id: newComment.post_id,
+      },
+    });
+    // send a push notification
+    if (targetFCMToken) {
+      await sendNotification(title, message, targetFCMToken);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -211,11 +277,14 @@ router.post("/:id/likes", async (req, res) => {
         message,
         for_user_id: updatedComment.user_id,
         from_user_id: currentUser.id,
-        for_post_id: Number(id),
+        for_comment_id: Number(id),
+        for_post_id: updatedComment.post_id,
       },
     });
     // send a push notification
-    await sendNotification(title, message, commentAuthor?.fcm_token || "");
+    if (commentAuthor?.fcm_token) {
+      await sendNotification(title, message, commentAuthor.fcm_token);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error liking comment" });
