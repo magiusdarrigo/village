@@ -277,6 +277,12 @@ router.post("/:id/likes", async (req, res) => {
         fcm_token: true,
       },
     });
+
+    // if the post author is the current user, don't send a notification
+    if (postAuthor?.id === currentUser.id) {
+      return;
+    }
+
     // query for the current user
     const currentUserData = await prisma.users.findUnique({
       where: {
