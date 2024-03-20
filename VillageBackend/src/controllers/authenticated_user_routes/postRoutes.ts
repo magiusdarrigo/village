@@ -305,7 +305,9 @@ router.post("/:id/likes", async (req, res) => {
       },
     });
     // send a push notification
-    await sendNotification(title, message, postAuthor?.fcm_token || "");
+    if (postAuthor?.fcm_token) {
+      await sendNotification(title, message, postAuthor.fcm_token);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error liking the post." });
