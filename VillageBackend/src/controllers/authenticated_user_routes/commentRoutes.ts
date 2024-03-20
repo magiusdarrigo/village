@@ -55,6 +55,8 @@ router.post("/", async (req, res) => {
     updatedNewComment.profile_image = newComment.user.image;
 
     res.json(updatedNewComment);
+
+    // send a notification to the post author if the comment is not a reply, else send a notification to the parent comment author
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -211,7 +213,7 @@ router.post("/:id/likes", async (req, res) => {
         message,
         for_user_id: updatedComment.user_id,
         from_user_id: currentUser.id,
-        for_post_id: Number(id),
+        for_comment_id: Number(id),
       },
     });
     // send a push notification
