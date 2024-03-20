@@ -67,7 +67,6 @@ const ModalScreen = ({ user }: ProfileProps) => {
     data: profileTweetsData,
     isFetching,
     refetch,
-    error: profileTweetsFetchError,
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
@@ -203,6 +202,9 @@ const ModalScreen = ({ user }: ProfileProps) => {
       style={styles.container}
       onScroll={handleScroll}
       scrollEventThrottle={500}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       {profileEditLoading ? (
         <ActivityIndicator size="small" />
@@ -294,9 +296,6 @@ const ModalScreen = ({ user }: ProfileProps) => {
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
-          }
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           ListEmptyComponent={() => EmptyListView("No posts yet.")}
           contentContainerStyle={{ flexGrow: 1 }}
