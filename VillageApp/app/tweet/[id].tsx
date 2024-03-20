@@ -80,7 +80,9 @@ const TweetScreen = () => {
       await mutateAsync({
         postID: String(id),
         textContent: commentText,
-        parentCommentID: String(selectedCommentID),
+        parentCommentID: selectedCommentID
+          ? String(selectedCommentID)
+          : undefined,
       });
       setCommentText("");
     } catch (error) {

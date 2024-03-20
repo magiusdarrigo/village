@@ -186,7 +186,9 @@ router.post("/:id/follow", async (req, res) => {
       },
     });
     // send a push notification
-    await sendNotification(title, message, followedUser?.fcm_token || "");
+    if (followedUser?.fcm_token) {
+      await sendNotification(title, message, followedUser.fcm_token);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error following the user." });
@@ -218,7 +220,7 @@ router.delete("/:id/follow", async (req, res) => {
       data: { followers_count: { decrement: 1 } },
     });
 
-    const [userFollowing, _, user] = await prisma.$transaction([
+    const [_, __, user] = await prisma.$transaction([
       deleteFollowing,
       decrementFollowingCount,
       decrementFollowersCount,
