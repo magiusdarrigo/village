@@ -2,7 +2,8 @@ import { Router } from "express";
 import prisma from "../../clients/prismaClient";
 import { AuthenticatedRequest } from "../../middleware/auth";
 import { commentTextContentAllowed } from "../../utils/badwords";
-import { createCommentQuery } from "../../sql_queries/comments";
+import { sendNotification } from "../../clients/firebaseClient";
+import { truncateNotificationMessage } from "../../utils/truncate";
 
 const router = Router();
 
@@ -52,18 +53,6 @@ router.post("/", async (req, res) => {
     const updatedNewComment: any = newComment;
     updatedNewComment.username = newComment.user.username;
     updatedNewComment.profile_image = newComment.user.image;
-
-    // const newCommentQuery = createCommentQuery(
-    //   currentUser.id,
-    //   postID,
-    //   textContent,
-    //   parentCommentID
-    // );
-    // const newComment = (await prisma.$queryRaw(newCommentQuery)) as any[];
-
-    // if (newComment.length !== 1) {
-    //   return res.status(500).json({ error: "error creating comment" });
-    // }
 
     res.json(updatedNewComment);
   } catch (error) {
@@ -173,6 +162,60 @@ router.post("/:id/likes", async (req, res) => {
     ]);
 
     res.status(200).json({ newLike, updatedComment });
+
+    // if the comment was liked, send a notification to the comment author
+    if (is_dislike === "true") {
+      return;
+    }
+    // query for the comment author
+    const commentAuthor = await prisma.users.findUnique({
+      where: {
+        id: updatedComment.user_id,
+      },
+      select: {
+        id: true,
+        fcm_token: true,
+      },
+    });
+
+    // if the comment author is the current user, don't send a notification
+    if (commentAuthor?.id === currentUser.id) {
+      return;
+    }
+
+    // query for the current user
+    const currentUserData = await prisma.users.findUnique({
+      where: {
+        id: currentUser.id,
+      },
+      select: {
+        username: true,
+      },
+    });
+
+    // send a notification to the comment author
+    let title;
+    if (updatedComment.parent_comment_id) {
+      title = `@${currentUserData?.username} liked your comment`;
+    } else {
+      title = `@${currentUserData?.username} liked your reply`;
+    }
+    const message = truncateNotificationMessage(
+      updatedComment.text_content ?? ""
+    );
+
+    // create a notification record
+    await prisma.notifications.create({
+      data: {
+        title,
+        message,
+        for_user_id: updatedComment.user_id,
+        from_user_id: currentUser.id,
+        for_post_id: Number(id),
+      },
+    });
+    // send a push notification
+    await sendNotification(title, message, commentAuthor?.fcm_token || "");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error liking comment" });
