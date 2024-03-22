@@ -16,11 +16,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.magius18.village",
-      "buildNumber": "9",
+      "buildNumber": "10",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "associatedDomains": ["applinks:api.villageapp.nyc"]
     },
     "android": {
       "package": "com.magius18.village",

@@ -1,0 +1,27 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "57B7N4W84N.com.magius18.village"
+        ],
+        "components": [
+          {
+            "/": "*",
+            "comment": "Matches all routes"
+          }
+        ]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": [
+      "57B7N4W84N.com.magius18.village"
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "57B7N4W84N.com.magius18.village"
+    ]
+  }
+}
