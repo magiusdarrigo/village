@@ -97,3 +97,5 @@ export const handleChooseCustomImage = async (
     Alert.alert("We had an issue uploading your image. Try again.");
   }
 };
+
+export const getDevice;

@@ -5,7 +5,6 @@ import {
   Platform,
   SafeAreaView,
 } from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../../context/UserContext";
 import { useTweetsApi } from "../../../context/TweetContext";
@@ -23,7 +22,6 @@ import {
   MessageList,
   messageActions as defaultMessageActions,
 } from "stream-chat-expo";
-import { Octicon } from "../../../components/Icons";
 
 let areNotificationsEnabled = false;
 
@@ -238,12 +236,6 @@ const ChatScreen = () => {
       </SafeAreaView>
     </OverlayProvider>
   );
-};
-
-const styles = {
-  container: {
-    flex: 1,
-  },
 };
 
 export default ChatScreen;

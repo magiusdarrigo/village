@@ -43,7 +43,7 @@ function TabBarIconOcticons(props: {
 }
 
 // listener for when a user TAPS on a notification
-notifee.onBackgroundEvent(async ({ detail, type }) => {
+notifee.onBackgroundEvent(async ({ type }) => {
   if (type === EventType.PRESS) {
     await Promise.resolve();
   }
@@ -56,7 +56,6 @@ export default function TabLayout() {
     updateChatTabBadgeCount,
     scrollToTop,
     channel,
-    updateChannel,
     getStreamChatClient,
     activeTab,
     updateActiveTab,
