@@ -9,6 +9,7 @@ COPY package*.json ./
 COPY prisma ./prisma
 COPY tsconfig.json ./
 COPY src ./src
+COPY public ./public
 COPY .env ./
 
 # Install app dependencies

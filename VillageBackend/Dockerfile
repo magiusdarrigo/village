@@ -9,6 +9,7 @@ COPY package*.json ./
 COPY prisma ./prisma
 COPY tsconfig.json ./
 COPY src ./src
+COPY public ./public
 
 # set all args from .env
 ARG DATABASE_URL
