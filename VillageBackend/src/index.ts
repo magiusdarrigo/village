@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import v1AuthUserRoutes from "./controllers/authenticated_user_routes/v1";
 import v1UnAuthUserRoutes from "./controllers/unauth_user_routes/v1";
 import v1AdminRoutes from "./controllers/admin_routes/v1";
@@ -11,6 +12,12 @@ import "./clients/firebaseClient";
 
 const app = express();
 app.use(express.json());
+
+// serve static files
+app.use(express.static(path.join(__dirname, "..", "public")));
+app.get("/welcome", (_, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "welcome.html"));
+});
 
 async function main() {
   try {
