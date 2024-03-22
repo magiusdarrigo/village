@@ -574,7 +574,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             <Link href={`/tweet/${tweet.id}`} asChild>
               <Pressable
                 onPress={handleCommentIconClicked}
-                style={{ paddingTop: 2 }}
+                style={{ paddingTop: 5 }}
               >
                 <MaterialCommunityIcon
                   icon="comment-outline"
@@ -607,7 +607,10 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                 )) || <AntIcon icon="dislike2" iconColor="#b2b2b2" size={22} />}
               </Pressable>
             </View>
-            <Pressable style={{ marginLeft: 5 }} onPress={() => {}}>
+            <Pressable
+              style={{ marginLeft: 5, paddingBottom: 5 }}
+              onPress={() => {}}
+            >
               <IoniconsIcon
                 icon="share-outline"
                 iconColor="#b2b2b2"
