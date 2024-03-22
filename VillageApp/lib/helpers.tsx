@@ -1,4 +1,4 @@
-import { Text, Platform, Alert } from "react-native";
+import { Text, Platform, Alert, Dimensions } from "react-native";
 import postStyles from "./styles/post";
 import * as Device from "expo-device";
 import * as WebBrowser from "expo-web-browser";
@@ -98,4 +98,19 @@ export const handleChooseCustomImage = async (
   }
 };
 
-export const getDevice;
+export enum DeviceType {
+  iPhoneSmall,
+  iPhoneMedium,
+  iPhoneLarge,
+}
+
+export const getDeviceType = (): DeviceType => {
+  const { width } = Dimensions.get("window");
+  if (width <= 375) {
+    return DeviceType.iPhoneSmall;
+  } else if (width <= 390) {
+    return DeviceType.iPhoneMedium;
+  } else {
+    return DeviceType.iPhoneLarge;
+  }
+};
