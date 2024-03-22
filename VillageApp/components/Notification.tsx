@@ -94,14 +94,13 @@ const styles = StyleSheet.create({
   parentContainer: {
     flexDirection: "row",
     paddingTop: 10,
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 25,
     flex: 1,
   },
   mainContainer: {
     flex: 1,
-    marginLeft: 5,
-    marginBottom: 25,
   },
   imageParentContainer: {
     flexDirection: "row",

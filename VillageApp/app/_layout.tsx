@@ -13,9 +13,9 @@ import { CURRENT_APP_VERSION, SENTRY_DSN } from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { STREAM_CHAT_API_KEY } from "../lib/api/config";
-import messaging from "@react-native-firebase/messaging";
 import { isIOSSimulator } from "../lib/helpers";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import * as Linking from "expo-linking";
 import * as Sentry from "sentry-expo";
 
 const queryClient = new QueryClient();
@@ -43,6 +43,14 @@ SplashScreen.preventAutoHideAsync();
 // create the stream chat client
 const streamChatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
 
+// This function would contain logic to navigate to the correct screen based on the URL
+function navigateToRoute(url: string) {
+  // Parse the URL and navigate to the correct screen
+  // You'll use your navigation logic here depending on how you have set up routing
+  const { path, queryParams } = Linking.parse(url);
+  // Example: navigate to the path with queryParams
+}
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -56,14 +64,6 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    // call register device for push notifications here
-    const registerDeviceForPushNotifications = async () => {
-      try {
-        await messaging().registerDeviceForRemoteMessages();
-      } catch (error) {
-        Sentry.Native.captureException(error);
-      }
-    };
     // call version check here
     const checkVersion = async () => {
       const { mandatoryUpdate, latestVersion } = await checkAppVersion();
@@ -74,10 +74,31 @@ export default function RootLayout() {
         );
       }
     };
-    // console warning says that this is not needed
-    // registerDeviceForPushNotifications();
     checkVersion();
   }, [loaded]);
+
+  useEffect(() => {
+    // Handle the initial URL
+    async function handleInitialURL() {
+      const initialURL = await Linking.getInitialURL();
+      if (initialURL) {
+        console.log(`Opened with URL: ${initialURL}`);
+        navigateToRoute(initialURL); // Implement this function based on your navigation logic
+      }
+    }
+
+    handleInitialURL();
+
+    // Subscribe to deep link events
+    const subscription = Linking.addEventListener("url", (event) => {
+      console.log(`Opened with URL: ${event.url}`);
+      navigateToRoute(event.url); // Implement this function based on your navigation logic
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   if (!loaded) {
     return null;
