@@ -5,7 +5,6 @@ import {
   FlatList,
   KeyboardAvoidingView,
   TextInput,
-  Text,
   StyleSheet,
   Platform,
   Pressable,
