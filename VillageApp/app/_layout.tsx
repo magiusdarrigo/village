@@ -17,6 +17,9 @@ import { isIOSSimulator } from "../lib/helpers";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import * as Linking from "expo-linking";
 import * as Sentry from "sentry-expo";
+import { useTweetsApi } from "../context/TweetContext";
+
+const { log } = useTweetsApi();
 
 const queryClient = new QueryClient();
 
@@ -44,17 +47,20 @@ SplashScreen.preventAutoHideAsync();
 const streamChatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
 
 // This function would contain logic to navigate to the correct screen based on the URL
-function navigateToRoute(url: string) {
+const navigateToRoute = async (url: string) => {
+  await log(url);
   const { path } = Linking.parse(url);
+  await log(path ?? "no path");
 
   if (path && path.startsWith("/tweet/")) {
+    await log(path.split("/tweet/").join(", "));
     const tweetId = path.split("/tweet/")[1]; // Extract the tweet ID
     router.replace({
       pathname: "/tweet/[id]",
       params: { id: tweetId },
     });
   }
-}
+};
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -88,16 +94,16 @@ export default function RootLayout() {
       const initialURL = await Linking.getInitialURL();
       if (initialURL) {
         console.log(`Opened with initial URL: ${initialURL}`);
-        navigateToRoute(initialURL); // Implement this function based on your navigation logic
+        await navigateToRoute(initialURL); // Implement this function based on your navigation logic
       }
     }
 
     handleInitialURL();
 
     // Subscribe to deep link events
-    const subscription = Linking.addEventListener("url", (event) => {
+    const subscription = Linking.addEventListener("url", async (event) => {
       console.log(`Opened with subscription URL: ${event.url}`);
-      navigateToRoute(event.url); // Implement this function based on your navigation logic
+      await navigateToRoute(event.url); // Implement this function based on your navigation logic
     });
 
     return () => {
