@@ -5,7 +5,6 @@ import {
   FlatList,
   KeyboardAvoidingView,
   TextInput,
-  Text,
   StyleSheet,
   Platform,
   Pressable,
@@ -31,6 +30,24 @@ import { ScrollView } from "react-native-gesture-handler";
 import Colors from "../../constants/Colors";
 import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../../lib/api/pagination";
 import { useUser } from "../../context/UserContext";
+import { DeviceType, getDeviceType } from "../../lib/helpers";
+
+const getVerticalOffset = () => {
+  switch (getDeviceType()) {
+    case DeviceType.iPhoneSmall:
+      return {
+        height: 80,
+        paddingTop: 20,
+      };
+    default:
+      return {
+        height: 100,
+        paddingTop: 0,
+      };
+  }
+};
+
+const footerHeight = getVerticalOffset();
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -396,7 +413,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: "row",
-    height: 100,
+    height: footerHeight.height,
     backgroundColor: "white",
     borderColor: "#ddd",
     borderWidth: 1,
@@ -406,7 +423,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 10,
     backgroundColor: "white",
-    paddingTop: 0,
+    paddingTop: footerHeight.paddingTop,
     padding: 20,
   },
 });

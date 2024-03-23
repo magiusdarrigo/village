@@ -5,7 +5,6 @@ import {
   Platform,
   SafeAreaView,
 } from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../../context/UserContext";
 import { useTweetsApi } from "../../../context/TweetContext";
@@ -23,9 +22,25 @@ import {
   MessageList,
   messageActions as defaultMessageActions,
 } from "stream-chat-expo";
-import { Octicon } from "../../../components/Icons";
+import { getDeviceType, DeviceType } from "../../../lib/helpers";
 
 let areNotificationsEnabled = false;
+
+const getVerticalOffset = () => {
+  switch (getDeviceType()) {
+    case DeviceType.iPhoneSmall:
+      // TODO: this shit still doesn't fix the problem for small iphone
+      return 0;
+    case DeviceType.iPhoneMedium:
+      return 80;
+    case DeviceType.iPhoneLarge:
+      return 100;
+    default:
+      return 100;
+  }
+};
+
+const keyboardVerticalOffset = getVerticalOffset();
 
 // TODO: This should probably happen in the app's entrypoint file. Reason:
 // https://stackoverflow.com/questions/66998305/warn-no-task-registered-for-key-reactnativefirebasemessagingheadlesstask-in-reac#:~:text=without%20mounting%20your
@@ -93,13 +108,7 @@ const requestPermission = async () => {
 const ChatScreen = () => {
   const [isReady, setIsReady] = useState(false);
   const { updateUserAttributes } = useTweetsApi();
-  const {
-    user,
-    getStreamChatClient,
-    updateChatTabBadgeCount,
-    channel,
-    updateChannel,
-  } = useUser();
+  const { user, getStreamChatClient, channel, updateChannel } = useUser();
   const streamChatClient = getStreamChatClient();
   const unsubscribeTokenRefreshListenerRef = useRef<() => void>();
 
@@ -214,7 +223,7 @@ const ChatScreen = () => {
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : "height"} // 'padding' on iOS, 'height' on Android
-          keyboardVerticalOffset={Platform.select({ ios: 100, android: 80 })} // Adjust the offset as needed
+          keyboardVerticalOffset={keyboardVerticalOffset} // Adjust the offset as needed
         >
           <Chat client={streamChatClient}>
             <Channel
@@ -238,12 +247,6 @@ const ChatScreen = () => {
       </SafeAreaView>
     </OverlayProvider>
   );
-};
-
-const styles = {
-  container: {
-    flex: 1,
-  },
 };
 
 export default ChatScreen;

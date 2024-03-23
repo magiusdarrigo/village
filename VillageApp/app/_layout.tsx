@@ -2,7 +2,7 @@ import "react-native-gesture-handler";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, SplashScreen } from "expo-router";
+import { Stack, SplashScreen, router } from "expo-router";
 import { useEffect } from "react";
 import { Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
@@ -17,6 +17,9 @@ import { isIOSSimulator } from "../lib/helpers";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import * as Linking from "expo-linking";
 import * as Sentry from "sentry-expo";
+import { useTweetsApi } from "../context/TweetContext";
+
+const { log } = useTweetsApi();
 
 const queryClient = new QueryClient();
 
@@ -44,12 +47,20 @@ SplashScreen.preventAutoHideAsync();
 const streamChatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
 
 // This function would contain logic to navigate to the correct screen based on the URL
-function navigateToRoute(url: string) {
-  // Parse the URL and navigate to the correct screen
-  // You'll use your navigation logic here depending on how you have set up routing
-  const { path, queryParams } = Linking.parse(url);
-  // Example: navigate to the path with queryParams
-}
+const navigateToRoute = async (url: string) => {
+  await log(url);
+  const { path } = Linking.parse(url);
+  await log(path ?? "no path");
+
+  if (path && path.startsWith("/tweet/")) {
+    await log(path.split("/tweet/").join(", "));
+    const tweetId = path.split("/tweet/")[1]; // Extract the tweet ID
+    router.replace({
+      pathname: "/tweet/[id]",
+      params: { id: tweetId },
+    });
+  }
+};
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -82,17 +93,17 @@ export default function RootLayout() {
     async function handleInitialURL() {
       const initialURL = await Linking.getInitialURL();
       if (initialURL) {
-        console.log(`Opened with URL: ${initialURL}`);
-        navigateToRoute(initialURL); // Implement this function based on your navigation logic
+        console.log(`Opened with initial URL: ${initialURL}`);
+        await navigateToRoute(initialURL); // Implement this function based on your navigation logic
       }
     }
 
     handleInitialURL();
 
     // Subscribe to deep link events
-    const subscription = Linking.addEventListener("url", (event) => {
-      console.log(`Opened with URL: ${event.url}`);
-      navigateToRoute(event.url); // Implement this function based on your navigation logic
+    const subscription = Linking.addEventListener("url", async (event) => {
+      console.log(`Opened with subscription URL: ${event.url}`);
+      await navigateToRoute(event.url); // Implement this function based on your navigation logic
     });
 
     return () => {

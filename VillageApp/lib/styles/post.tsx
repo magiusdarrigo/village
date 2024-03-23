@@ -33,7 +33,15 @@ const postStyles = StyleSheet.create({
     fontWeight: "500",
     marginLeft: 5,
   },
-  footer: {
+  postFooter: {
+    flexDirection: "row",
+    marginTop: 20,
+    marginBottom: 10,
+    width: 260,
+    justifyContent: "space-between",
+    marginLeft: 70,
+  },
+  commentFooter: {
     flexDirection: "row",
     marginTop: 20,
     marginBottom: 10,

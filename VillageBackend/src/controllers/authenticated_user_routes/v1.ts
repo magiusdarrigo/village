@@ -6,6 +6,7 @@ import neighborhoodsRouter from "./neighborhoodRoutes";
 import buildingsRouter from "./buildingRoutes";
 import commentsRouter from "./commentRoutes";
 import chatMessagesRouter from "./chatMessageRoutes";
+import logsRouter from "./logRoutes";
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.use("/neighborhoods", neighborhoodsRouter);
 router.use("/buildings", buildingsRouter);
 router.use("/comments", commentsRouter);
 router.use("/chatMessages", chatMessagesRouter);
+router.use("/logs", logsRouter);
 
 export default router;
