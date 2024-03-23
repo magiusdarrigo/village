@@ -15,12 +15,31 @@ import {
 import { Image } from "expo-image";
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
-import { handleChooseCustomImage } from "../lib/helpers";
+import {
+  DeviceType,
+  getDeviceType,
+  handleChooseCustomImage,
+} from "../lib/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import { useUser } from "../context/UserContext";
 import * as Sentry from "sentry-expo";
 import { IoniconsIcon } from "../components/Icons";
+
+const getVerticalOffset = () => {
+  switch (getDeviceType()) {
+    case DeviceType.iPhoneSmall:
+      return 50;
+    case DeviceType.iPhoneMedium:
+      return 75;
+    case DeviceType.iPhoneLarge:
+      return 85;
+    default:
+      return 75;
+  }
+};
+
+const keyboardVerticalOffset = getVerticalOffset();
 
 const NewTweet = () => {
   const [text, setText] = useState("");
@@ -332,7 +351,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     flexDirection: "row",
     justifyContent: "space-between",
-    height: 75,
+    height: keyboardVerticalOffset,
     backgroundColor: "white",
     borderColor: "lightgrey",
     borderTopWidth: StyleSheet.hairlineWidth,
