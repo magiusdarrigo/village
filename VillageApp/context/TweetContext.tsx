@@ -65,6 +65,7 @@ interface TweetsApiContextType {
   addBuildingChangeRequest: (address: string) => Promise<any>;
   accountDeletionRequest: () => Promise<any>;
   blockUser: (userID: string) => Promise<any>;
+  log: (log: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -95,6 +96,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   addBuildingChangeRequest: async () => {},
   accountDeletionRequest: async () => {},
   blockUser: async () => {},
+  log: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -931,6 +933,35 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const log = async (log: string) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/logs`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-type": "Application/json",
+      },
+      body: JSON.stringify({ log }),
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw Error("Error logging");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   return (
     <TweetsApiContext.Provider
       value={{
@@ -961,6 +992,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         addBuildingChangeRequest,
         accountDeletionRequest,
         blockUser,
+        log,
       }}
     >
       {children}

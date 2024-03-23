@@ -64,7 +64,7 @@ const FeedScreen = () => {
       useNativeDriver: true,
     }).start();
     Animated.timing(fadeNewTweetButtonAnim, {
-      toValue: 0.75,
+      toValue: 0.5,
       duration: 200, // Duration of the fade-in animation
       useNativeDriver: true,
     }).start();

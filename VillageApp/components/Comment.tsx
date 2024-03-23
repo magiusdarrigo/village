@@ -472,10 +472,10 @@ const Comment = ({
           >
             <Text style={postStyles.textContent}>{comment.text_content}</Text>
           </Hyperlink>
-          <View style={postStyles.footer}>
+          <View style={postStyles.commentFooter}>
             {comment.parent_comment_id === null && (
               <Pressable
-                style={styles.iconWrapper}
+                style={{ paddingTop: 2 }}
                 onPress={() => handleAddReply(comment.id, index)}
               >
                 <MaterialCommunityIcon
@@ -547,7 +547,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: 15,
   },
-  iconWrapper: {},
 });
 
 export default Comment;

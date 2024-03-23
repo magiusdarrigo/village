@@ -3,7 +3,13 @@ import { Image, ImageLoadEventData } from "expo-image";
 import { useEffect, useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
-import { AntIcon, MaterialCommunityIcon } from "./Icons";
+import {
+  AntIcon,
+  EvilIcon,
+  IoniconsIcon,
+  MaterialCommunityIcon,
+  Octicon,
+} from "./Icons";
 import { Link, useNavigation, useSegments } from "expo-router";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -564,9 +570,12 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
       </Link>
       <Link href={`/tweet/${tweet.id}`} asChild>
         <Pressable style={{ flex: 1 }}>
-          <View style={postStyles.footer}>
+          <View style={postStyles.postFooter}>
             <Link href={`/tweet/${tweet.id}`} asChild>
-              <Pressable onPress={handleCommentIconClicked}>
+              <Pressable
+                onPress={handleCommentIconClicked}
+                style={{ paddingTop: 5 }}
+              >
                 <MaterialCommunityIcon
                   icon="comment-outline"
                   text={tweet.comments_count}
@@ -598,6 +607,16 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
                 )) || <AntIcon icon="dislike2" iconColor="#b2b2b2" size={22} />}
               </Pressable>
             </View>
+            <Pressable
+              style={{ marginLeft: 5, paddingBottom: 5 }}
+              onPress={() => {}}
+            >
+              <IoniconsIcon
+                icon="share-outline"
+                iconColor="#b2b2b2"
+                size={24}
+              />
+            </Pressable>
           </View>
         </Pressable>
       </Link>

@@ -232,3 +232,10 @@ model account_deletion_requests {
   created_at DateTime @default(now())
   tags       Json?
 }
+
+model log_entries {
+  id         Int      @id @default(autoincrement())
+  log        String
+  created_at DateTime @default(now())
+  tags       Json?
+}

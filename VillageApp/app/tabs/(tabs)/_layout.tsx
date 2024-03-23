@@ -9,7 +9,11 @@ import Colors from "../../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { handlePressButtonAsync } from "../../../lib/helpers";
+import {
+  DeviceType,
+  getDeviceType,
+  handlePressButtonAsync,
+} from "../../../lib/helpers";
 import { useTweetsApi } from "../../../context/TweetContext";
 import { Linking } from "react-native";
 
@@ -20,16 +24,43 @@ const PRIVACY_POLICY_URL =
 const REPORT_A_BUG_URL =
   "https://villagenyc.notion.site/Report-a-Bug-for-Village-a46e44e552cf4234b5a6fc9f5294559b?pvs=4";
 
+const getVerticalOffset = () => {
+  switch (getDeviceType()) {
+    case DeviceType.iPhoneSmall:
+      return {
+        fontAwesome: {
+          marginBottom: 0,
+          marginTop: 2,
+        },
+        octicon: {
+          marginBottom: -3,
+          marginTop: 2,
+        },
+        tabBarLabelStyle: { marginBottom: 5 },
+      };
+    default:
+      return {
+        fontAwesome: {
+          marginBottom: -3,
+          marginTop: 2,
+        },
+        octicon: {
+          marginBottom: -5,
+          marginTop: 2,
+        },
+        tabBarLabelStyle: {},
+      };
+  }
+};
+
+const tabVerticalOffset = getVerticalOffset();
+
 function TabBarIconFontAwesome(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
   return (
-    <FontAwesome
-      size={24}
-      style={{ marginBottom: -3, marginTop: 2 }}
-      {...props}
-    />
+    <FontAwesome size={24} style={tabVerticalOffset.fontAwesome} {...props} />
   );
 }
 
@@ -37,13 +68,11 @@ function TabBarIconOcticons(props: {
   name: React.ComponentProps<typeof Octicons>["name"];
   color: string;
 }) {
-  return (
-    <Octicons size={22} style={{ marginBottom: -5, marginTop: 2 }} {...props} />
-  );
+  return <Octicons size={22} style={tabVerticalOffset.octicon} {...props} />;
 }
 
 // listener for when a user TAPS on a notification
-notifee.onBackgroundEvent(async ({ detail, type }) => {
+notifee.onBackgroundEvent(async ({ type }) => {
   if (type === EventType.PRESS) {
     await Promise.resolve();
   }
@@ -56,7 +85,6 @@ export default function TabLayout() {
     updateChatTabBadgeCount,
     scrollToTop,
     channel,
-    updateChannel,
     getStreamChatClient,
     activeTab,
     updateActiveTab,
@@ -247,6 +275,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           headerTitle: user?.neighborhood?.name || "Home",
+          tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
           ),
@@ -270,6 +299,7 @@ export default function TabLayout() {
         options={{
           title: "Building",
           headerTitle: user?.building?.address || "Building",
+          tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="comments" color={color} />
@@ -293,6 +323,7 @@ export default function TabLayout() {
         name="notifications"
         options={{
           title: "Activity",
+          tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconOcticons name="bell-fill" color={color} />
           ),
@@ -307,6 +338,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "You",
+          tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="user" color={color} />
           ),
