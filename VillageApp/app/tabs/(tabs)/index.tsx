@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import Tweet from "../../../components/Tweet";
-import { Link, SplashScreen } from "expo-router";
+import { Link, SplashScreen, router } from "expo-router";
 import { useTweetsApi } from "../../../context/TweetContext";
 import { useUser } from "../../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";

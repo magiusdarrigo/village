@@ -608,7 +608,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               </Pressable>
             </View>
             <Pressable
-              style={{ marginLeft: 5, paddingBottom: 5 }}
+              style={{ marginLeft: 8, paddingBottom: 3 }}
               onPress={() => {}}
             >
               <IoniconsIcon

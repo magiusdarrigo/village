@@ -65,7 +65,7 @@ interface TweetsApiContextType {
   addBuildingChangeRequest: (address: string) => Promise<any>;
   accountDeletionRequest: () => Promise<any>;
   blockUser: (userID: string) => Promise<any>;
-  log: (log: string) => Promise<any>;
+  logEvent: (log: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -96,7 +96,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   addBuildingChangeRequest: async () => {},
   accountDeletionRequest: async () => {},
   blockUser: async () => {},
-  log: async () => {},
+  logEvent: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -614,6 +614,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
   const getTweet = async (id: string) => {
     if (!authToken) {
+      console.log("no authToken");
       return {};
     }
     const url = `${API_URL}/v1/posts/${id}`;
@@ -933,7 +934,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const log = async (log: string) => {
+  const logEvent = async (log: string) => {
+    console.log("breh");
     if (!authToken) {
       return {};
     }
@@ -948,6 +950,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       },
       body: JSON.stringify({ log }),
     });
+
+    console.log(res.status, "res.status");
 
     if (res.status === 403) {
       removeAuthToken();
@@ -992,7 +996,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         addBuildingChangeRequest,
         accountDeletionRequest,
         blockUser,
-        log,
+        logEvent,
       }}
     >
       {children}

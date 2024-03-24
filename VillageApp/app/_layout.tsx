@@ -18,8 +18,7 @@ import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import * as Linking from "expo-linking";
 import * as Sentry from "sentry-expo";
 import { useTweetsApi } from "../context/TweetContext";
-
-const { log } = useTweetsApi();
+import DeepLinkHandler from "../components/DeepLinkHandler";
 
 const queryClient = new QueryClient();
 
@@ -45,22 +44,6 @@ SplashScreen.preventAutoHideAsync();
 
 // create the stream chat client
 const streamChatClient = StreamChat.getInstance(STREAM_CHAT_API_KEY);
-
-// This function would contain logic to navigate to the correct screen based on the URL
-const navigateToRoute = async (url: string) => {
-  await log(url);
-  const { path } = Linking.parse(url);
-  await log(path ?? "no path");
-
-  if (path && path.startsWith("/tweet/")) {
-    await log(path.split("/tweet/").join(", "));
-    const tweetId = path.split("/tweet/")[1]; // Extract the tweet ID
-    router.replace({
-      pathname: "/tweet/[id]",
-      params: { id: tweetId },
-    });
-  }
-};
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -88,29 +71,6 @@ export default function RootLayout() {
     checkVersion();
   }, [loaded]);
 
-  useEffect(() => {
-    // Handle the initial URL
-    async function handleInitialURL() {
-      const initialURL = await Linking.getInitialURL();
-      if (initialURL) {
-        console.log(`Opened with initial URL: ${initialURL}`);
-        await navigateToRoute(initialURL); // Implement this function based on your navigation logic
-      }
-    }
-
-    handleInitialURL();
-
-    // Subscribe to deep link events
-    const subscription = Linking.addEventListener("url", async (event) => {
-      console.log(`Opened with subscription URL: ${event.url}`);
-      await navigateToRoute(event.url); // Implement this function based on your navigation logic
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
   if (!loaded) {
     return null;
   }
@@ -126,6 +86,7 @@ function RootLayoutNav() {
           <TweetsApiContextProvider>
             <QueryClientProvider client={queryClient}>
               <ThemeProvider value={DefaultTheme}>
+                <DeepLinkHandler />
                 <ActionSheetProvider>
                   <Stack>
                     <Stack.Screen
