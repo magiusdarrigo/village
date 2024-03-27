@@ -51,6 +51,7 @@ const footerHeight = getVerticalOffset();
 
 const TweetScreen = () => {
   const { id } = useGlobalSearchParams();
+  console.log("id from TweetScreen: ", id);
   const { getTweet, listComments, createComment } = useTweetsApi();
   const queryClient = useQueryClient();
   const inputRef = useRef<TextInput>(null);

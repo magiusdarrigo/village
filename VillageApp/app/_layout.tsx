@@ -4,7 +4,7 @@ import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, SplashScreen, router } from "expo-router";
 import { useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, Text } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -19,6 +19,7 @@ import * as Linking from "expo-linking";
 import * as Sentry from "sentry-expo";
 import { useTweetsApi } from "../context/TweetContext";
 import DeepLinkHandler from "../components/DeepLinkHandler";
+import { NavigationContainer } from "@react-navigation/native";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +36,6 @@ export {
 } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
 };
 
