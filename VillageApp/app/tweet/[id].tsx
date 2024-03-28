@@ -20,7 +20,7 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import { useTweetsApi } from "../../context/TweetContext";
 import Tweet from "../../components/Tweet";
-import { useGlobalSearchParams } from "expo-router";
+import { useLocalSearchParams, usePathname } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
 import * as Sentry from "sentry-expo";
@@ -50,8 +50,9 @@ const getVerticalOffset = () => {
 const footerHeight = getVerticalOffset();
 
 const TweetScreen = () => {
-  const { id } = useGlobalSearchParams();
-  console.log("id from TweetScreen: ", id);
+  const { tweetId } = useLocalSearchParams();
+  console.log("TweetScreen called, tweet_id:", tweetId);
+  console.log("path: ", usePathname());
   const { getTweet, listComments, createComment } = useTweetsApi();
   const queryClient = useQueryClient();
   const inputRef = useRef<TextInput>(null);
@@ -81,8 +82,8 @@ const TweetScreen = () => {
   };
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["tweets", id],
-    queryFn: () => getTweet(id as string),
+    queryKey: ["tweets", tweetId],
+    queryFn: () => getTweet(tweetId as string),
   });
 
   const handleAddComment = async () => {
@@ -96,7 +97,7 @@ const TweetScreen = () => {
       }
       Keyboard.dismiss();
       await mutateAsync({
-        postID: String(id),
+        postID: String(tweetId),
         textContent: commentText,
         parentCommentID: selectedCommentID
           ? String(selectedCommentID)
@@ -132,7 +133,7 @@ const TweetScreen = () => {
     mutationFn: createComment,
     onSuccess: (newData) => {
       // update the single tweet cache with a +1 total comments count
-      queryClient.setQueryData(["tweets", String(id)], (old: any) => {
+      queryClient.setQueryData(["tweets", String(tweetId)], (old: any) => {
         if (!old) return;
         return {
           ...old,
@@ -148,7 +149,7 @@ const TweetScreen = () => {
             return {
               ...page,
               data: page.data.map((tweet: any) => {
-                if (tweet.id === Number(id)) {
+                if (tweet.id === Number(tweetId)) {
                   return {
                     ...tweet,
                     comments_count: tweet.comments_count + 1,
@@ -171,7 +172,7 @@ const TweetScreen = () => {
               return {
                 ...page,
                 data: page.data.map((tweet: any) => {
-                  if (tweet.id === Number(id)) {
+                  if (tweet.id === Number(tweetId)) {
                     return {
                       ...tweet,
                       comments_count: tweet.comments_count + 1,
@@ -185,7 +186,7 @@ const TweetScreen = () => {
         }
       );
       // update the comments cache with the new comment
-      queryClient.setQueryData(["comments", String(id)], (old: any) => {
+      queryClient.setQueryData(["comments", String(tweetId)], (old: any) => {
         if (!old) {
           return {
             pageParams: [],
@@ -220,11 +221,10 @@ const TweetScreen = () => {
   const {
     data: commentsData,
     isFetching,
-    error: commentsError,
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
-  } = useCommentsInfiniteQuery(String(id));
+  } = useCommentsInfiniteQuery(String(tweetId));
 
   const handleLoadMore = () => {
     if (hasNextPage) fetchNextPage();

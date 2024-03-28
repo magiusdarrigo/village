@@ -498,10 +498,12 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             href={{
               pathname: `/profile/${tweet.user_id}`,
               params: {
+                // TODO: no need to make userID a query param too, just extract id with useParams hook in profileScreen
                 userID: tweet.user_id,
                 username: tweet.username,
               },
             }}
+            push
             asChild
           >
             <Pressable
@@ -515,11 +517,11 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               </View>
             </Pressable>
           </Link>
-          <Link href={`/tweet/${tweet.id}`} asChild>
+          <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
             <Pressable style={{ flex: 1 }}></Pressable>
           </Link>
         </View>
-        <Link href={`/tweet/${tweet.id}`} asChild>
+        <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
           <Pressable style={styles.container}>
             <View style={styles.mainContainer}>
               <View style={{ flexDirection: "row" }}>
@@ -547,7 +549,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           </Pressable>
         </Link>
       </View>
-      <Link href={`/tweet/${tweet.id}`} asChild>
+      <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
         <Pressable style={{ flex: 1 }}>
           <View
             style={{
@@ -568,10 +570,10 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           </View>
         </Pressable>
       </Link>
-      <Link href={`/tweet/${tweet.id}`} asChild>
+      <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
         <Pressable style={{ flex: 1 }}>
           <View style={postStyles.postFooter}>
-            <Link href={`/tweet/${tweet.id}`} asChild>
+            <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
               <Pressable
                 onPress={handleCommentIconClicked}
                 style={{ paddingTop: 5 }}

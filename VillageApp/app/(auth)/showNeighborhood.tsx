@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
-import { useGlobalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
@@ -9,7 +9,7 @@ import * as Sentry from "sentry-expo";
 
 const ShowNeighborhood = () => {
   const { neighborhoodName, buildingID, neighborhoodID } =
-    useGlobalSearchParams();
+    useLocalSearchParams();
   const { updateUserAttributes } = useTweetsApi();
   const { user, updateUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);

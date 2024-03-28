@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { useGlobalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { authenticate } from "../../lib/api/auth";
 import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
@@ -21,7 +21,7 @@ import onboardingStyles from "../../lib/styles/onboarding";
 const Authenticate = () => {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { phoneNumber } = useGlobalSearchParams();
+  const { phoneNumber } = useLocalSearchParams();
   const router = useRouter();
   const { updateAuthToken } = useAuth();
   const { user } = useUser();

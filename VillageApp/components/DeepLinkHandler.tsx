@@ -18,7 +18,7 @@ function DeepLinkHandler() {
   //       if (path) {
   //         router.push({
   //           pathname: "/tweet/[id]",
-  //           params: { id: "41" },
+  //           params: { tweetId: "41" },
   //         });
   //       }
   //     }
