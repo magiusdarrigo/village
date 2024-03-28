@@ -93,16 +93,29 @@ function RootLayoutNav() {
                     <Stack>
                       <Stack.Screen
                         name="tabs/(tabs)"
-                        options={{ headerShown: false }}
+                        options={{
+                          headerShown: false,
+                          headerBackTitleVisible: false,
+                          headerTintColor: "black",
+                        }}
                       />
                       <Stack.Screen name="profile/[id]" options={{}} />
                       <Stack.Screen
                         name="tweet/[id]"
-                        options={{ title: "Post" }}
+                        options={{
+                          title: "Post",
+                          headerBackTitleVisible: false,
+                          headerTintColor: "black",
+                        }}
                       />
                       <Stack.Screen
                         name="new-tweet"
-                        options={{ title: "New Post", headerShown: true }}
+                        options={{
+                          title: "New Post",
+                          headerShown: true,
+                          headerBackTitleVisible: false,
+                          headerTintColor: "black",
+                        }}
                       />
                       <Stack.Screen
                         name="(auth)/signIn"
