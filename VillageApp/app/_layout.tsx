@@ -20,6 +20,7 @@ import * as Sentry from "sentry-expo";
 import { useTweetsApi } from "../context/TweetContext";
 import DeepLinkHandler from "../components/DeepLinkHandler";
 import { NavigationContainer } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const queryClient = new QueryClient();
 
@@ -88,45 +89,47 @@ function RootLayoutNav() {
               <ThemeProvider value={DefaultTheme}>
                 <DeepLinkHandler />
                 <ActionSheetProvider>
-                  <Stack>
-                    <Stack.Screen
-                      name="tabs/(tabs)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen name="profile/[id]" options={{}} />
-                    <Stack.Screen
-                      name="tweet/[id]"
-                      options={{ title: "Post" }}
-                    />
-                    <Stack.Screen
-                      name="new-tweet"
-                      options={{ title: "New Post", headerShown: true }}
-                    />
-                    <Stack.Screen
-                      name="(auth)/signIn"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(auth)/authenticate"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(auth)/createProfile"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(auth)/pickBuilding"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(auth)/pickNeighborhood"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(auth)/showNeighborhood"
-                      options={{ headerShown: false }}
-                    />
-                  </Stack>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <Stack>
+                      <Stack.Screen
+                        name="tabs/(tabs)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen name="profile/[id]" options={{}} />
+                      <Stack.Screen
+                        name="tweet/[id]"
+                        options={{ title: "Post" }}
+                      />
+                      <Stack.Screen
+                        name="new-tweet"
+                        options={{ title: "New Post", headerShown: true }}
+                      />
+                      <Stack.Screen
+                        name="(auth)/signIn"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(auth)/authenticate"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(auth)/createProfile"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(auth)/pickBuilding"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(auth)/pickNeighborhood"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(auth)/showNeighborhood"
+                        options={{ headerShown: false }}
+                      />
+                    </Stack>
+                  </GestureHandlerRootView>
                 </ActionSheetProvider>
               </ThemeProvider>
             </QueryClientProvider>
