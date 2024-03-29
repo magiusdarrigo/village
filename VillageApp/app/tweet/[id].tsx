@@ -51,13 +51,14 @@ const footerHeight = getVerticalOffset();
 
 const TweetScreen = () => {
   const { tweetId } = useLocalSearchParams();
-  console.log("TweetScreen called, tweet_id:", tweetId);
-  console.log("path: ", usePathname());
   const { getTweet, listComments, createComment } = useTweetsApi();
   const queryClient = useQueryClient();
   const inputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
   const { isFeedHot, user: currentUser } = useUser();
+  console.log("TweetScreen called, tweet_id:", tweetId);
+  console.log("path: ", usePathname());
+  console.log("current user: ", currentUser);
 
   const [commentText, setCommentText] = useState("");
   const [selectedCommentID, setSelectedCommentID] = useState<
