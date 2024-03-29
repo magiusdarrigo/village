@@ -20,7 +20,7 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import { useTweetsApi } from "../../context/TweetContext";
 import Tweet from "../../components/Tweet";
-import { useGlobalSearchParams } from "expo-router";
+import { SplashScreen, useLocalSearchParams, usePathname } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
 import * as Sentry from "sentry-expo";
@@ -50,7 +50,7 @@ const getVerticalOffset = () => {
 const footerHeight = getVerticalOffset();
 
 const TweetScreen = () => {
-  const { id } = useGlobalSearchParams();
+  const { tweetId } = useLocalSearchParams();
   const { getTweet, listComments, createComment } = useTweetsApi();
   const queryClient = useQueryClient();
   const inputRef = useRef<TextInput>(null);
@@ -80,8 +80,11 @@ const TweetScreen = () => {
   };
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["tweets", id],
-    queryFn: () => getTweet(id as string),
+    queryKey: ["tweets", tweetId],
+    enabled: currentUser !== null,
+    queryFn: () => {
+      return getTweet(tweetId as string);
+    },
   });
 
   const handleAddComment = async () => {
@@ -95,7 +98,7 @@ const TweetScreen = () => {
       }
       Keyboard.dismiss();
       await mutateAsync({
-        postID: String(id),
+        postID: String(tweetId),
         textContent: commentText,
         parentCommentID: selectedCommentID
           ? String(selectedCommentID)
@@ -111,6 +114,7 @@ const TweetScreen = () => {
   const useCommentsInfiniteQuery = (postId: string) => {
     return useInfiniteQuery({
       queryKey: ["comments", String(postId)],
+      enabled: currentUser !== null,
       queryFn: async ({
         pageParam = { lastLikesCount: undefined, lastCommentID: undefined },
       }) => {
@@ -131,7 +135,7 @@ const TweetScreen = () => {
     mutationFn: createComment,
     onSuccess: (newData) => {
       // update the single tweet cache with a +1 total comments count
-      queryClient.setQueryData(["tweets", String(id)], (old: any) => {
+      queryClient.setQueryData(["tweets", String(tweetId)], (old: any) => {
         if (!old) return;
         return {
           ...old,
@@ -147,7 +151,7 @@ const TweetScreen = () => {
             return {
               ...page,
               data: page.data.map((tweet: any) => {
-                if (tweet.id === Number(id)) {
+                if (tweet.id === Number(tweetId)) {
                   return {
                     ...tweet,
                     comments_count: tweet.comments_count + 1,
@@ -170,7 +174,7 @@ const TweetScreen = () => {
               return {
                 ...page,
                 data: page.data.map((tweet: any) => {
-                  if (tweet.id === Number(id)) {
+                  if (tweet.id === Number(tweetId)) {
                     return {
                       ...tweet,
                       comments_count: tweet.comments_count + 1,
@@ -184,7 +188,7 @@ const TweetScreen = () => {
         }
       );
       // update the comments cache with the new comment
-      queryClient.setQueryData(["comments", String(id)], (old: any) => {
+      queryClient.setQueryData(["comments", String(tweetId)], (old: any) => {
         if (!old) {
           return {
             pageParams: [],
@@ -219,18 +223,24 @@ const TweetScreen = () => {
   const {
     data: commentsData,
     isFetching,
-    error: commentsError,
+    isFetched,
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
-  } = useCommentsInfiniteQuery(String(id));
+  } = useCommentsInfiniteQuery(String(tweetId));
 
   const handleLoadMore = () => {
     if (hasNextPage) fetchNextPage();
   };
 
-  if (isLoading) {
+  if (isLoading || currentUser === null) {
     return <ActivityIndicator />;
+  }
+
+  if (isFetched) {
+    setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 500);
   }
 
   if (error) {
@@ -262,7 +272,10 @@ const TweetScreen = () => {
 
   // Add replies to the corresponding parent comment
   items.forEach((comment: CommentType) => {
-    if (comment.parent_comment_id && uniqueIds.has(comment.parent_comment_id)) {
+    if (
+      comment?.parent_comment_id &&
+      uniqueIds.has(comment.parent_comment_id)
+    ) {
       const parentIndex = uniqueItems.findIndex(
         (c) => c.id === comment.parent_comment_id
       );

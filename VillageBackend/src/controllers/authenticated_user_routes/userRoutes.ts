@@ -303,7 +303,7 @@ router.get("/", async (req, res) => {
  * paginate by 10 for infinite scroll on the frontend
  */
 router.get("/:id/posts", async (req, res) => {
-  console.log("get posts by user id called, id: ", req.params.id);
+  console.log("get posts by user id called, user_id: ", req.params.id);
   const { id } = req.params;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   const currentUserID = currentUser.id;

@@ -11,22 +11,26 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { useGlobalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { authenticate } from "../../lib/api/auth";
 import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
+import { addParenthesesToPhoneNumber } from "../../lib/helpers";
 
 const Authenticate = () => {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { phoneNumber } = useGlobalSearchParams();
+  let { phoneNumber } = useLocalSearchParams();
+  // add back parantheses to the phone number. Have to do this because someone on the expo team is brain dead
+  // TODO: remove once issue: https://github.com/expo/expo/issues/26664 resolved. Because these regex-based helpers will
+  // break in the future if the phone number format changes
+  phoneNumber = addParenthesesToPhoneNumber(phoneNumber.toString());
   const router = useRouter();
   const { updateAuthToken } = useAuth();
   const { user } = useUser();
   const otpCodeRef = useRef<TextInput>(null);
-
   const isCodeInvalid = code.length < 6;
 
   useEffect(() => {

@@ -15,7 +15,8 @@ app.use(express.json());
 
 // serve static files
 app.use(express.static(path.join(__dirname, "..", "public")));
-app.get("/welcome", (_, res) => {
+// Catch-all route for any other path except those starting with "/v1"
+app.get(/^\/(?!v1).*$/, (_, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "welcome.html"));
 });
 

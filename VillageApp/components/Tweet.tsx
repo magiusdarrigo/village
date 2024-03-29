@@ -1,15 +1,9 @@
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { Image, ImageLoadEventData } from "expo-image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
-import {
-  AntIcon,
-  EvilIcon,
-  IoniconsIcon,
-  MaterialCommunityIcon,
-  Octicon,
-} from "./Icons";
+import { AntIcon, IoniconsIcon, MaterialCommunityIcon } from "./Icons";
 import { Link, useNavigation, useSegments } from "expo-router";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +15,7 @@ import Hyperlink from "react-native-hyperlink";
 import { handlePressButtonAsync } from "../lib/helpers";
 import Colors from "../constants/Colors";
 import { AlertButton } from "react-native";
+import * as Sharing from "expo-sharing";
 
 type TweetProps = {
   tweet: TweetType;
@@ -40,6 +35,17 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     Alert.alert("Something went wrong. Try again.");
     return null;
   }
+
+  const onShare = async () => {
+    try {
+      await Sharing.shareAsync(
+        `https://api.villageapp.nyc/tweet/${tweet.id}?tweetId=${tweet.id}`
+      );
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We couldn't share this post. Try again.");
+    }
+  };
 
   const onLayout = (event: any) => {
     const { width } = event.nativeEvent.layout;
@@ -498,10 +504,12 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             href={{
               pathname: `/profile/${tweet.user_id}`,
               params: {
+                // TODO: no need to make userID a query param too, just extract id with useParams hook in profileScreen
                 userID: tweet.user_id,
                 username: tweet.username,
               },
             }}
+            push
             asChild
           >
             <Pressable
@@ -515,11 +523,11 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               </View>
             </Pressable>
           </Link>
-          <Link href={`/tweet/${tweet.id}`} asChild>
+          <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
             <Pressable style={{ flex: 1 }}></Pressable>
           </Link>
         </View>
-        <Link href={`/tweet/${tweet.id}`} asChild>
+        <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
           <Pressable style={styles.container}>
             <View style={styles.mainContainer}>
               <View style={{ flexDirection: "row" }}>
@@ -547,7 +555,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           </Pressable>
         </Link>
       </View>
-      <Link href={`/tweet/${tweet.id}`} asChild>
+      <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
         <Pressable style={{ flex: 1 }}>
           <View
             style={{
@@ -568,10 +576,10 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           </View>
         </Pressable>
       </Link>
-      <Link href={`/tweet/${tweet.id}`} asChild>
+      <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
         <Pressable style={{ flex: 1 }}>
           <View style={postStyles.postFooter}>
-            <Link href={`/tweet/${tweet.id}`} asChild>
+            <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
               <Pressable
                 onPress={handleCommentIconClicked}
                 style={{ paddingTop: 5 }}
@@ -608,8 +616,8 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               </Pressable>
             </View>
             <Pressable
-              style={{ marginLeft: 5, paddingBottom: 5 }}
-              onPress={() => {}}
+              style={{ marginLeft: 8, paddingBottom: 3 }}
+              onPress={() => onShare()}
             >
               <IoniconsIcon
                 icon="share-outline"

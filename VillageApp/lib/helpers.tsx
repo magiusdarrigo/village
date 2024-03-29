@@ -114,3 +114,11 @@ export const getDeviceType = (): DeviceType => {
     return DeviceType.iPhoneLarge;
   }
 };
+
+export const stripParentheses = (text: string) => {
+  return text.replace(/[()]/g, "");
+};
+
+export const addParenthesesToPhoneNumber = (text: string) => {
+  return `(${text.slice(0, 3)})${text.slice(3)}`;
+};

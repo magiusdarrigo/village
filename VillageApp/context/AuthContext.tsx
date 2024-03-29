@@ -1,5 +1,5 @@
 // import * as SplashScreen from "expo-splash-screen";
-import { useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments, useRootNavigationState } from "expo-router";
 import {
   PropsWithChildren,
   createContext,
