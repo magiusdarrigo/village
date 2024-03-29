@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { router, useGlobalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
@@ -11,7 +11,7 @@ import * as Sentry from "sentry-expo";
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { buildingAddress } = useGlobalSearchParams();
+  const { buildingAddress } = useLocalSearchParams();
   const { createBuilding } = useTweetsApi();
   const { user } = useUser();
 

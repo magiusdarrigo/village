@@ -1,6 +1,6 @@
 import { ActivityIndicator, Alert, Pressable } from "react-native";
 import { useEffect } from "react";
-import { useGlobalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, usePathname } from "expo-router";
 import ModalScreen from "../modal";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ import { useUser } from "../../context/UserContext";
 
 const ProfileScreen = () => {
   const { user: currentUser, updateUser } = useUser();
-  const { userID: userIDParam, username } = useGlobalSearchParams();
+  const { userID: userIDParam, username } = useLocalSearchParams();
   const userID = String(userIDParam);
   const navigation = useNavigation();
   const { getUserProfile, blockUser, unFollowUser } = useTweetsApi();

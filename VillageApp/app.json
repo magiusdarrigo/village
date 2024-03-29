@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.magius18.village",
-      "buildNumber": "10",
+      "buildNumber": "12",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false

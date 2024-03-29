@@ -429,9 +429,9 @@ const Comment = ({
             params: {
               userID: comment.user_id,
               username: comment.username,
-              image: comment.profile_image ?? "",
             },
           }}
+          push
           asChild
         >
           <Pressable

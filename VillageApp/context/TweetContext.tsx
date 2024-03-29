@@ -65,7 +65,7 @@ interface TweetsApiContextType {
   addBuildingChangeRequest: (address: string) => Promise<any>;
   accountDeletionRequest: () => Promise<any>;
   blockUser: (userID: string) => Promise<any>;
-  log: (log: string) => Promise<any>;
+  logEvent: (log: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -96,7 +96,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   addBuildingChangeRequest: async () => {},
   accountDeletionRequest: async () => {},
   blockUser: async () => {},
-  log: async () => {},
+  logEvent: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -933,7 +933,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const log = async (log: string) => {
+  const logEvent = async (log: string) => {
     if (!authToken) {
       return {};
     }
@@ -992,7 +992,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         addBuildingChangeRequest,
         accountDeletionRequest,
         blockUser,
-        log,
+        logEvent,
       }}
     >
       {children}

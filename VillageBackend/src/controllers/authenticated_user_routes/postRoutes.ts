@@ -152,8 +152,8 @@ router.post("/", upload.single("image"), async (req, res) => {
 
 // get post
 router.get("/:id", async (req, res) => {
-  console.log("get post called");
   const { id } = req.params;
+  console.log("get post called, post_id: ", id);
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
     const getPostQuery = getSinglePostQuery(currentUser.id, Number(id));
