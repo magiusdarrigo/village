@@ -582,7 +582,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
               <Pressable
                 onPress={handleCommentIconClicked}
-                style={{ paddingTop: 5 }}
+                style={{ paddingTop: 3.5 }}
               >
                 <MaterialCommunityIcon
                   icon="comment-outline"
