@@ -1,27 +1,32 @@
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useUser } from "../context/UserContext";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 
 function DeepLinkHandler() {
   const router = useRouter();
   const { authToken } = useAuth();
+  const { user } = useUser();
   useEffect(() => {
     const handleDeepLink = (event: Linking.EventType) => {
-      if (event.url) {
+      if (event.url && authToken && user) {
         const { hostname, path, queryParams } = Linking.parse(event.url);
         console.log(
           `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
             queryParams
           )}`
         );
-        // console.log("Auth token: ", authToken);
         // Use a dynamic route parameter based on the actual URL
         if (path) {
-          router.navigate({
+          // first take user to the home screen
+          router.replace({
+            pathname: "/tabs",
+          });
+          router.push({
             pathname: path,
             params: queryParams ?? {},
-          });
+          } as any);
         }
       }
     };
@@ -37,7 +42,7 @@ function DeepLinkHandler() {
       // Clean up the event listener
       sub.remove();
     };
-  }, []);
+  }, [authToken, user]);
   return null;
 }
 

@@ -20,7 +20,7 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import { useTweetsApi } from "../../context/TweetContext";
 import Tweet from "../../components/Tweet";
-import { useLocalSearchParams, usePathname } from "expo-router";
+import { SplashScreen, useLocalSearchParams, usePathname } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
 import * as Sentry from "sentry-expo";
@@ -56,9 +56,6 @@ const TweetScreen = () => {
   const inputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
   const { isFeedHot, user: currentUser } = useUser();
-  console.log("TweetScreen called, tweet_id:", tweetId);
-  console.log("path: ", usePathname());
-  console.log("current user: ", currentUser);
 
   const [commentText, setCommentText] = useState("");
   const [selectedCommentID, setSelectedCommentID] = useState<
@@ -84,7 +81,10 @@ const TweetScreen = () => {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["tweets", tweetId],
-    queryFn: () => getTweet(tweetId as string),
+    enabled: currentUser !== null,
+    queryFn: () => {
+      return getTweet(tweetId as string);
+    },
   });
 
   const handleAddComment = async () => {
@@ -114,6 +114,7 @@ const TweetScreen = () => {
   const useCommentsInfiniteQuery = (postId: string) => {
     return useInfiniteQuery({
       queryKey: ["comments", String(postId)],
+      enabled: currentUser !== null,
       queryFn: async ({
         pageParam = { lastLikesCount: undefined, lastCommentID: undefined },
       }) => {
@@ -222,6 +223,7 @@ const TweetScreen = () => {
   const {
     data: commentsData,
     isFetching,
+    isFetched,
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
@@ -231,8 +233,14 @@ const TweetScreen = () => {
     if (hasNextPage) fetchNextPage();
   };
 
-  if (isLoading) {
+  if (isLoading || currentUser === null) {
     return <ActivityIndicator />;
+  }
+
+  if (isFetched) {
+    setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 500);
   }
 
   if (error) {
@@ -264,7 +272,10 @@ const TweetScreen = () => {
 
   // Add replies to the corresponding parent comment
   items.forEach((comment: CommentType) => {
-    if (comment.parent_comment_id && uniqueIds.has(comment.parent_comment_id)) {
+    if (
+      comment?.parent_comment_id &&
+      uniqueIds.has(comment.parent_comment_id)
+    ) {
       const parentIndex = uniqueItems.findIndex(
         (c) => c.id === comment.parent_comment_id
       );

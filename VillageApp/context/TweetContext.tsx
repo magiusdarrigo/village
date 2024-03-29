@@ -614,7 +614,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
   const getTweet = async (id: string) => {
     if (!authToken) {
-      console.log("no authToken");
       return {};
     }
     const url = `${API_URL}/v1/posts/${id}`;
@@ -935,7 +934,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   const logEvent = async (log: string) => {
-    console.log("breh");
     if (!authToken) {
       return {};
     }
@@ -950,8 +948,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
       },
       body: JSON.stringify({ log }),
     });
-
-    console.log(res.status, "res.status");
 
     if (res.status === 403) {
       removeAuthToken();

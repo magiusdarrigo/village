@@ -2,24 +2,21 @@ import "react-native-gesture-handler";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, SplashScreen, router } from "expo-router";
+import { Stack, SplashScreen, useRootNavigationState } from "expo-router";
 import { useEffect } from "react";
-import { Alert, Text } from "react-native";
+import { Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TweetsApiContextProvider from "../context/TweetContext";
 import { CURRENT_APP_VERSION, SENTRY_DSN } from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
-import { StreamChat, Channel as ChannelType } from "stream-chat";
+import { StreamChat } from "stream-chat";
 import { STREAM_CHAT_API_KEY } from "../lib/api/config";
 import { isIOSSimulator } from "../lib/helpers";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import * as Linking from "expo-linking";
 import * as Sentry from "sentry-expo";
-import { useTweetsApi } from "../context/TweetContext";
 import DeepLinkHandler from "../components/DeepLinkHandler";
-import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const queryClient = new QueryClient();
@@ -87,7 +84,6 @@ function RootLayoutNav() {
           <TweetsApiContextProvider>
             <QueryClientProvider client={queryClient}>
               <ThemeProvider value={DefaultTheme}>
-                <DeepLinkHandler />
                 <ActionSheetProvider>
                   <GestureHandlerRootView style={{ flex: 1 }}>
                     <Stack>
@@ -142,6 +138,7 @@ function RootLayoutNav() {
                         options={{ headerShown: false }}
                       />
                     </Stack>
+                    <DeepLinkHandler />
                   </GestureHandlerRootView>
                 </ActionSheetProvider>
               </ThemeProvider>
