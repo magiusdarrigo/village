@@ -1,15 +1,9 @@
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { Image, ImageLoadEventData } from "expo-image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
-import {
-  AntIcon,
-  EvilIcon,
-  IoniconsIcon,
-  MaterialCommunityIcon,
-  Octicon,
-} from "./Icons";
+import { AntIcon, IoniconsIcon, MaterialCommunityIcon } from "./Icons";
 import { Link, useNavigation, useSegments } from "expo-router";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +15,7 @@ import Hyperlink from "react-native-hyperlink";
 import { handlePressButtonAsync } from "../lib/helpers";
 import Colors from "../constants/Colors";
 import { AlertButton } from "react-native";
+import * as Sharing from "expo-sharing";
 
 type TweetProps = {
   tweet: TweetType;
@@ -40,6 +35,17 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     Alert.alert("Something went wrong. Try again.");
     return null;
   }
+
+  const onShare = async () => {
+    try {
+      await Sharing.shareAsync(
+        `https://api.villageapp.nyc/tweet/${tweet.id}?tweetId=${tweet.id}`
+      );
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We couldn't share this post. Try again.");
+    }
+  };
 
   const onLayout = (event: any) => {
     const { width } = event.nativeEvent.layout;
@@ -611,7 +617,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             </View>
             <Pressable
               style={{ marginLeft: 8, paddingBottom: 3 }}
-              onPress={() => {}}
+              onPress={() => onShare()}
             >
               <IoniconsIcon
                 icon="share-outline"
