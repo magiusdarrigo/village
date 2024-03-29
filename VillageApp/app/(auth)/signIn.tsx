@@ -17,6 +17,7 @@ import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
+import { stripParentheses } from "../../lib/helpers";
 
 const SignIn = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -54,7 +55,10 @@ const SignIn = () => {
       Keyboard.dismiss();
       const user = await login({ phoneNumber });
       updateUser(user);
-      router.replace({ pathname: "/authenticate", params: { phoneNumber } });
+      router.replace({
+        pathname: "/authenticate",
+        params: { phoneNumber: stripParentheses(phoneNumber) },
+      });
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue signing you in. Try again.");
