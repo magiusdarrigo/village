@@ -95,7 +95,13 @@ function RootLayoutNav() {
                           headerTintColor: "black",
                         }}
                       />
-                      <Stack.Screen name="profile/[id]" options={{}} />
+                      <Stack.Screen
+                        name="profile/[id]"
+                        options={{
+                          headerBackTitleVisible: false,
+                          headerTintColor: "black",
+                        }}
+                      />
                       <Stack.Screen
                         name="tweet/[id]"
                         options={{
