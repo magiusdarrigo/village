@@ -50,7 +50,12 @@ const NewTweet = () => {
   const tweetTextRef = useRef<TextInput>(null);
   const [image, setImage] = useState<string | undefined>(undefined);
   const [tweetUploading, setTweetUploading] = useState(false);
-  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [imageSize, setImageSize] = useState({
+    width: 0,
+    height: 0,
+    originalWidth: 0,
+    originalHeight: 0,
+  });
 
   const isPostButtonDisabled = !image && text.length < 1;
   const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
@@ -66,7 +71,12 @@ const NewTweet = () => {
         const aspectRatio = width / height;
         // Set width and height based on aspect ratio
         const scaledHeight = 150 / aspectRatio;
-        setImageSize({ width: 150, height: scaledHeight });
+        setImageSize({
+          width: 150,
+          height: scaledHeight,
+          originalWidth: width,
+          originalHeight: height,
+        });
       },
       (error) => {
         console.error(`Couldn't get the image size: ${error.message}`);
@@ -167,6 +177,8 @@ const NewTweet = () => {
         neighborhoodID: user?.neighborhood_id,
         textContent: text,
         imageURL: image,
+        imageWidth: imageSize.originalWidth,
+        imageHeight: imageSize.originalHeight,
       });
       setTweetUploading(false);
       setText("");

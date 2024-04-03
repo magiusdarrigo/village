@@ -335,6 +335,7 @@ const TweetScreen = () => {
         style={{ flex: 1 }}
         onScroll={handleScroll}
         scrollEventThrottle={500}
+        keyboardDismissMode="on-drag"
       >
         <Tweet
           tweet={data}

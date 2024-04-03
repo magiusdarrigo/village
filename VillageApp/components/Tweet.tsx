@@ -1,6 +1,12 @@
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
-import { Image, ImageLoadEventData } from "expo-image";
-import { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Alert,
+  Dimensions,
+} from "react-native";
+import { Image } from "expo-image";
 import { TweetType } from "../types";
 import { Entypo } from "@expo/vector-icons";
 import { AntIcon, IoniconsIcon, MaterialCommunityIcon } from "./Icons";
@@ -8,7 +14,7 @@ import { Link, useNavigation, useSegments } from "expo-router";
 import { useTweetsApi } from "../context/TweetContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../context/UserContext";
-import { calculateHoursAgo } from "../lib/helpers";
+import { calculateHoursAgo, blurhash } from "../lib/helpers";
 import * as Sentry from "sentry-expo";
 import postStyles from "../lib/styles/post";
 import Hyperlink from "react-native-hyperlink";
@@ -22,9 +28,9 @@ type TweetProps = {
   handleCommentIconClicked: () => void;
 };
 
+const { width: phoneWidth } = Dimensions.get("window");
+
 const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
-  const [imageSize, setImageSize] = useState({ width: 1, height: 1 });
-  const [postWidth, setPostWidth] = useState(1);
   const { likeTweet, unlikeTweet, deleteTweet, reportTweet, hideTweet } =
     useTweetsApi();
   const queryClient = useQueryClient();
@@ -45,11 +51,6 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
       Sentry.Native.captureException(error);
       Alert.alert("We couldn't share this post. Try again.");
     }
-  };
-
-  const onLayout = (event: any) => {
-    const { width } = event.nativeEvent.layout;
-    setPostWidth(width - 20);
   };
 
   // +1 on either like or dislike
@@ -487,17 +488,17 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
     }
   };
 
-  const onPostImageLoad = (e: ImageLoadEventData) => {
-    const { width, height } = e.source;
-    // Calculate aspect ratio
-    const aspectRatio = width / height;
-    // Set width and height based on aspect ratio
+  const imageSize = { width: 0, height: 0 };
+  if (tweet.image_url) {
+    const postWidth = phoneWidth - 20;
+    const aspectRatio = tweet.image_width / tweet.image_height;
     const scaledHeight = postWidth / aspectRatio;
-    setImageSize({ width: postWidth, height: scaledHeight });
-  };
+    imageSize.width = postWidth;
+    imageSize.height = scaledHeight;
+  }
 
   return (
-    <View style={postStyles.parentContainer} onLayout={onLayout}>
+    <View style={postStyles.parentContainer}>
       <View style={postStyles.imageParentContainer}>
         <View style={postStyles.imageContainer}>
           <Link
@@ -566,7 +567,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             {tweet.image_url && (
               <Image
                 source={tweet.image_url}
-                onLoad={onPostImageLoad}
+                placeholder={blurhash}
                 style={[
                   { width: imageSize.width, height: imageSize.height },
                   styles.libraryImage,
@@ -582,7 +583,7 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
             <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
               <Pressable
                 onPress={handleCommentIconClicked}
-                style={{ paddingTop: 5 }}
+                style={{ paddingTop: 3.5 }}
               >
                 <MaterialCommunityIcon
                   icon="comment-outline"

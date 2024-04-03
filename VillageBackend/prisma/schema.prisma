@@ -55,7 +55,7 @@ model tokens {
   tags        Json?
 
   user_id String
-  user    users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user    users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 enum TokenType {
@@ -93,9 +93,11 @@ model posts {
   neighborhood_id   Int
   text_content      String?
   image_url         String        @default("")
+  image_height      Int           @default(0)
+  image_width       Int           @default(0)
   likes_count       Int           @default(0)
   comments_count    Int           @default(0)
-  hidden_from_users String[]         @default([])
+  hidden_from_users String[]      @default([])
   created_at        DateTime      @default(now())
   tags              Json?
 
