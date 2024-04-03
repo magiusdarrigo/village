@@ -1,5 +1,4 @@
-// import * as SplashScreen from "expo-splash-screen";
-import { useRouter, useSegments, useRootNavigationState } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import {
   PropsWithChildren,
   createContext,
@@ -82,7 +81,6 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
         setAuthToken(token);
         if (!user) {
           try {
-            console.log("fetching user");
             const currentUser = await getUser(token);
             updateUser(currentUser);
           } catch (error) {

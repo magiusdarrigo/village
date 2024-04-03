@@ -23,6 +23,7 @@ import {
   messageActions as defaultMessageActions,
 } from "stream-chat-expo";
 import { getDeviceType, DeviceType } from "../../../lib/helpers";
+import CustomMessageList from "../../../components/CustomMessageList";
 
 let areNotificationsEnabled = false;
 
@@ -239,7 +240,7 @@ const ChatScreen = () => {
                 return actions;
               }}
             >
-              <MessageList />
+              <CustomMessageList />
               <MessageInput />
             </Channel>
           </Chat>

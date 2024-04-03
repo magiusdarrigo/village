@@ -48,6 +48,8 @@ interface TweetsApiContextType {
     neighborhoodID: number;
     textContent?: string;
     imageURL?: string;
+    imageWidth: number;
+    imageHeight: number;
   }) => Promise<any>;
   updateUserAttributes: (data: {
     username?: string;
@@ -641,6 +643,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     neighborhoodID: number;
     textContent?: string;
     imageURL?: string;
+    imageWidth: number;
+    imageHeight: number;
   }) => {
     if (!authToken) {
       return {};
@@ -655,6 +659,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         type: imageType,
         name: `upload.${imageType.split("/").pop()}`,
       } as any);
+      formData.append("imageWidth", data.imageWidth.toString());
+      formData.append("imageHeight", data.imageHeight.toString());
     }
     formData.append("textContent", data.textContent || "");
     formData.append("neighborhoodID", data.neighborhoodID.toString());
