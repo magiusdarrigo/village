@@ -30,6 +30,8 @@ export type TweetType = {
   neighborhood_id: number;
   text_content?: string;
   image_url?: string;
+  image_width: number;
+  image_height: number;
   likes_count: number;
   comments_count: number;
   created_at: string;

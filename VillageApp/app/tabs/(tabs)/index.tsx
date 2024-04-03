@@ -152,8 +152,6 @@ const FeedScreen = () => {
     }
   });
 
-  // console.log("uniqueItems", uniqueItems.length);
-
   return (
     <View style={pageStyles.page}>
       {/* <NeighborhoodScrollPicker /> */}

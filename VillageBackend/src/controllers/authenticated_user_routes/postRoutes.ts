@@ -97,8 +97,9 @@ router.post("/:id/hide", async (req, res) => {
 // create post
 router.post("/", upload.single("image"), async (req, res) => {
   console.log("create post called");
-  const { neighborhoodID, textContent } = req.body;
+  const { neighborhoodID, textContent, imageWidth, imageHeight } = req.body;
   const currentUser = (req as unknown as AuthenticatedRequest).user;
+  console.log("image dimensions: ", imageWidth, imageHeight);
 
   if (textContent && !postTextContentAllowed(textContent)) {
     return res
@@ -133,7 +134,9 @@ router.post("/", upload.single("image"), async (req, res) => {
       currentUser.id,
       Number(neighborhoodID),
       textContent,
-      uploadedFilePath
+      uploadedFilePath,
+      imageWidth ? Number(imageWidth) : 0,
+      imageHeight ? Number(imageHeight) : 0
     );
     const newPost = (await prisma.$queryRaw(newPostQuery)) as any[];
 
