@@ -9,6 +9,10 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY src ./src
 
+# set all args from .env
+ARG RABBITMQ_PRIVATE_URL
+ARG PORT
+
 # Install app dependencies
 RUN npm install
 
