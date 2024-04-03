@@ -1,41 +1,52 @@
 import express, { Request, Response } from "express";
+import "dotenv/config";
 import amqp from "amqplib";
 
 const app = express();
-app.use(express.json());
-const port = 3002;
+const port = process.env.PORT;
+if (!port) {
+  throw new Error("Missing PORT env variable");
+}
 
-const rabbitMQURL = process.env.RABBITMQ_PRIVATE_URL ?? "";
+const rabbitMQURL = process.env.RABBITMQ_PRIVATE_URL;
+if (!rabbitMQURL) {
+  throw new Error("Missing RABBITMQ_PRIVATE_URL env variable");
+}
+
+app.use(express.json());
+
 let channel: amqp.Channel;
 
 async function connectRabbitMQ() {
+  console.log("Connecting to RabbitMQ...");
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const connection = await amqp.connect(rabbitMQURL);
   channel = await connection.createChannel();
-  await channel.assertQueue("postsQueue"); // Ensure the queue exists
+  await channel.assertQueue("posts-queue");
 }
-
-// Connect to RabbitMQ when the server starts
-connectRabbitMQ()
-  .then(() => {
-    console.log("Connected to RabbitMQ");
-  })
-  .catch((err) => {
-    console.error("Failed to connect to RabbitMQ", err);
-  });
 
 app.post("/newpost", async (req: Request, res: Response) => {
   const postEvent = req.body;
   console.log("Received new post event:", postEvent);
 
-  if (!channel) {
-    console.error("RabbitMQ channel not initialized");
-    return res.status(500).send("Server error");
-  }
-
-  channel.sendToQueue("postsQueue", Buffer.from(JSON.stringify(postEvent)));
+  channel.sendToQueue("posts-queue", Buffer.from(JSON.stringify(postEvent)));
   res.status(200).send("Post event received and published");
 });
 
-app.listen(port, () => {
-  console.log(`VillageEventPublisher listening at http://localhost:${port}`);
-});
+async function init() {
+  try {
+    await connectRabbitMQ();
+    console.log("Connected to RabbitMQ");
+    app.listen(port, () => {
+      console.log(
+        `VillageEventPublisher listening at http://localhost:${port}`
+      );
+    });
+  } catch (error) {
+    console.error("Failed to connect to RabbitMQ or start the server:", error);
+    process.exit(1);
+  }
+}
+
+init();
