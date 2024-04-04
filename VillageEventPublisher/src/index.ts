@@ -23,21 +23,23 @@ async function connectRabbitMQ() {
   // @ts-ignore
   const connection = await amqp.connect(rabbitMQURL);
   channel = await connection.createChannel();
-  await channel.assertQueue("posts-queue");
+  await channel.assertQueue("posts-queue", { durable: true });
 }
 
 app.post("/newpost", async (req: Request, res: Response) => {
   const postEvent = req.body;
   console.log("Received new post event:", postEvent);
 
-  channel.sendToQueue("posts-queue", Buffer.from(JSON.stringify(postEvent)));
+  channel.sendToQueue("posts-queue", Buffer.from(JSON.stringify(postEvent)), {
+    persistent: true,
+  });
   res.status(200).send("Post event received and published");
 });
 
 async function init() {
   try {
     await connectRabbitMQ();
-    console.log("Connected to RabbitMQ");
+    console.log("Connected to RabbitMQ... Ready for publishing.");
     app.listen(port, () => {
       console.log(
         `VillageEventPublisher listening at http://localhost:${port}`
