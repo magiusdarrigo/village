@@ -19,7 +19,7 @@ RUN npm install
 # Compile TypeScript to JavaScript
 RUN npm run build
 
-# Your app's port, make sure it matches with your app's configuration
+# Your app's port, make sure it matches with your app's configuration.
 EXPOSE 3002
 
 # Define the command to run your app using the compiled JavaScript files
