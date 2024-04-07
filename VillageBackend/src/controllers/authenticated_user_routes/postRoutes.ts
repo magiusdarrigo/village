@@ -266,8 +266,8 @@ router.post("/:id/likes", async (req, res) => {
 
     res.status(200).json({ newLike, updatedPost });
 
-    // if the post was liked, send a notification to the post author
-    if (is_dislike === "true") {
+    // if the post was un-liked and total likes is not -3, don't send a notification
+    if (is_dislike === "true" && updatedPost.likes_count !== -3) {
       return;
     }
     // query for the post author
@@ -280,6 +280,29 @@ router.post("/:id/likes", async (req, res) => {
         fcm_token: true,
       },
     });
+
+    // if likes_count is -3, send a notification to the post author
+    if (updatedPost.likes_count === -3) {
+      const title = "Your post has been banned.";
+      const message = truncateNotificationMessage(
+        updatedPost.text_content ?? ""
+      );
+      // create a notification record
+      await prisma.notifications.create({
+        data: {
+          title,
+          message,
+          for_user_id: updatedPost.user_id,
+          from_user_id: currentUser.id,
+          for_post_id: Number(id),
+        },
+      });
+      // send a push notification
+      if (postAuthor?.fcm_token) {
+        await sendNotification(title, message, postAuthor.fcm_token);
+      }
+      return;
+    }
 
     // if the post author is the current user, don't send a notification
     if (postAuthor?.id === currentUser.id) {
