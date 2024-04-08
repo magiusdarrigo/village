@@ -63,7 +63,9 @@ export const checkAbuse = async (event: NewPostWebhookEvent) => {
     }
     const answer = response.choices[0].message;
     if (!isAbuseAnswer(answer)) {
-      throw Error("Invalid response from OpenAI");
+      throw Error(
+        "Invalid response from OpenAI, response: " + JSON.stringify(answer)
+      );
     }
     return answer.ban;
   } catch (err: any) {
