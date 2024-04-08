@@ -104,6 +104,8 @@ const getNewPosts = async (
   );
   const posts = (await prisma.$queryRaw(sqlQuery)) as any;
   const nextCursor = posts.length < 20 ? undefined : posts[19].id;
+  console.log("posts length", posts.length);
+  console.log("nextCursor", nextCursor);
   return { posts, nextCursor };
 };
 
