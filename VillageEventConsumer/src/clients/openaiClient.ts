@@ -2,9 +2,16 @@ import OpenAI from "openai";
 
 const openai = new OpenAI();
 
-export const getPostAbuseDecision = async (text: string) => {};
+export const getGPT4Response = async (messages: any[]) => {
+  return await openai.chat.completions.create({
+    model: "gpt-4-0125-preview",
+    messages,
+  });
+};
 
-export const getPostWithImageAbuseDecision = async (
-  text: string,
-  image: string
-) => {};
+export const getGPT4VisionResponse = async (messages: any[]) => {
+  return await openai.chat.completions.create({
+    model: "gpt-4-1106-vision-preview",
+    messages,
+  });
+};
