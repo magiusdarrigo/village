@@ -3,6 +3,7 @@ import amqp from "amqplib";
 import { checkAbuse } from "./analyze";
 import { banPost } from "./ban";
 import { notifyUser } from "./notify";
+import { NewPostWebhookEvent } from "./types/custom";
 
 const rabbitMQURL = process.env.RABBITMQ_PRIVATE_URL;
 if (!rabbitMQURL) {
@@ -29,13 +30,17 @@ async function consumeEvents() {
         return;
       }
 
-      const postEvent = JSON.parse(message.content.toString());
+      const postEvent = JSON.parse(
+        message.content.toString()
+      ) as NewPostWebhookEvent;
       console.log("Received new post event:", postEvent);
       const ban = await checkAbuse(postEvent);
       if (!ban) {
+        console.log(`post ${postEvent.record.id} is deemed not abusive.`);
         channel.ack(message);
         return;
       }
+      console.log(`post ${postEvent.record.id} is deemed ABUSIVE.`);
       await banPost(postEvent);
       await notifyUser(postEvent);
       channel.ack(message);
