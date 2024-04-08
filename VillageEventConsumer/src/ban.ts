@@ -9,7 +9,7 @@ export const banPost = async (postEvent: NewPostWebhookEvent) => {
     const { error: updateError } = await supabaseClient
       .from("posts")
       .update({
-        ban: true,
+        is_banned: true,
       })
       .eq("id", postEvent.record.id);
 
