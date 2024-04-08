@@ -22,6 +22,8 @@ export const getPostsByUserAndPostIdsQuery = (
                   post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
               WHERE 
                   posts.id IN (${Prisma.raw(postIdsString)})
+              AND
+                  posts.is_banned = FALSE
               LIMIT 20;
           `;
 };
@@ -46,6 +48,8 @@ export const getPostsByUserAndNeighborhoodQuery = (
                 post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
             WHERE 
                 posts.neighborhood_id = ${neighborhoodID} AND posts.id < ${lastPostId}
+            AND
+                posts.is_banned = FALSE
             ORDER BY 
                 posts.id DESC
             LIMIT 20;
@@ -117,6 +121,8 @@ export const getPostsByUserQuery = (
                 post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${currentUserID} 
             WHERE 
                 posts.user_id = ${userID} AND posts.id < ${lastPostId}
+            AND
+                posts.is_banned = FALSE
             ORDER BY 
                 posts.created_at DESC 
             LIMIT 10;

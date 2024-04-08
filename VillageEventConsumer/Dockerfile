@@ -11,6 +11,10 @@ COPY src ./src
 
 # set all args from .env
 ARG RABBITMQ_PRIVATE_URL
+ARG OPENAI_API_KEY
+ARG SUPABASE_URL
+ARG SUPABASE_SECRET
+ARG FIREBASE_SERVICE_ACCOUNT_BASE64
 
 # Install app dependencies
 RUN npm install

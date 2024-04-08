@@ -1,5 +1,8 @@
 import "dotenv/config";
 import amqp from "amqplib";
+import { checkAbuse } from "./analyze";
+import { banPost } from "./ban";
+import { notifyUser } from "./notify";
 
 const rabbitMQURL = process.env.RABBITMQ_PRIVATE_URL;
 if (!rabbitMQURL) {
@@ -21,13 +24,20 @@ async function connectRabbitMQ() {
 async function consumeEvents() {
   channel.consume(
     "posts-queue",
-    (message) => {
+    async (message) => {
       if (!message) {
         return;
       }
 
       const postEvent = JSON.parse(message.content.toString());
       console.log("Received new post event:", postEvent);
+      const ban = await checkAbuse(postEvent);
+      if (!ban) {
+        channel.ack(message);
+        return;
+      }
+      await banPost(postEvent);
+      await notifyUser(postEvent);
       channel.ack(message);
     },
     { noAck: false }
