@@ -61,7 +61,8 @@ export const checkAbuse = async (event: NewPostWebhookEvent) => {
     if (response.choices.length == 0) {
       throw Error("Response choices has length of 0");
     }
-    const answer = response.choices[0].message;
+    const answerString = response.choices[0].message.content as string;
+    const answer = JSON.parse(answerString);
     if (!isAbuseAnswer(answer)) {
       throw Error(
         "Invalid response from OpenAI, response: " + JSON.stringify(response)
