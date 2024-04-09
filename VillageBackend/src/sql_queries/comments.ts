@@ -62,12 +62,14 @@ export const getTop10CommentsFromPostQuery = (
         r.created_at ASC
   )
   
-  SELECT * FROM TopComments
-  UNION ALL
-  SELECT * FROM Replies
-  ORDER BY is_top_comment DESC, likes_count DESC, id DESC;
+  SELECT * FROM (
+    SELECT * FROM TopComments
+    UNION ALL
+    SELECT * FROM Replies
+) AS CombinedComments
+ORDER BY is_top_comment DESC, CASE WHEN is_top_comment = 1 THEN likes_count ELSE id END DESC;
   `;
-};
+}; // By using the id column for sorting replies, we avoid the data type conflict issue since both likes_count and id are integers.
 
 export const createCommentQuery = (
   userID: string,

@@ -25,18 +25,24 @@ import * as Sharing from "expo-sharing";
 
 type TweetProps = {
   tweet: TweetType;
+  allowPush: boolean;
   handleCommentIconClicked: () => void;
 };
 
 const { width: phoneWidth } = Dimensions.get("window");
 
-const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
+const Tweet = ({
+  tweet,
+  handleCommentIconClicked,
+  allowPush = true,
+}: TweetProps) => {
   const { likeTweet, unlikeTweet, deleteTweet, reportTweet, hideTweet } =
     useTweetsApi();
   const queryClient = useQueryClient();
   const navigation = useNavigation();
   const segments = useSegments();
   const { user, isFeedHot } = useUser();
+
   if (!user) {
     Alert.alert("Something went wrong. Try again.");
     return null;
@@ -524,11 +530,19 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
               </View>
             </Pressable>
           </Link>
-          <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
+          <Link
+            href={`/tweet/${tweet.id}?tweetId=${tweet.id}`}
+            push={allowPush}
+            asChild
+          >
             <Pressable style={{ flex: 1 }}></Pressable>
           </Link>
         </View>
-        <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
+        <Link
+          href={`/tweet/${tweet.id}?tweetId=${tweet.id}`}
+          push={allowPush}
+          asChild
+        >
           <Pressable style={styles.container}>
             <View style={styles.mainContainer}>
               <View style={{ flexDirection: "row" }}>
@@ -556,7 +570,11 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           </Pressable>
         </Link>
       </View>
-      <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
+      <Link
+        href={`/tweet/${tweet.id}?tweetId=${tweet.id}`}
+        push={allowPush}
+        asChild
+      >
         <Pressable style={{ flex: 1 }}>
           <View
             style={{
@@ -577,10 +595,18 @@ const Tweet = ({ tweet, handleCommentIconClicked }: TweetProps) => {
           </View>
         </Pressable>
       </Link>
-      <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
+      <Link
+        href={`/tweet/${tweet.id}?tweetId=${tweet.id}`}
+        push={allowPush}
+        asChild
+      >
         <Pressable style={{ flex: 1 }}>
           <View style={postStyles.postFooter}>
-            <Link href={`/tweet/${tweet.id}?tweetId=${tweet.id}`} push asChild>
+            <Link
+              href={`/tweet/${tweet.id}?tweetId=${tweet.id}`}
+              push={allowPush}
+              asChild
+            >
               <Pressable
                 onPress={handleCommentIconClicked}
                 style={{ paddingTop: 3.5 }}

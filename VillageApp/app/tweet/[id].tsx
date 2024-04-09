@@ -339,6 +339,7 @@ const TweetScreen = () => {
       >
         <Tweet
           tweet={data}
+          allowPush={false}
           handleCommentIconClicked={handleCommentIconPressed}
         />
         {items.length > 0 && (

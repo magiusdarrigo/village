@@ -281,8 +281,15 @@ router.post("/:id/likes", async (req, res) => {
       },
     });
 
-    // if likes_count is -3, send a notification to the post author
+    // if likes_count is -3, ban post
     if (updatedPost.likes_count === -3) {
+      // update the post to be banned
+      await prisma.posts.update({
+        where: { id: Number(id) },
+        data: {
+          is_banned: true,
+        },
+      });
       const title = "Your post has been banned.";
       const message = truncateNotificationMessage(
         updatedPost.text_content ?? ""
