@@ -164,6 +164,7 @@ const FeedScreen = () => {
         renderItem={({ item }) => (
           <Tweet
             tweet={item}
+            allowPush={true}
             handleCommentIconClicked={() => console.log("comment clicked")}
           />
         )}

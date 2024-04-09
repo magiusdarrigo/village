@@ -19,7 +19,6 @@ import {
   Chat,
   Channel,
   MessageInput,
-  MessageList,
   messageActions as defaultMessageActions,
 } from "stream-chat-expo";
 import { getDeviceType, DeviceType } from "../../../lib/helpers";
