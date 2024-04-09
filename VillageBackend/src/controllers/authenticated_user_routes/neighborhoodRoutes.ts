@@ -82,13 +82,14 @@ const getHotPosts = async (
   if (postIDsToGet.length === 0) {
     return { posts: [], nextCursor: undefined };
   }
-
   const sqlQuery = getPostsByUserAndPostIdsQuery(userID, postIDsToGet);
   const posts = (await prisma.$queryRaw(sqlQuery)) as any;
-  const nextCursor = posts.length < 20 ? undefined : posts[19].id;
+
+  const nextCursor = postIDsToGet.length < 20 ? undefined : postIDsToGet[19];
   const sortedPosts = postIDsToGet
     .map((id) => posts.find((post: any) => post.id === id))
     .filter((post) => post !== undefined);
+
   return { posts: sortedPosts, nextCursor };
 };
 
