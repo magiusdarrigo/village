@@ -12,6 +12,7 @@ const storePostsRankingsForNeighborhood = async (
     .from("posts")
     .select("id,created_at,likes_count,comments_count")
     .eq("neighborhood_id", neighborhoodID)
+    .eq("is_banned", false)
     .order("created_at", { ascending: false })
     .limit(1000);
 
