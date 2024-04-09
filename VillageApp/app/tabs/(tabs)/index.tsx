@@ -113,8 +113,6 @@ const FeedScreen = () => {
   };
 
   const handleLoadMore = () => {
-    console.log("handleLoadMore fired");
-    console.log("hasNextPage", hasNextPage);
     if (hasNextPage) fetchNextPage();
   };
 

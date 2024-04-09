@@ -18,7 +18,9 @@ import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import * as Sentry from "sentry-expo";
 import DeepLinkHandler from "../components/DeepLinkHandler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { vexo } from "vexo-analytics";
 
+vexo("56050f00-021b-4ecb-bcaf-5cbc7ac80b45");
 const queryClient = new QueryClient();
 
 Sentry.init({
