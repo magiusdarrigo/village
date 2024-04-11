@@ -9,10 +9,14 @@ import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TweetsApiContextProvider from "../context/TweetContext";
-import { CURRENT_APP_VERSION, SENTRY_DSN } from "../lib/api/config";
+import {
+  CURRENT_APP_VERSION,
+  SENTRY_DSN,
+  STREAM_CHAT_API_KEY,
+  VEXO_API_KEY,
+} from "../lib/api/config";
 import { checkAppVersion } from "../lib/api/auth";
 import { StreamChat } from "stream-chat";
-import { STREAM_CHAT_API_KEY } from "../lib/api/config";
 import { isIOSSimulator } from "../lib/helpers";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import * as Sentry from "sentry-expo";
@@ -20,7 +24,7 @@ import DeepLinkHandler from "../components/DeepLinkHandler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { vexo } from "vexo-analytics";
 
-vexo("56050f00-021b-4ecb-bcaf-5cbc7ac80b45");
+vexo(VEXO_API_KEY);
 const queryClient = new QueryClient();
 
 Sentry.init({
