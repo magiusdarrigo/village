@@ -30,8 +30,8 @@ function isAbuseAnswer(obj: any): obj is AbuseAnswer {
 
 export const checkAbuse = async (event: NewPostWebhookEvent) => {
   try {
-    const { text_content, image_url } = event.record;
-    console.log("event.record: ", event.record);
+    let { text_content, image_url } = event.record;
+    text_content = text_content ?? "";
 
     let response;
     if (image_url) {
@@ -40,7 +40,7 @@ export const checkAbuse = async (event: NewPostWebhookEvent) => {
         {
           role: "user",
           content: [
-            { type: "text", text_content },
+            { type: "text", text: text_content },
             {
               type: "image_url",
               image_url: {

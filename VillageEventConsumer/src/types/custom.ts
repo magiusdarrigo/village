@@ -6,6 +6,6 @@ export type NewPostWebhookEvent = {
     user_id: string;
     image_url?: string;
     created_at: string;
-    text_content: string;
+    text_content?: string;
   };
 };
