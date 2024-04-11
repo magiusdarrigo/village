@@ -226,6 +226,7 @@ const NewTweet = () => {
             value={text}
             onChangeText={(value) => setText(value)}
             placeholder={`What's going on in ${user?.neighborhood?.name}?`}
+            placeholderTextColor={"#c5c5c7"}
             multiline
             style={{
               marginTop: 8,

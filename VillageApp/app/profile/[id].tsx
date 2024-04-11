@@ -1,7 +1,7 @@
 import { ActivityIndicator, Alert, Pressable } from "react-native";
 import { useEffect } from "react";
 import { useLocalSearchParams, useNavigation, usePathname } from "expo-router";
-import ModalScreen from "../modal";
+import Profile from "../../components/Profile";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -10,7 +10,7 @@ import Colors from "../../constants/Colors";
 import * as Sentry from "sentry-expo";
 import { useUser } from "../../context/UserContext";
 
-const ProfileScreen = () => {
+const OtherUserProfileScreen = () => {
   const { user: currentUser, updateUser } = useUser();
   const { userID: userIDParam, username } = useLocalSearchParams();
   const userID = String(userIDParam);
@@ -124,7 +124,7 @@ const ProfileScreen = () => {
     return null; // Or render some fallback UI
   }
 
-  return <ModalScreen user={data} />;
+  return <Profile user={data} />;
 };
 
-export default ProfileScreen;
+export default OtherUserProfileScreen;

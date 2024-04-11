@@ -1,15 +1,15 @@
 import { ActivityIndicator } from "react-native";
-import ModalScreen from "../../modal";
+import Profile from "../../../components/Profile";
 import { useUser } from "../../../context/UserContext";
 
-const ProfileScreen = () => {
+const YourProfileScreen = () => {
   const { user } = useUser();
 
   if (!user) {
     return <ActivityIndicator />;
   }
 
-  return <ModalScreen user={user} />;
+  return <Profile user={user} />;
 };
 
-export default ProfileScreen;
+export default YourProfileScreen;
