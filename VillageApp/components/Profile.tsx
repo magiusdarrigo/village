@@ -19,20 +19,20 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
-import EmptyListView from "../components/EmptyListView";
+import EmptyListView from "./EmptyListView";
 import { useUser } from "../context/UserContext";
 import { handleChooseCustomImage } from "../lib/helpers";
-import { MaterialCommunityIcon } from "../components/Icons";
+import { MaterialCommunityIcon } from "./Icons";
 import * as Sentry from "sentry-expo";
 import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../lib/api/pagination";
-import Tweet from "../components/Tweet";
+import Tweet from "./Tweet";
 import Colors from "../constants/Colors";
 
 type ProfileProps = {
   user: UserType;
 };
 
-const ModalScreen = ({ user }: ProfileProps) => {
+const Profile = ({ user }: ProfileProps) => {
   const queryClient = useQueryClient();
   const {
     followUser,
@@ -420,4 +420,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ModalScreen;
+export default Profile;
