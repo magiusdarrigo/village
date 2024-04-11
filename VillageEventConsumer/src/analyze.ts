@@ -31,6 +31,7 @@ function isAbuseAnswer(obj: any): obj is AbuseAnswer {
 export const checkAbuse = async (event: NewPostWebhookEvent) => {
   try {
     const { text_content, image_url } = event.record;
+    console.log("event.record: ", event.record);
 
     let response;
     if (image_url) {
