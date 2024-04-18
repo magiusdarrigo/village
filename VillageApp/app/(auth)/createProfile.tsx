@@ -13,7 +13,11 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Image } from "expo-image";
-import { handleChooseCustomImage } from "../../lib/helpers";
+import {
+  handleChooseCustomImage,
+  getDeviceType,
+  DeviceType,
+} from "../../lib/helpers";
 import { useRouter } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
@@ -25,6 +29,8 @@ import { defaultImages } from "../../lib/api/onboarding";
 import Hyperlink from "react-native-hyperlink";
 import { handlePressButtonAsync } from "../../lib/helpers";
 
+const deviceType = getDeviceType();
+
 const CreateProfile = () => {
   const { updateUser } = useUser();
   const router = useRouter();
@@ -35,7 +41,13 @@ const CreateProfile = () => {
 
   // Function to render color options
   const renderColorOptions = () => {
-    return defaultImages.map((colorImage) => (
+    let images = [...defaultImages]; // Create a copy using spread syntax
+    // remove the last 2 colors for small devices
+    if (deviceType === DeviceType.iPhoneSmall) {
+      images.pop();
+      images.pop();
+    }
+    return images.map((colorImage) => (
       <TouchableOpacity
         key={colorImage}
         onPress={() => setImage(colorImage)}
