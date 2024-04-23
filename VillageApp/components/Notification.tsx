@@ -5,6 +5,7 @@ import { NotificationType } from "../types";
 import postStyles from "../lib/styles/post";
 import { Link } from "expo-router";
 import Colors from "../constants/Colors";
+const warning = require("../assets/images/warning.png");
 
 type NotificationProps = {
   notification: NotificationType;
@@ -43,7 +44,7 @@ const Notification = ({ notification }: NotificationProps) => {
             >
               <View style={styles.userImage}>
                 <Image
-                  source={notification.from_profile_image}
+                  source={notification.from_profile_image ?? warning}
                   style={styles.userImage}
                 />
               </View>
