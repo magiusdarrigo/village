@@ -1,16 +1,18 @@
 import React from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
-import { Image, ImageLoadEventData } from "expo-image";
+import { Image } from "expo-image";
 import { NotificationType } from "../types";
 import postStyles from "../lib/styles/post";
 import { Link } from "expo-router";
 import Colors from "../constants/Colors";
+const warning = require("../assets/images/warning.png");
 
 type NotificationProps = {
   notification: NotificationType;
 };
 
 const Notification = ({ notification }: NotificationProps) => {
+  console.log("notification: ", notification);
   const disablePostPressable = notification.for_post_id === null;
   const notificationHasBeenSeen = notification.read;
   return (
@@ -42,20 +44,28 @@ const Notification = ({ notification }: NotificationProps) => {
             >
               <View style={styles.userImage}>
                 <Image
-                  source={notification.from_profile_image}
+                  source={notification.from_profile_image ?? warning}
                   style={styles.userImage}
                 />
               </View>
             </Pressable>
           </Link>
-          <Link href={`/tweet/${notification.for_post_id}`} asChild>
+          <Link
+            href={`/tweet/${notification.for_post_id}?tweetId=${notification.for_post_id}`}
+            asChild
+            push={true}
+          >
             <Pressable
               style={{ flex: 1 }}
               disabled={disablePostPressable}
             ></Pressable>
           </Link>
         </View>
-        <Link href={`/tweet/${notification.for_post_id}`} asChild>
+        <Link
+          href={`/tweet/${notification.for_post_id}?tweetId=${notification.for_post_id}`}
+          asChild
+          push={true}
+        >
           <Pressable
             style={styles.parentContainer}
             disabled={disablePostPressable}
