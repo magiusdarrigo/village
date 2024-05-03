@@ -77,7 +77,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
     const loadAuthToken = async () => {
       const token = await SecureStore.getItemAsync("authToken");
       if (token) {
-        console.log("user auth token: ", token);
+        // console.log("user auth token: ", token);
         setAuthToken(token);
         if (!user) {
           try {
