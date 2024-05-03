@@ -12,6 +12,7 @@ COPY src ./src
 # set all args from .env
 ARG RABBITMQ_PRIVATE_URL
 ARG PORT
+ARG RESEND_API_KEY
 
 # Install app dependencies
 RUN npm install
