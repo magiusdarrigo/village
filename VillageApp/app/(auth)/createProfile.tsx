@@ -34,7 +34,7 @@ const deviceType = getDeviceType();
 const CreateProfile = () => {
   const { updateUser } = useUser();
   const router = useRouter();
-  const { updateUserAttributes } = useTweetsApi();
+  const { updateUserAttributes, checkIfUserAccountWasDeleted } = useTweetsApi();
   const [username, setUsername] = useState("");
   const [image, setImage] = useState<string | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
@@ -92,15 +92,26 @@ const CreateProfile = () => {
         return;
       }
       setIsSaving(true);
+      const building = await checkIfUserAccountWasDeleted();
       const updatedUser = await updateUserAttributes({
         username,
         profileImage: image,
+        buildingID: building?.id,
+        neighborhoodID: building?.neighborhood_id,
       });
+
       updateUser(updatedUser);
+      if (building) {
+        // show popup stating this account was previously deleted
+        Alert.alert(
+          "This phone number was previously used. Welcome back! Please submit a building change request if you've moved."
+        );
+        router.replace("/showNeighborhood");
+        return;
+      }
       router.replace("/pickBuilding");
     } catch (error: any) {
-      // convert error to json
-      const err = await error.json();
+      const err = JSON.parse(error.message);
       if (err?.status === 400) {
         Alert.alert(err?.body?.error);
         return;

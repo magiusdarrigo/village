@@ -419,15 +419,29 @@ router.delete("/", async (req, res) => {
   console.log("delete user called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    await prisma.account_deletion_requests.create({
-      data: {
-        user_id: currentUser.id,
+    const deleteUser = await prisma.users.delete({
+      where: {
+        id: currentUser.id,
       },
     });
 
-    await prisma.users.delete({
+    if (!deleteUser || !deleteUser.building_id) {
+      return res.status(404).json({ error: "user account never finished" });
+    }
+
+    // if an account_deletion_requests with the same phone_number exists, delete it
+    await prisma.account_deletion_requests.deleteMany({
       where: {
-        id: currentUser.id,
+        phone_number: deleteUser.phone_number,
+      },
+    });
+
+    await prisma.account_deletion_requests.create({
+      data: {
+        user_id: currentUser.id,
+        username: deleteUser.username,
+        phone_number: deleteUser.phone_number,
+        building_id: deleteUser.building_id,
       },
     });
 

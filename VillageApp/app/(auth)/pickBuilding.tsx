@@ -147,6 +147,4 @@ const PickBuilding = () => {
   );
 };
 
-const styles = StyleSheet.create({});
-
 export default PickBuilding;

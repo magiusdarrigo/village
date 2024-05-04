@@ -7,6 +7,7 @@ import buildingsRouter from "./buildingRoutes";
 import commentsRouter from "./commentRoutes";
 import chatMessagesRouter from "./chatMessageRoutes";
 import logsRouter from "./logRoutes";
+import accountDeletionRequestRouter from "./accountDeletionRequestRoutes";
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.use("/buildings", buildingsRouter);
 router.use("/comments", commentsRouter);
 router.use("/chatMessages", chatMessagesRouter);
 router.use("/logs", logsRouter);
+router.use("/accountdeletionrequest", accountDeletionRequestRouter);
 
 export default router;

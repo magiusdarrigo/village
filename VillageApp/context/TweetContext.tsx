@@ -58,6 +58,7 @@ interface TweetsApiContextType {
     neighborhoodID?: string;
     fcmToken?: string;
   }) => Promise<any>;
+  checkIfUserAccountWasDeleted: () => Promise<any>;
   uploadProfileWithCustomPic: (formData: FormData) => Promise<any>;
   getBuilding: (address: string) => Promise<any>;
   createBuilding: (
@@ -92,6 +93,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   getTweet: async () => {},
   createTweet: async () => {},
   updateUserAttributes: async () => {},
+  checkIfUserAccountWasDeleted: async () => {},
   uploadProfileWithCustomPic: async () => {},
   getBuilding: async () => {},
   createBuilding: async () => {},
@@ -769,6 +771,31 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return await res.json();
   };
 
+  const checkIfUserAccountWasDeleted = async () => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/accountdeletionrequest`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error Checking if account previously existed.");
+    }
+
+    return await res.json();
+  };
+
   const uploadProfileWithCustomPic = async (formData: FormData) => {
     if (!authToken) {
       return {};
@@ -992,6 +1019,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         getTweet,
         createTweet,
         updateUserAttributes,
+        checkIfUserAccountWasDeleted,
         uploadProfileWithCustomPic,
         getBuilding,
         createBuilding,
