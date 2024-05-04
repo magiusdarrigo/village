@@ -138,7 +138,7 @@ const NewTweet = () => {
       );
     },
     onError: async (error: any) => {
-      const err = await error.json();
+      const err = JSON.parse(error.message);
       if (err?.status === 400) {
         Alert.alert(err?.body?.error);
         return;
@@ -187,7 +187,6 @@ const NewTweet = () => {
     } catch (error) {
       setTweetUploading(false);
       Sentry.Native.captureException(error);
-      Alert.alert("We had an issue making your post.");
     }
   };
 

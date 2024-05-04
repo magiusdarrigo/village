@@ -28,6 +28,7 @@ model users {
   created_at      DateTime       @default(now())
   tags            Json?
   blocked_users   String[]       @default([])
+  outside_nyc     Boolean        @default(false)
 
   posts                    posts[]
   comments                 comments[]
@@ -81,8 +82,9 @@ model buildings {
   created_at      DateTime      @default(now())
   tags            Json?
 
-  users         users[]
-  chat_messages chat_messages[]
+  users                     users[]
+  account_deletion_requests account_deletion_requests[]
+  chat_messages             chat_messages[]
 }
 
 model posts {
@@ -228,12 +230,17 @@ model notifications {
 }
 
 model account_deletion_requests {
-  id         Int      @id @default(autoincrement())
-  user_id    String
-  username   String?
-  reason     String?
-  created_at DateTime @default(now())
-  tags       Json?
+  id           Int       @id @default(autoincrement())
+  user_id      String
+  username     String
+  phone_number String
+  building     buildings @relation(fields: [building_id], references: [id])
+  building_id  Int
+  reason       String    @default("")
+  created_at   DateTime  @default(now())
+  tags         Json?
+
+  @@index([phone_number], name: "idx_phone_number")
 }
 
 model log_entries {

@@ -83,7 +83,7 @@ app.post("/newbuildingchangerequest", async (req: Request, res: Response) => {
 
   // send email to support
   const { data: _, error } = await resend.emails.send({
-    from: "Support <noreply@support.villageapp.nyc>",
+    from: "Village <noreply@support.villageapp.nyc>",
     to: ["magiusdarrigo@gmail.com"],
     subject: "Building Change Request",
     html: `
