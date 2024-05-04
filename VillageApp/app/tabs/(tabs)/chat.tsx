@@ -123,6 +123,12 @@ const ChatScreen = () => {
     const registerPushToken = async () => {
       // unsubscribe any previous listener
       unsubscribeTokenRefreshListenerRef.current?.();
+
+      // Register device for remote messages
+      if (!messaging().isDeviceRegisteredForRemoteMessages) {
+        await messaging().registerDeviceForRemoteMessages();
+      }
+
       const token = await messaging().getToken();
       console.log("FCM token: ", token);
       const push_provider = "firebase";
@@ -132,7 +138,7 @@ const ChatScreen = () => {
         push_provider,
         push_provider_name,
       });
-      setTokenForUser(token);
+      await setTokenForUser(token);
 
       const removeOldToken = async () => {
         const oldToken = await SecureStore.getItemAsync("current_push_token");

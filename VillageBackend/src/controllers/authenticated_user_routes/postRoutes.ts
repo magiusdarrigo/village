@@ -266,8 +266,8 @@ router.post("/:id/likes", async (req, res) => {
 
     res.status(200).json({ newLike, updatedPost });
 
-    // if the post was un-liked and total likes is not -3, don't send a notification
-    if (is_dislike === "true" && updatedPost.likes_count !== -3) {
+    // if the post was un-liked and total likes is not -5, don't send a notification
+    if (is_dislike === "true" && updatedPost.likes_count !== -5) {
       return;
     }
     // query for the post author
@@ -281,8 +281,8 @@ router.post("/:id/likes", async (req, res) => {
       },
     });
 
-    // if likes_count is -3, ban post
-    if (updatedPost.likes_count === -3) {
+    // if likes_count is -5, ban post
+    if (updatedPost.likes_count === -5) {
       // update the post to be banned
       await prisma.posts.update({
         where: { id: Number(id) },
