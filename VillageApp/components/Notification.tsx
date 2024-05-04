@@ -12,7 +12,6 @@ type NotificationProps = {
 };
 
 const Notification = ({ notification }: NotificationProps) => {
-  console.log("notification: ", notification);
   const disablePostPressable = notification.for_post_id === null;
   const notificationHasBeenSeen = notification.read;
   return (
