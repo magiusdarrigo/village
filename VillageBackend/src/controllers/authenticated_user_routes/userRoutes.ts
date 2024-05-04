@@ -419,15 +419,16 @@ router.delete("/", async (req, res) => {
   console.log("delete user called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    await prisma.account_deletion_requests.create({
-      data: {
-        user_id: currentUser.id,
+    const deleteUser = await prisma.users.delete({
+      where: {
+        id: currentUser.id,
       },
     });
 
-    await prisma.users.delete({
-      where: {
-        id: currentUser.id,
+    const createAccountDelReq = await prisma.account_deletion_requests.create({
+      data: {
+        user_id: currentUser.id,
+        username: deleteUser.username,
       },
     });
 
