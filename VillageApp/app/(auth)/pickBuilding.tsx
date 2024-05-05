@@ -23,14 +23,29 @@ import * as Sentry from "sentry-expo";
 
 const PickBuilding = () => {
   const [address, setAddress] = useState("");
+  const [secondaryAddress, setSecondaryAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { getBuilding } = useTweetsApi();
+  const { getBuilding, createBuilding, updateUserAttributes } = useTweetsApi();
+
   const { user } = useUser();
   const ref = useRef<GooglePlacesAutocompleteRef>(null);
+  const WAITLISTED_NEIGHBORHOOD = "WAITLISTED";
 
   const onSubmit = async () => {
     try {
       setIsLoading(true);
+      // if address is outside of NYC, send user to waitlist page
+      if (!secondaryAddress.toLowerCase().includes("new york")) {
+        const building = await createBuilding(address, WAITLISTED_NEIGHBORHOOD);
+        await updateUserAttributes({
+          neighborhoodID: building.neighborhood_id,
+          buildingID: building.id,
+        });
+        router.replace({
+          pathname: "/waitlist",
+        });
+        return;
+      }
       const building = await getBuilding(address);
       const neighborhoodName = building?.neighborhood?.name;
       if (user === null) {
@@ -47,6 +62,7 @@ const PickBuilding = () => {
         });
         return;
       }
+
       router.replace({
         pathname: "/pickNeighborhood",
         params: {
@@ -89,6 +105,7 @@ const PickBuilding = () => {
             }}
             onPress={(data, _ = null) => {
               setAddress(data.structured_formatting.main_text);
+              setSecondaryAddress(data.structured_formatting.secondary_text);
             }}
             query={{
               key: GOOGLE_MAPS_API_KEY,
