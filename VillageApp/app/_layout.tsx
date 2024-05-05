@@ -142,6 +142,10 @@ function RootLayoutNav() {
                         options={{ headerShown: false }}
                       />
                       <Stack.Screen
+                        name="(auth)/waitlist"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
                         name="(auth)/pickNeighborhood"
                         options={{ headerShown: false }}
                       />

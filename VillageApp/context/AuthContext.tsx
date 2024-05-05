@@ -67,6 +67,11 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
       return;
     }
 
+    if (authToken && user?.neighborhood?.name === "WAITLISTED") {
+      router.replace("/waitlist");
+      return;
+    }
+
     if (authToken && user?.neighborhood?.name && segments[0] === "(auth)") {
       router.replace("/tabs");
       return;

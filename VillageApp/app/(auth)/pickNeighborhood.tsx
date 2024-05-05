@@ -16,6 +16,10 @@ const PickNeighborhood = () => {
   const { user } = useUser();
 
   const neighborhoods = [
+    "All of Brooklyn",
+    "All of Bronx",
+    "All of Queens",
+    "All of Staten Island",
     "Battery Park City",
     "Carnegie Hill",
     "Central Harlem",
@@ -48,7 +52,6 @@ const PickNeighborhood = () => {
     "Upper West Side",
     "West Harlem",
     "West Village",
-    "Williamsburg",
     "Yorkville",
   ];
 
@@ -121,13 +124,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 24, // for top space
     paddingHorizontal: 24,
-  },
-  input: {
-    borderColor: "transparent", // no border
-    borderWidth: 0,
-    paddingTop: 10,
-    fontSize: 20,
-    color: "black",
   },
 });
 
