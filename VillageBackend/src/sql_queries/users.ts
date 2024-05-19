@@ -17,3 +17,27 @@ export const getUserProfileQuery = (userID: string, userToGetID: string) => {
                       users.id = ${userToGetID};
               `;
 };
+
+export const getUserFollowers = (
+  userID: string,
+  lastFollowerId: number // cursor
+) => {
+  return Prisma.sql`
+            SELECT 
+                user_following.id,
+                user_following.follower_user_id,
+                users.username,
+                users.image AS profile_image,
+                user_following.created_at
+            FROM 
+                user_following
+            INNER JOIN 
+                users ON user_following.follower_user_id = users.id
+            WHERE 
+                user_following.following_user_id = ${userID}
+                AND user_following.id < ${lastFollowerId}
+            ORDER BY 
+                user_following.created_at DESC 
+            LIMIT 20;
+        `;
+};
