@@ -1,19 +1,25 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Modal,
   Text,
   View,
   StyleSheet,
-  ScrollView,
   Dimensions,
+  FlatList,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
+import { ProfileRowType } from "../types";
+import EmptyListView from "./EmptyListView";
+import ProfileRow from "./ProfileRow";
 
 type ProfilesListModalProps = {
   isVisible: boolean;
-  profiles: string[];
+  profiles: ProfileRowType[];
   onClose: () => void;
   modalTitle: string;
+  handleLoadMoreProfiles: () => void;
+  isFetchingNextProfilesPage: boolean;
 };
 
 const ProfilesListModal = ({
@@ -21,7 +27,23 @@ const ProfilesListModal = ({
   profiles,
   onClose,
   modalTitle,
+  handleLoadMoreProfiles,
+  isFetchingNextProfilesPage,
 }: ProfilesListModalProps) => {
+  const flatListRef = useRef<FlatList>(null);
+
+  const renderEmptyListComponent = () => {
+    if (modalTitle === "Followers") {
+      return (
+        <View style={styles.emptyProfilesView}>
+          {EmptyListView("No followers yet.")}
+        </View>
+      );
+    } else {
+      return EmptyListView("Not following anyone yet.");
+    }
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -36,13 +58,28 @@ const ProfilesListModal = ({
               <View>
                 <Text style={styles.modalTitle}>{modalTitle}</Text>
               </View>
-              <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                {profiles.map((profile, index) => (
-                  <View key={index} style={styles.profileRow}>
-                    <Text>{profile}</Text>
-                  </View>
-                ))}
-              </ScrollView>
+              <FlatList
+                style={styles.flatList}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                ref={flatListRef}
+                data={profiles}
+                renderItem={({ item }) => (
+                  <ProfileRow
+                    profile={item}
+                    key={item.id}
+                    handleClose={onClose}
+                  />
+                )}
+                onEndReached={handleLoadMoreProfiles}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={
+                  isFetchingNextProfilesPage
+                    ? () => <ActivityIndicator size="small" />
+                    : null
+                }
+                ListEmptyComponent={renderEmptyListComponent}
+              />
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -56,6 +93,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
+  },
+  flatList: {
+    width: "100%",
+    marginTop: 10,
+  },
+  emptyProfilesView: {
+    minHeight: "90%",
   },
   modalView: {
     width: "100%",
@@ -95,12 +139,6 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
-  },
-  profileRow: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    width: "100%",
   },
   scrollViewContent: {
     flexGrow: 1,

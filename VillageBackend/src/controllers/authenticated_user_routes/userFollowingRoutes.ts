@@ -2,11 +2,36 @@ import { Router } from "express";
 import prisma from "../../clients/prismaClient";
 import { getNumberFromQuery } from "../../utils/casting";
 import { MAX_INT4_VALUE } from "../../utils/constants";
-import { getUserFollowers } from "../../sql_queries/users";
+import { getUserFollowers, getUserFollowing } from "../../sql_queries/users";
 
 const router = Router();
 
 // get the users that the current user is following
+router.get("/:id/following", async (req, res) => {
+  console.log(`get who user_id: ${req.params.id} is following`);
+  const { id } = req.params;
+  const userID = id;
+  const lastFollowingID =
+    getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
+
+  if (!userID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
+  try {
+    const getFollowingSqlQuery = getUserFollowing(userID, lastFollowingID);
+    const following = (await prisma.$queryRaw(getFollowingSqlQuery)) as any;
+
+    const nextCursor = following.length < 10 ? undefined : following[9].id;
+
+    res.json({ data: following, nextCursor });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching who the user is following",
+    });
+  }
+});
 
 // get the users that are following the current user
 router.get("/:id/followers", async (req, res) => {
@@ -23,7 +48,7 @@ router.get("/:id/followers", async (req, res) => {
     const getFollowersSqlQuery = getUserFollowers(userID, lastFollowerID);
     const followers = (await prisma.$queryRaw(getFollowersSqlQuery)) as any;
 
-    const nextCursor = followers.length < 20 ? undefined : followers[19].id;
+    const nextCursor = followers.length < 10 ? undefined : followers[9].id;
 
     res.json({ data: followers, nextCursor });
   } catch (error) {

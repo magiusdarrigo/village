@@ -38,6 +38,7 @@ interface TweetsApiContextType {
   ) => Promise<any>;
   listTweetsForProfile: (userID: string, page: number) => Promise<any>;
   listUserFollowers: (userID: string, page: number) => Promise<any>;
+  listUserFollowing: (userID: string, page: number) => Promise<any>;
   listTweets: (page: number, isHot: boolean) => Promise<any>;
   listNotifications: (page: number) => Promise<any>;
   updateNotifications: (data: {
@@ -88,6 +89,7 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   listComments: async () => {},
   listTweetsForProfile: async () => {},
   listUserFollowers: async () => {},
+  listUserFollowing: async () => {},
   listTweets: async () => {},
   listNotifications: async () => {},
   updateNotifications: async () => {},
@@ -553,7 +555,33 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     if (res.status !== 200) {
-      throw new Error("Error fetching posts for user");
+      throw new Error("Error fetching followers for user");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const listUserFollowing = async (userID: string, page: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/userfollowing/${userID}/following?cursor=${page}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching who the user is following");
     }
 
     const body = await res.json();
@@ -1011,6 +1039,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         listComments,
         listTweetsForProfile,
         listUserFollowers,
+        listUserFollowing,
         listTweets,
         listNotifications,
         updateNotifications,

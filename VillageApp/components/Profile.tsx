@@ -41,6 +41,7 @@ const Profile = ({ user }: ProfileProps) => {
     updateUserAttributes,
     listTweetsForProfile,
     listUserFollowers,
+    listUserFollowing,
   } = useTweetsApi();
   const { user: currentUser, updateUser } = useUser();
   const [profileEditLoading, setProfileEditLoading] = React.useState(false);
@@ -49,7 +50,6 @@ const Profile = ({ user }: ProfileProps) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
-
   const usersProfile = currentUser?.id === user.id;
 
   const onRefresh = async () => {
@@ -57,6 +57,29 @@ const Profile = ({ user }: ProfileProps) => {
     await isRefetchingTweets();
     setRefreshing(false);
   };
+
+  const useProfileFollowingInfiniteQuery = () => {
+    return useInfiniteQuery({
+      queryKey: ["profilefollowing", String(user.id)],
+      queryFn: async ({ pageParam = 0 }) =>
+        listUserFollowing(user.id, pageParam),
+      getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
+    });
+  };
+
+  const {
+    data: profileFollowingData,
+    fetchNextPage: fetchNextFollowingPage,
+    isFetchingNextPage: isFetchingNextFollowingPage,
+    hasNextPage: hasNextFollowingPage,
+  } = useProfileFollowingInfiniteQuery();
+
+  const handleLoadMoreFollowing = () => {
+    if (hasNextFollowingPage) fetchNextFollowingPage();
+  };
+
+  const following =
+    profileFollowingData?.pages.flatMap((page) => page.data) ?? [];
 
   const useProfileFollowersInfiniteQuery = () => {
     return useInfiniteQuery({
@@ -69,12 +92,25 @@ const Profile = ({ user }: ProfileProps) => {
 
   const {
     data: profileFollowersData,
-    isFetching: isFetchingFollowers,
-    refetch: refetchFollowers,
     fetchNextPage: fetchNextFollowersPage,
     isFetchingNextPage: isFetchingNextFollowersPage,
     hasNextPage: hasNextFollowersPage,
   } = useProfileFollowersInfiniteQuery();
+
+  const handleLoadMoreFollowers = () => {
+    if (hasNextFollowersPage) fetchNextFollowersPage();
+  };
+
+  const handleMoreProfiles = () => {
+    if (modalTitle === "Followers") {
+      handleLoadMoreFollowers();
+    } else {
+      handleLoadMoreFollowing();
+    }
+  };
+
+  const followers =
+    profileFollowersData?.pages.flatMap((page) => page.data) ?? [];
 
   const useProfileTweetsInfiniteQuery = () => {
     return useInfiniteQuery({
@@ -120,7 +156,7 @@ const Profile = ({ user }: ProfileProps) => {
     }
   });
 
-  const handleLoadMore = () => {
+  const handleLoadMoreTweets = () => {
     if (hasNextTweetsPage) fetchNextTweetsPage();
   };
 
@@ -136,7 +172,7 @@ const Profile = ({ user }: ProfileProps) => {
     ) {
       // 50 is a threshold
       if (!isFetchingTweets) {
-        handleLoadMore();
+        handleLoadMoreTweets();
       }
     }
   };
@@ -329,7 +365,7 @@ const Profile = ({ user }: ProfileProps) => {
               allowPush={true}
             />
           )}
-          onEndReached={handleLoadMore}
+          onEndReached={handleLoadMoreTweets}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetchingNextTweetsPage
@@ -343,9 +379,18 @@ const Profile = ({ user }: ProfileProps) => {
       </View>
       <ProfilesListModal
         isVisible={modalVisible}
-        profiles={[]}
-        onClose={() => setModalVisible(false)}
+        profiles={modalTitle === "Followers" ? followers : following}
+        onClose={() => {
+          // console.log("closing modal");
+          setModalVisible(false);
+        }}
         modalTitle={modalTitle}
+        handleLoadMoreProfiles={handleMoreProfiles}
+        isFetchingNextProfilesPage={
+          modalTitle === "Followers"
+            ? isFetchingNextFollowersPage
+            : isFetchingNextFollowingPage
+        }
       />
     </ScrollView>
   );
