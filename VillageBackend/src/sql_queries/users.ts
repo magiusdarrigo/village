@@ -52,7 +52,7 @@ export const getUserFollowing = (
   return Prisma.sql`
         SELECT 
             user_following.id,
-            user_following.following_user_id,
+            user_following.following_user_id AS follower_user_id,
             users.username,
             users.image AS profile_image,
             user_following.created_at,
