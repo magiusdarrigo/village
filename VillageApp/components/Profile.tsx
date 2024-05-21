@@ -291,6 +291,7 @@ const Profile = ({ user }: ProfileProps) => {
             )}
           </View>
           <Text style={styles.username}>@{user.username}</Text>
+          <Text style={styles.bio}>Lives in {user.neighborhood?.name}</Text>
           <View style={styles.countContainer}>
             <TouchableOpacity
               onPress={() => {
@@ -397,6 +398,13 @@ const Profile = ({ user }: ProfileProps) => {
 };
 
 const styles = StyleSheet.create({
+  bio: {
+    lineHeight: 20,
+    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: "600",
+    color: Colors.light.switchFontColor,
+  },
   followButtonContainer: {
     backgroundColor: "transparent",
   },
@@ -487,7 +495,8 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 22,
     fontWeight: "bold",
-    marginVertical: 12,
+    marginTop: 12,
+    marginBottom: 8,
   },
   countContainer: {
     flexDirection: "row",
