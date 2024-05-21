@@ -84,9 +84,9 @@ const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
                 <View style={{ flexDirection: "row" }}>
                   <Text style={styles.titleContent}>{profile.username}</Text>
                 </View>
-                <Text
-                  style={styles.messageContent}
-                >{`Lives in ${profile.neighborhood_name}`}</Text>
+                <Text style={styles.messageContent}>
+                  Lives in {profile.neighborhood_name}
+                </Text>
               </View>
             </Pressable>
           </Link>
