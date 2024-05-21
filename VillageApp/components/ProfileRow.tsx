@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { ProfileRowType } from "../types";
 import postStyles from "../lib/styles/post";
@@ -19,55 +13,34 @@ type ProfileRowProps = {
 
 const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
   return (
-    <TouchableOpacity
-      onPress={() => {
-        console.log("Pressed!");
-        handleClose();
-      }}
-    >
-      <View style={postStyles.parentContainer}>
-        <View
-          style={[styles.imageParentContainer, { backgroundColor: "white" }]}
-        >
-          <View style={postStyles.imageContainer}>
-            <Link
-              href={{
-                pathname: `/profile/${profile.follower_user_id}`,
-                params: {
-                  userID: profile.follower_user_id,
-                  username: profile.username,
-                },
+    <View style={postStyles.parentContainer}>
+      <View style={[styles.imageParentContainer, { backgroundColor: "white" }]}>
+        <View style={postStyles.imageContainer}>
+          <Link
+            href={{
+              pathname: `/profile/${profile.follower_user_id}`,
+              params: {
+                userID: profile.follower_user_id,
+                username: profile.username,
+              },
+            }}
+            asChild
+          >
+            <Pressable
+              style={{
+                paddingTop: 10,
+                alignItems: "flex-end",
               }}
-              asChild
+              onPress={handleClose}
             >
-              <Pressable
-                style={{
-                  paddingTop: 10,
-                  alignItems: "flex-end",
-                }}
-              >
-                <View style={styles.userImage}>
-                  <Image
-                    source={profile.profile_image}
-                    style={styles.userImage}
-                  />
-                </View>
-              </Pressable>
-            </Link>
-            <Link
-              href={{
-                pathname: `/profile/${profile.follower_user_id}`,
-                params: {
-                  userID: profile.follower_user_id,
-                  username: profile.username,
-                },
-              }}
-              asChild
-              push={true}
-            >
-              <Pressable style={{ flex: 1 }}></Pressable>
-            </Link>
-          </View>
+              <View style={styles.userImage}>
+                <Image
+                  source={profile.profile_image}
+                  style={styles.userImage}
+                />
+              </View>
+            </Pressable>
+          </Link>
           <Link
             href={{
               pathname: `/profile/${profile.follower_user_id}`,
@@ -79,20 +52,33 @@ const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
             asChild
             push={true}
           >
-            <Pressable style={styles.parentContainer}>
-              <View style={[styles.mainContainer]}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={styles.titleContent}>{profile.username}</Text>
-                </View>
-                <Text style={styles.messageContent}>
-                  Lives in {profile.neighborhood_name}
-                </Text>
-              </View>
-            </Pressable>
+            <Pressable style={{ flex: 1 }} onPress={handleClose}></Pressable>
           </Link>
         </View>
+        <Link
+          href={{
+            pathname: `/profile/${profile.follower_user_id}`,
+            params: {
+              userID: profile.follower_user_id,
+              username: profile.username,
+            },
+          }}
+          asChild
+          push={true}
+        >
+          <Pressable style={styles.parentContainer} onPress={handleClose}>
+            <View style={[styles.mainContainer]}>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.titleContent}>{profile.username}</Text>
+              </View>
+              <Text style={styles.messageContent}>
+                Lives in {profile.neighborhood_name}
+              </Text>
+            </View>
+          </Pressable>
+        </Link>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
