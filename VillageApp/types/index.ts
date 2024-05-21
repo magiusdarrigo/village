@@ -68,3 +68,12 @@ export type NotificationType = {
   read: boolean;
   created_at: string;
 };
+
+export type ProfileRowType = {
+  created_at: string;
+  follower_user_id: string;
+  id: number;
+  neighborhood_name: string;
+  profile_image: string;
+  username: string;
+};

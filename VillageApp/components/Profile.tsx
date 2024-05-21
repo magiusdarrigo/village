@@ -27,6 +27,7 @@ import * as Sentry from "sentry-expo";
 import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../lib/api/pagination";
 import Tweet from "./Tweet";
 import Colors from "../constants/Colors";
+import ProfilesListModal from "./ProfilesListModal";
 
 type ProfileProps = {
   user: UserType;
@@ -39,20 +40,77 @@ const Profile = ({ user }: ProfileProps) => {
     unFollowUser,
     updateUserAttributes,
     listTweetsForProfile,
+    listUserFollowers,
+    listUserFollowing,
   } = useTweetsApi();
   const { user: currentUser, updateUser } = useUser();
   const [profileEditLoading, setProfileEditLoading] = React.useState(false);
   const flatListRef = useRef<FlatList>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
   const usersProfile = currentUser?.id === user.id;
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await refetch();
+    await isRefetchingTweets();
     setRefreshing(false);
   };
+
+  const useProfileFollowingInfiniteQuery = () => {
+    return useInfiniteQuery({
+      queryKey: ["profilefollowing", String(user.id)],
+      queryFn: async ({ pageParam = 0 }) =>
+        listUserFollowing(user.id, pageParam),
+      getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
+    });
+  };
+
+  const {
+    data: profileFollowingData,
+    fetchNextPage: fetchNextFollowingPage,
+    isFetchingNextPage: isFetchingNextFollowingPage,
+    hasNextPage: hasNextFollowingPage,
+  } = useProfileFollowingInfiniteQuery();
+
+  const handleLoadMoreFollowing = () => {
+    if (hasNextFollowingPage) fetchNextFollowingPage();
+  };
+
+  const following =
+    profileFollowingData?.pages.flatMap((page) => page.data) ?? [];
+
+  const useProfileFollowersInfiniteQuery = () => {
+    return useInfiniteQuery({
+      queryKey: ["profilefollowers", String(user.id)],
+      queryFn: async ({ pageParam = 0 }) =>
+        listUserFollowers(user.id, pageParam),
+      getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
+    });
+  };
+
+  const {
+    data: profileFollowersData,
+    fetchNextPage: fetchNextFollowersPage,
+    isFetchingNextPage: isFetchingNextFollowersPage,
+    hasNextPage: hasNextFollowersPage,
+  } = useProfileFollowersInfiniteQuery();
+
+  const handleLoadMoreFollowers = () => {
+    if (hasNextFollowersPage) fetchNextFollowersPage();
+  };
+
+  const handleMoreProfiles = () => {
+    if (modalTitle === "Followers") {
+      handleLoadMoreFollowers();
+    } else {
+      handleLoadMoreFollowing();
+    }
+  };
+
+  const followers =
+    profileFollowersData?.pages.flatMap((page) => page.data) ?? [];
 
   const useProfileTweetsInfiniteQuery = () => {
     return useInfiniteQuery({
@@ -65,11 +123,11 @@ const Profile = ({ user }: ProfileProps) => {
 
   const {
     data: profileTweetsData,
-    isFetching,
-    refetch,
-    fetchNextPage,
-    isFetchingNextPage,
-    hasNextPage,
+    isFetching: isFetchingTweets,
+    refetch: isRefetchingTweets,
+    fetchNextPage: fetchNextTweetsPage,
+    isFetchingNextPage: isFetchingNextTweetsPage,
+    hasNextPage: hasNextTweetsPage,
   } = useProfileTweetsInfiniteQuery();
 
   const postItems = profileTweetsData?.pages.flatMap((page) => page.data) ?? [];
@@ -98,8 +156,8 @@ const Profile = ({ user }: ProfileProps) => {
     }
   });
 
-  const handleLoadMore = () => {
-    if (hasNextPage) fetchNextPage();
+  const handleLoadMoreTweets = () => {
+    if (hasNextTweetsPage) fetchNextTweetsPage();
   };
 
   const handleScroll = (event: any) => {
@@ -113,8 +171,8 @@ const Profile = ({ user }: ProfileProps) => {
       contentHeight - PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD
     ) {
       // 50 is a threshold
-      if (!isFetching) {
-        handleLoadMore();
+      if (!isFetchingTweets) {
+        handleLoadMoreTweets();
       }
     }
   };
@@ -233,13 +291,28 @@ const Profile = ({ user }: ProfileProps) => {
             )}
           </View>
           <Text style={styles.username}>@{user.username}</Text>
+          <Text style={styles.bio}>Lives in {user.neighborhood?.name}</Text>
           <View style={styles.countContainer}>
-            <Text style={styles.countText}>
-              Following: {user.following_count ?? ""}
-            </Text>
-            <Text style={styles.countText}>
-              Followers: {user.followers_count ?? ""}
-            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(true);
+                setModalTitle("Following");
+              }}
+            >
+              <Text style={styles.countText}>
+                Following: {user.following_count ?? ""}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(true);
+                setModalTitle("Followers");
+              }}
+            >
+              <Text style={styles.countText}>
+                Followers: {user.followers_count ?? ""}
+              </Text>
+            </TouchableOpacity>
           </View>
           {usersProfile ? (
             <>
@@ -290,23 +363,48 @@ const Profile = ({ user }: ProfileProps) => {
             <Tweet
               tweet={item}
               handleCommentIconClicked={() => console.log("comment clicked")}
+              allowPush={true}
             />
           )}
-          onEndReached={handleLoadMore}
+          onEndReached={handleLoadMoreTweets}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
-            isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
+            isFetchingNextTweetsPage
+              ? () => <ActivityIndicator size="small" />
+              : null
           }
           ListEmptyComponent={() => EmptyListView("No posts yet.")}
           contentContainerStyle={{ flexGrow: 1 }}
           scrollEnabled={false}
         />
       </View>
+      <ProfilesListModal
+        isVisible={modalVisible}
+        profiles={modalTitle === "Followers" ? followers : following}
+        onClose={() => {
+          // console.log("closing modal");
+          setModalVisible(false);
+        }}
+        modalTitle={modalTitle}
+        handleLoadMoreProfiles={handleMoreProfiles}
+        isFetchingNextProfilesPage={
+          modalTitle === "Followers"
+            ? isFetchingNextFollowersPage
+            : isFetchingNextFollowingPage
+        }
+      />
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  bio: {
+    lineHeight: 20,
+    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: "600",
+    color: Colors.light.switchFontColor,
+  },
   followButtonContainer: {
     backgroundColor: "transparent",
   },
@@ -397,7 +495,8 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 22,
     fontWeight: "bold",
-    marginVertical: 12,
+    marginTop: 12,
+    marginBottom: 8,
   },
   countContainer: {
     flexDirection: "row",
