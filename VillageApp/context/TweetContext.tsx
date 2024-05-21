@@ -37,6 +37,8 @@ interface TweetsApiContextType {
     lastCommentID: string
   ) => Promise<any>;
   listTweetsForProfile: (userID: string, page: number) => Promise<any>;
+  listUserFollowers: (userID: string, page: number) => Promise<any>;
+  listUserFollowing: (userID: string, page: number) => Promise<any>;
   listTweets: (page: number, isHot: boolean) => Promise<any>;
   listNotifications: (page: number) => Promise<any>;
   updateNotifications: (data: {
@@ -68,7 +70,6 @@ interface TweetsApiContextType {
   addBuildingChangeRequest: (address: string) => Promise<any>;
   accountDeletionRequest: () => Promise<any>;
   blockUser: (userID: string) => Promise<any>;
-  logEvent: (log: string) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -87,6 +88,8 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   unlikeTweet: async () => {},
   listComments: async () => {},
   listTweetsForProfile: async () => {},
+  listUserFollowers: async () => {},
+  listUserFollowing: async () => {},
   listTweets: async () => {},
   listNotifications: async () => {},
   updateNotifications: async () => {},
@@ -100,7 +103,6 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   addBuildingChangeRequest: async () => {},
   accountDeletionRequest: async () => {},
   blockUser: async () => {},
-  logEvent: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -528,6 +530,58 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (res.status !== 200) {
       throw new Error("Error fetching posts for user");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const listUserFollowers = async (userID: string, page: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/userfollowing/${userID}/followers?cursor=${page}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching followers for user");
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const listUserFollowing = async (userID: string, page: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/userfollowing/${userID}/following?cursor=${page}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching who the user is following");
     }
 
     const body = await res.json();
@@ -966,35 +1020,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const logEvent = async (log: string) => {
-    if (!authToken) {
-      return {};
-    }
-
-    const url = `${API_URL}/v1/logs`;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        "Content-type": "Application/json",
-      },
-      body: JSON.stringify({ log }),
-    });
-
-    if (res.status === 403) {
-      removeAuthToken();
-      return {};
-    }
-
-    if (res.status !== 200) {
-      throw Error("Error logging");
-    }
-
-    const body = await res.json();
-    return body;
-  };
-
   return (
     <TweetsApiContext.Provider
       value={{
@@ -1013,6 +1038,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         unlikeTweet,
         listComments,
         listTweetsForProfile,
+        listUserFollowers,
+        listUserFollowing,
         listTweets,
         listNotifications,
         updateNotifications,
@@ -1026,7 +1053,6 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         addBuildingChangeRequest,
         accountDeletionRequest,
         blockUser,
-        logEvent,
       }}
     >
       {children}

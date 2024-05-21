@@ -6,8 +6,8 @@ import neighborhoodsRouter from "./neighborhoodRoutes";
 import buildingsRouter from "./buildingRoutes";
 import commentsRouter from "./commentRoutes";
 import chatMessagesRouter from "./chatMessageRoutes";
-import logsRouter from "./logRoutes";
 import accountDeletionRequestRouter from "./accountDeletionRequestRoutes";
+import userFollowingRouter from "./userFollowingRoutes";
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router.use("/neighborhoods", neighborhoodsRouter);
 router.use("/buildings", buildingsRouter);
 router.use("/comments", commentsRouter);
 router.use("/chatMessages", chatMessagesRouter);
-router.use("/logs", logsRouter);
 router.use("/accountdeletionrequest", accountDeletionRequestRouter);
+router.use("/userfollowing", userFollowingRouter);
 
 export default router;

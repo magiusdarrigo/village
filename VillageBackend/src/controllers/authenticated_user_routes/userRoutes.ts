@@ -247,6 +247,10 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "user not found" });
     }
 
+    // move the neighborhood_name key to be { neighborhood: { name: neighborhood_name } }
+    user[0].neighborhood = { name: user[0].neighborhood_name };
+    delete user[0].neighborhood_name;
+
     res.json(user[0]);
   } catch (error) {
     console.error(error);
