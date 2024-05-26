@@ -181,6 +181,7 @@ const Profile = ({ user }: ProfileProps) => {
     followUser,
     {
       onSuccess: (data) => {
+        console.log("onSuccess data", data);
         queryClient.setQueryData(["profiles", String(user.id)], (_: any) => {
           return {
             ...data,

@@ -154,6 +154,22 @@ router.post("/:id/follow", async (req, res) => {
     const incrementFollowersCount = prisma.users.update({
       where: { id },
       data: { followers_count: { increment: 1 } },
+      select: {
+        id: true,
+        username: true,
+        image: true,
+        is_verified: true,
+        followers_count: true,
+        fcm_token: true,
+        following_count: true,
+        neighborhood_id: true,
+        building_id: true,
+        neighborhood: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     const [_, __, followedUser] = await prisma.$transaction([
@@ -162,7 +178,11 @@ router.post("/:id/follow", async (req, res) => {
       incrementFollowersCount,
     ]);
 
-    res.status(200).json(followedUser);
+    // return the followedUser object but without the fcm_token
+    res.status(200).json({
+      ...followedUser,
+      fcm_token: undefined,
+    });
 
     // send a notification to the user being followed
     // get current user's username
@@ -218,6 +238,22 @@ router.delete("/:id/follow", async (req, res) => {
     const decrementFollowersCount = prisma.users.update({
       where: { id },
       data: { followers_count: { decrement: 1 } },
+      select: {
+        id: true,
+        username: true,
+        image: true,
+        is_verified: true,
+        followers_count: true,
+        fcm_token: true,
+        following_count: true,
+        neighborhood_id: true,
+        building_id: true,
+        neighborhood: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     const [_, __, user] = await prisma.$transaction([
@@ -226,7 +262,10 @@ router.delete("/:id/follow", async (req, res) => {
       decrementFollowersCount,
     ]);
 
-    res.status(200).json(user);
+    res.status(200).json({
+      ...user,
+      fcm_token: undefined,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error unfollowing the user." });
