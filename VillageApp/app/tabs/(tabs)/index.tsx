@@ -154,7 +154,7 @@ const FeedScreen = () => {
 
   return (
     <View style={pageStyles.page}>
-      {/* <NeighborhoodScrollPicker /> */}
+      <NeighborhoodScrollPicker />
       <FlatList
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
