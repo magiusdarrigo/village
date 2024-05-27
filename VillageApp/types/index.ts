@@ -6,6 +6,10 @@ export type UserType = {
   building?: {
     address: string;
   };
+  selected_neighborhoods?: {
+    id: number;
+    name: string;
+  }[];
   building_id?: number;
   id: string;
   username: string;

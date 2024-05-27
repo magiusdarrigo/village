@@ -12,24 +12,25 @@ datasource db {
 }
 
 model users {
-  id              String         @id @default(uuid())
-  username        String         @unique
-  phone_number    String         @unique
-  image           String?
-  is_verified     Boolean        @default(false)
-  neighborhood    neighborhoods? @relation(fields: [neighborhood_id], references: [id])
-  neighborhood_id Int?
-  building        buildings?     @relation(fields: [building_id], references: [id])
-  building_id     Int?
-  followers_count Int            @default(0)
-  following_count Int            @default(0)
-  chat_token      String?
-  fcm_token       String?
-  created_at      DateTime       @default(now())
-  tags            Json?
-  blocked_users   String[]       @default([])
-  outside_nyc     Boolean        @default(false)
-  is_hidden       Boolean        @default(false)
+  id                     String         @id @default(uuid())
+  username               String         @unique
+  phone_number           String         @unique
+  image                  String?
+  is_verified            Boolean        @default(false)
+  neighborhood           neighborhoods? @relation(fields: [neighborhood_id], references: [id])
+  neighborhood_id        Int?
+  selected_neighborhoods Json[]         @default([])
+  building               buildings?     @relation(fields: [building_id], references: [id])
+  building_id            Int?
+  followers_count        Int            @default(0)
+  following_count        Int            @default(0)
+  chat_token             String?
+  fcm_token              String?
+  created_at             DateTime       @default(now())
+  tags                   Json?
+  blocked_users          String[]       @default([])
+  outside_nyc            Boolean        @default(false)
+  is_hidden              Boolean        @default(false)
 
   posts                    posts[]
   comments                 comments[]

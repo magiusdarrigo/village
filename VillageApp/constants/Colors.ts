@@ -14,6 +14,7 @@ export default {
     cancelRed: "#C71717",
     switchBackgroundColor: "#F3F7F9",
     switchFontColor: "#AEB5BC",
+    neighborhoodButtonColor: "#91959A",
   },
   dark: {
     text: "#ffffff",
