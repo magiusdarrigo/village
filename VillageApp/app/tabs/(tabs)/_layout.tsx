@@ -1,5 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Octicons } from "@expo/vector-icons";
+import { Octicons, Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Pressable, AppState, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -278,6 +278,30 @@ export default function TabLayout() {
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
+          ),
+          headerLeft: () => (
+            <Pressable onPress={() => {}}>
+              {({ pressed }) => (
+                <Ionicons
+                  name="menu"
+                  size={28}
+                  color={Colors.light.text}
+                  style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          ),
+          headerRight: () => (
+            <Pressable onPress={() => {}}>
+              {({ pressed }) => (
+                <Ionicons
+                  name="search"
+                  size={25}
+                  color={Colors.light.text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
           ),
         }}
         listeners={{
