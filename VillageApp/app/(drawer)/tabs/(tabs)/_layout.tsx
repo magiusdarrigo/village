@@ -1,11 +1,11 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Octicons, Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Tabs, useNavigation } from "expo-router";
 import { Pressable, AppState, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
-import { useUser } from "../../../context/UserContext";
-import { useAuth } from "../../../context/AuthContext";
-import Colors from "../../../constants/Colors";
+import { useUser } from "../../../../context/UserContext";
+import { useAuth } from "../../../../context/AuthContext";
+import Colors from "../../../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -13,8 +13,8 @@ import {
   DeviceType,
   getDeviceType,
   handlePressButtonAsync,
-} from "../../../lib/helpers";
-import { useTweetsApi } from "../../../context/TweetContext";
+} from "../../../../lib/helpers";
+import { useTweetsApi } from "../../../../context/TweetContext";
 import { Linking } from "react-native";
 
 const TERMS_OF_SERVICE_URL =
@@ -79,6 +79,8 @@ notifee.onBackgroundEvent(async ({ type }) => {
 });
 
 export default function TabLayout() {
+  const navigation = useNavigation();
+
   const {
     user,
     chatTabBadgeCount,
@@ -280,7 +282,7 @@ export default function TabLayout() {
             <TabBarIconFontAwesome name="home" color={color} />
           ),
           headerLeft: () => (
-            <Pressable onPress={() => {}}>
+            <Pressable onPress={navigation.openDrawer}>
               {({ pressed }) => (
                 <Ionicons
                   name="menu"

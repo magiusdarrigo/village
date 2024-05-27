@@ -6,8 +6,8 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../../context/UserContext";
-import { useTweetsApi } from "../../../context/TweetContext";
+import { useUser } from "../../../../context/UserContext";
+import { useTweetsApi } from "../../../../context/TweetContext";
 import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
@@ -22,9 +22,9 @@ import {
   messageActions as defaultMessageActions,
   Thread,
 } from "stream-chat-expo";
-import { getDeviceType, DeviceType } from "../../../lib/helpers";
-import CustomMessageList from "../../../components/CustomMessageList";
-import CustomChatAvatar from "../../../components/CustomChatAvatar";
+import { getDeviceType, DeviceType } from "../../../../lib/helpers";
+import CustomMessageList from "../../../../components/CustomMessageList";
+import CustomChatAvatar from "../../../../components/CustomChatAvatar";
 
 let areNotificationsEnabled = false;
 

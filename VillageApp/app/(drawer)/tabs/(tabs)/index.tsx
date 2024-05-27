@@ -9,16 +9,16 @@ import {
   Animated,
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import Tweet from "../../../components/Tweet";
+import Tweet from "../../../../components/Tweet";
 import { Link, SplashScreen } from "expo-router";
-import { useTweetsApi } from "../../../context/TweetContext";
-import { useUser } from "../../../context/UserContext";
+import { useTweetsApi } from "../../../../context/TweetContext";
+import { useUser } from "../../../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import EmptyListView from "../../../components/EmptyListView";
-import pageStyles from "../../../lib/styles/page";
+import EmptyListView from "../../../../components/EmptyListView";
+import pageStyles from "../../../../lib/styles/page";
 import { useEffect, useRef, useState } from "react";
-import FeedSwitch from "../../../components/FeedSwitch";
-import NeighborhoodScrollPicker from "../../../components/NeighborhoodScrollPicker";
+import FeedSwitch from "../../../../components/FeedSwitch";
+import NeighborhoodScrollPicker from "../../../../components/NeighborhoodScrollPicker";
 
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
@@ -154,7 +154,7 @@ const FeedScreen = () => {
 
   return (
     <View style={pageStyles.page}>
-      <NeighborhoodScrollPicker />
+      {/* <NeighborhoodScrollPicker /> */}
       <FlatList
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}

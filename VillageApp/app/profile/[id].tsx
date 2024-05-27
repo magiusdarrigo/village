@@ -123,7 +123,6 @@ const OtherUserProfileScreen = () => {
   if (!userID || !data) {
     return null; // Or render some fallback UI
   }
-  console.log("user data", data);
 
   return <Profile user={data} />;
 };

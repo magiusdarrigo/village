@@ -95,7 +95,7 @@ function RootLayoutNav() {
                   <GestureHandlerRootView style={{ flex: 1 }}>
                     <Stack>
                       <Stack.Screen
-                        name="tabs/(tabs)"
+                        name="(drawer)"
                         options={{
                           headerShown: false,
                           headerBackTitleVisible: false,
