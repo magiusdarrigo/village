@@ -15,10 +15,13 @@ import {
   BronxNeighborhoods,
   StatenIslandNeighborhoods,
 } from "../../constants/Neighborhoods";
+import * as Sentry from "sentry-expo";
 import { useUser } from "../../context/UserContext";
+import { useTweetsApi } from "../../context/TweetContext";
+import { NeighborhoodType } from "../../types/index";
 
 type NeighborhoodProps = {
-  neighborhood: string;
+  neighborhood: NeighborhoodType;
   isSelected: boolean;
   onPress: () => void;
 };
@@ -65,7 +68,7 @@ const NeighborhoodButton: React.FC<NeighborhoodProps> = ({
           isSelected && styles.neighborhoodButtonTextSelected,
         ]}
       >
-        {neighborhood}
+        {neighborhood.name}
       </Text>
     </TouchableOpacity>
   );
@@ -73,9 +76,9 @@ const NeighborhoodButton: React.FC<NeighborhoodProps> = ({
 
 type CategoryProps = {
   title: string;
-  neighborhoods: string[];
-  selectedNeighborhoods: string[];
-  toggleNeighborhood: (neighborhood: string) => void;
+  neighborhoods: NeighborhoodType[];
+  selectedNeighborhoods: NeighborhoodType[];
+  toggleNeighborhood: (neighborhood: NeighborhoodType) => void;
 };
 
 const Category: React.FC<CategoryProps> = ({
@@ -92,7 +95,9 @@ const Category: React.FC<CategoryProps> = ({
           <NeighborhoodButton
             key={index}
             neighborhood={neighborhood}
-            isSelected={selectedNeighborhoods.includes(neighborhood)}
+            isSelected={selectedNeighborhoods.some(
+              (n) => n.name === neighborhood.name
+            )}
             onPress={() => toggleNeighborhood(neighborhood)}
           />
         ))}
@@ -101,40 +106,70 @@ const Category: React.FC<CategoryProps> = ({
   );
 };
 
+const areArraysEqual = (arr1: any, arr2: any) => {
+  if (arr1.length !== arr2.length) return false;
+  return arr1.every((item: any, index: any) => item.name === arr2[index].name);
+};
+
 const Neighborhoods: React.FC = () => {
-  const { user } = useUser();
-  if (user?.neighborhood?.name === undefined) {
+  const { updateUserAttributes } = useTweetsApi();
+  const { user, updateUser } = useUser();
+  if (
+    user?.neighborhood?.name === undefined ||
+    user?.neighborhood_id === undefined
+  ) {
     throw new Error("User neighborhood is undefined");
   }
-  const currentNeighborhoods = [user?.neighborhood?.name];
+  const currentNeighborhoods = [
+    { name: user?.neighborhood?.name, id: user?.neighborhood_id },
+  ];
   if (user?.selected_neighborhoods) {
     user.selected_neighborhoods.forEach((neighborhood) => {
-      currentNeighborhoods.push(neighborhood.name);
+      currentNeighborhoods.push(neighborhood);
     });
   }
   const [selectedNeighborhoods, setSelectedNeighborhoods] =
-    useState<string[]>(currentNeighborhoods);
+    useState<NeighborhoodType[]>(currentNeighborhoods);
   const [isLoading, setIsLoading] = useState(false);
-  const didSelectionChange =
-    selectedNeighborhoods.length !== currentNeighborhoods.length;
+  const didSelectionChange = !areArraysEqual(
+    selectedNeighborhoods,
+    currentNeighborhoods
+  );
 
-  const toggleNeighborhood = (neighborhood: string) => {
-    if (neighborhood === user?.neighborhood?.name) {
+  const toggleNeighborhood = (neighborhood: NeighborhoodType) => {
+    if (neighborhood.name === user?.neighborhood?.name) {
       Alert.alert("You cannot remove the neighborhood you live in");
       return;
     }
-    if (selectedNeighborhoods.includes(neighborhood)) {
+    if (selectedNeighborhoods.some((n) => n.name === neighborhood.name)) {
       setSelectedNeighborhoods(
-        selectedNeighborhoods.filter((item) => item !== neighborhood)
+        selectedNeighborhoods.filter((item) => item.name !== neighborhood.name)
       );
     } else if (selectedNeighborhoods.length < 6) {
       setSelectedNeighborhoods([...selectedNeighborhoods, neighborhood]);
     }
   };
 
-  const handleSave = () => {
-    console.log("Selected Neighborhoods: ", selectedNeighborhoods);
-    // Add your save functionality here
+  const handleSave = async () => {
+    try {
+      setIsLoading(true);
+      // remove current neighborhood from selected neighborhoods
+      const filteredNeighborhoods = selectedNeighborhoods.filter(
+        (n) => n.name !== user?.neighborhood?.name
+      );
+      const updatedUser = await updateUserAttributes({
+        selectedNeighborhoods: filteredNeighborhoods,
+      });
+      updateUser(updatedUser);
+    } catch (error) {
+      console.error(error);
+      Sentry.Native.captureException(error);
+      Alert.alert(
+        "An error occurred while saving your neighborhoods. Try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

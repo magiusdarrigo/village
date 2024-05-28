@@ -21,7 +21,7 @@ const PickNeighborhood = () => {
   const { buildingAddress } = useLocalSearchParams();
   const { createBuilding } = useTweetsApi();
   const { user } = useUser();
-  // combine all neighborhoods
+
   const neighborhoods = [
     ...BrooklynNeighborhoods,
     ...BronxNeighborhoods,
@@ -72,9 +72,9 @@ const PickNeighborhood = () => {
         >
           {neighborhoods.map((neighborhood) => (
             <Picker.Item
-              key={neighborhood}
-              label={neighborhood}
-              value={neighborhood}
+              key={neighborhood.id}
+              label={neighborhood.name}
+              value={neighborhood.name}
             />
           ))}
         </Picker>

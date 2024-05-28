@@ -23,8 +23,14 @@ router.put("/", upload.single("image"), async (req, res) => {
   console.log("update user profile called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   // get the attributes that can be updated from the request body
-  let { username, buildingID, neighborhoodID, defaultImage, fcmToken } =
-    req.body;
+  let {
+    username,
+    buildingID,
+    neighborhoodID,
+    defaultImage,
+    fcmToken,
+    selectedNeighborhoods,
+  } = req.body;
   // ensure username is not racist
   if (username && !usernameAllowed(username)) {
     return res.status(400).json({
@@ -59,6 +65,10 @@ router.put("/", upload.single("image"), async (req, res) => {
   // change buildingID and neighborhoodID to numbers
   buildingID = buildingID ? Number(buildingID) : undefined;
   neighborhoodID = neighborhoodID ? Number(neighborhoodID) : undefined;
+  // change selectedNeighborhoods to an array of objects
+  selectedNeighborhoods = selectedNeighborhoods
+    ? JSON.parse(selectedNeighborhoods)
+    : [];
   try {
     const updatedUser = await prisma.users.update({
       where: {
@@ -70,6 +80,7 @@ router.put("/", upload.single("image"), async (req, res) => {
         building_id: buildingID,
         neighborhood_id: neighborhoodID,
         fcm_token: fcmToken,
+        selected_neighborhoods: selectedNeighborhoods,
       },
       select: {
         id: true,

@@ -3,6 +3,7 @@ import { API_URL } from "../lib/api/config";
 import { useAuth } from "./AuthContext";
 import { useUser } from "./UserContext";
 import { getFileType } from "../lib/helpers";
+import { NeighborhoodType } from "../types";
 
 const DEFAULT_IMAGE_BASE_URL =
   "https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults";
@@ -59,6 +60,7 @@ interface TweetsApiContextType {
     buildingID?: string;
     neighborhoodID?: string;
     fcmToken?: string;
+    selectedNeighborhoods?: NeighborhoodType[];
   }) => Promise<any>;
   checkIfUserAccountWasDeleted: () => Promise<any>;
   uploadProfileWithCustomPic: (formData: FormData) => Promise<any>;
@@ -756,6 +758,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     buildingID?: string;
     neighborhoodID?: string;
     fcmToken?: string;
+    selectedNeighborhoods?: NeighborhoodType[];
   }) => {
     if (!authToken) {
       return {};
@@ -795,6 +798,13 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (data.fcmToken) {
       formData.append("fcmToken", data.fcmToken);
+    }
+
+    if (data.selectedNeighborhoods) {
+      formData.append(
+        "selectedNeighborhoods",
+        JSON.stringify(data.selectedNeighborhoods)
+      );
     }
 
     const url = `${API_URL}/v1/users`;

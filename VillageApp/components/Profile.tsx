@@ -241,14 +241,13 @@ const Profile = ({ user }: ProfileProps) => {
       const updatedUser = await updateUserAttributes({
         profileImage: newImage,
       });
-      setProfileEditLoading(false);
-      setIsEditingProfile(false);
       updateUser(updatedUser);
     } catch (error) {
-      setProfileEditLoading(false);
-      setIsEditingProfile(false);
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue uploading your image. Try again.");
+    } finally {
+      setProfileEditLoading(false);
+      setIsEditingProfile(false);
     }
   };
 
