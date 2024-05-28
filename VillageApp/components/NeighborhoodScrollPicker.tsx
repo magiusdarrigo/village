@@ -34,7 +34,7 @@ const NeighborhoodScrollPicker = () => {
 
   return (
     <View style={styles.scrollParentContainer}>
-      <View style={{ height: 44 }}>
+      <View style={{ height: 45 }}>
         <FlatList
           showsHorizontalScrollIndicator={false}
           horizontal

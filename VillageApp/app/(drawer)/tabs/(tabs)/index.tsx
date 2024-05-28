@@ -34,6 +34,8 @@ const FeedScreen = () => {
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
+  const selectedNeighborhoodsCount =
+    currentUser?.selected_neighborhoods?.length ?? 0;
 
   if (!activeNeighborhood) {
     return <Text>Loading...</Text>;
@@ -160,7 +162,17 @@ const FeedScreen = () => {
 
   return (
     <View style={pageStyles.page}>
-      <NeighborhoodScrollPicker />
+      <Animated.View
+        pointerEvents={switchIsVisible ? "auto" : "none"}
+        style={[
+          {
+            opacity: fadeSwitchAnim,
+            zIndex: 1,
+          },
+        ]}
+      >
+        <NeighborhoodScrollPicker />
+      </Animated.View>
       <FlatList
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
@@ -178,6 +190,11 @@ const FeedScreen = () => {
         onEndReachedThreshold={0.5}
         ListFooterComponent={
           isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
+        }
+        ListHeaderComponent={
+          selectedNeighborhoodsCount
+            ? () => <View style={{ height: 45, backgroundColor: "white" }} />
+            : null
         }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
