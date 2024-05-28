@@ -3,20 +3,27 @@ import Colors from "../../constants/Colors";
 
 const neighborhoodStyles = StyleSheet.create({
   neighborhoodButton: {
-    backgroundColor: "white",
+    backgroundColor: Colors.light.switchBackgroundColor,
     borderRadius: 20,
-    borderColor: Colors.light.neighborhoodButtonColor,
-    borderWidth: 1,
     paddingVertical: 8,
     paddingHorizontal: 12,
     margin: 5,
+    // shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 2.11,
+    elevation: 3,
   },
   neighborhoodButtonSelected: {
     backgroundColor: "black",
   },
   neighborhoodButtonText: {
     fontSize: 14,
-    color: Colors.light.neighborhoodButtonColor,
+    color: Colors.light.switchFontColor,
     fontWeight: "bold",
   },
   neighborhoodButtonTextSelected: {
