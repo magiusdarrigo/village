@@ -1,3 +1,7 @@
+export type NeighborhoodType = {
+  id: number;
+  name: string;
+};
 export type UserType = {
   neighborhood_id?: number;
   neighborhood?: {
@@ -6,6 +10,7 @@ export type UserType = {
   building?: {
     address: string;
   };
+  selected_neighborhoods?: NeighborhoodType[];
   building_id?: number;
   id: string;
   username: string;

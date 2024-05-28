@@ -9,16 +9,16 @@ import {
   Animated,
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import Tweet from "../../../components/Tweet";
+import Tweet from "../../../../components/Tweet";
 import { Link, SplashScreen } from "expo-router";
-import { useTweetsApi } from "../../../context/TweetContext";
-import { useUser } from "../../../context/UserContext";
+import { useTweetsApi } from "../../../../context/TweetContext";
+import { useUser } from "../../../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import EmptyListView from "../../../components/EmptyListView";
-import pageStyles from "../../../lib/styles/page";
+import EmptyListView from "../../../../components/EmptyListView";
+import pageStyles from "../../../../lib/styles/page";
 import { useEffect, useRef, useState } from "react";
-import FeedSwitch from "../../../components/FeedSwitch";
-import NeighborhoodScrollPicker from "../../../components/NeighborhoodScrollPicker";
+import FeedSwitch from "../../../../components/FeedSwitch";
+import NeighborhoodScrollPicker from "../../../../components/NeighborhoodScrollPicker";
 
 const FeedScreen = () => {
   const { listTweets } = useTweetsApi();
@@ -29,10 +29,17 @@ const FeedScreen = () => {
     isFeedHot,
     updateIsFeedHot,
     user: currentUser,
+    activeNeighborhood,
   } = useUser();
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
+  const selectedNeighborhoodsCount =
+    currentUser?.selected_neighborhoods?.length ?? 0;
+
+  if (!activeNeighborhood) {
+    return <Text>Loading...</Text>;
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,8 +97,9 @@ const FeedScreen = () => {
 
   const usePostsInfiniteQuery = (isHot: boolean) => {
     return useInfiniteQuery({
-      queryKey: ["infinitetweets", isHot],
-      queryFn: async ({ pageParam = 0 }) => listTweets(pageParam, isHot),
+      queryKey: ["infinitetweets", activeNeighborhood.id, isHot],
+      queryFn: async ({ pageParam = 0 }) =>
+        listTweets(activeNeighborhood.id, pageParam, isHot),
       getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     });
   };
@@ -154,7 +162,17 @@ const FeedScreen = () => {
 
   return (
     <View style={pageStyles.page}>
-      {/* <NeighborhoodScrollPicker /> */}
+      <Animated.View
+        pointerEvents={switchIsVisible ? "auto" : "none"}
+        style={[
+          {
+            opacity: fadeSwitchAnim,
+            zIndex: 1,
+          },
+        ]}
+      >
+        <NeighborhoodScrollPicker />
+      </Animated.View>
       <FlatList
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
@@ -172,6 +190,11 @@ const FeedScreen = () => {
         onEndReachedThreshold={0.5}
         ListFooterComponent={
           isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
+        }
+        ListHeaderComponent={
+          selectedNeighborhoodsCount
+            ? () => <View style={{ height: 45, backgroundColor: "white" }} />
+            : null
         }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

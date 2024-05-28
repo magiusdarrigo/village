@@ -1,6 +1,6 @@
 import { ActivityIndicator } from "react-native";
-import Profile from "../../../components/Profile";
-import { useUser } from "../../../context/UserContext";
+import Profile from "../../../../components/Profile";
+import { useUser } from "../../../../context/UserContext";
 
 const YourProfileScreen = () => {
   const { user } = useUser();

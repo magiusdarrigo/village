@@ -7,6 +7,13 @@ import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
+import {
+  ManhattanNeighborhoods,
+  BrooklynNeighborhoods,
+  QueensNeighborhoods,
+  BronxNeighborhoods,
+  StatenIslandNeighborhoods,
+} from "../../constants/Neighborhoods";
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
@@ -16,43 +23,11 @@ const PickNeighborhood = () => {
   const { user } = useUser();
 
   const neighborhoods = [
-    "All of Brooklyn",
-    "All of Bronx",
-    "All of Queens",
-    "All of Staten Island",
-    "Battery Park City",
-    "Carnegie Hill",
-    "Central Harlem",
-    "Chelsea",
-    "Chinatown",
-    "East Harlem",
-    "East Village",
-    "Fidi",
-    "Flatiron",
-    "Gramercy",
-    "Greenwich Village",
-    "Hell's Kitchen",
-    "Hudson Yards",
-    "Kips Bay",
-    "Lenox Hill",
-    "Little Italy",
-    "Lower East Side",
-    "Manhattanville",
-    "Meatpacking District",
-    "Midtown",
-    "Murray Hill",
-    "NoHo",
-    "Nolita",
-    "NoMad",
-    "SoHo",
-    "Tribeca",
-    "Turtle Bay",
-    "Two Bridges",
-    "Upper East Side",
-    "Upper West Side",
-    "West Harlem",
-    "West Village",
-    "Yorkville",
+    ...BrooklynNeighborhoods,
+    ...BronxNeighborhoods,
+    ...QueensNeighborhoods,
+    ...StatenIslandNeighborhoods,
+    ...ManhattanNeighborhoods,
   ];
 
   const onSubmit = async () => {
@@ -97,9 +72,9 @@ const PickNeighborhood = () => {
         >
           {neighborhoods.map((neighborhood) => (
             <Picker.Item
-              key={neighborhood}
-              label={neighborhood}
-              value={neighborhood}
+              key={neighborhood.id}
+              label={neighborhood.name}
+              value={neighborhood.name}
             />
           ))}
         </Picker>

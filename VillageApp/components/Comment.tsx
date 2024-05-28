@@ -27,12 +27,16 @@ const Comment = ({
   isSelected,
   index,
 }: CommentProps) => {
-  const { user, isFeedHot } = useUser();
+  const { user, isFeedHot, activeNeighborhood } = useUser();
   const { reportComment, deleteComment, likeComment, unlikeComment } =
     useTweetsApi();
   const queryClient = useQueryClient();
 
   const isReply = comment.parent_comment_id !== null;
+
+  if (activeNeighborhood === null) {
+    return null;
+  }
 
   if (!user) {
     return null;
@@ -231,26 +235,29 @@ const Comment = ({
         }
       );
       // update the tweet list cache with a +1 total comments count for the tweet
-      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
-        if (!old) return;
-        return {
-          ...old,
-          pages: old.pages.map((page: any) => {
-            return {
-              ...page,
-              data: page.data.map((tweet: any) => {
-                if (tweet.id === comment.post_id) {
-                  return {
-                    ...tweet,
-                    comments_count: tweet.comments_count - 1,
-                  };
-                }
-                return tweet;
-              }),
-            };
-          }),
-        };
-      });
+      queryClient.setQueryData(
+        ["infinitetweets", activeNeighborhood.id, isFeedHot],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => {
+              return {
+                ...page,
+                data: page.data.map((tweet: any) => {
+                  if (tweet.id === comment.post_id) {
+                    return {
+                      ...tweet,
+                      comments_count: tweet.comments_count - 1,
+                    };
+                  }
+                  return tweet;
+                }),
+              };
+            }),
+          };
+        }
+      );
       queryClient.setQueryData(
         ["profiletweets", String(user.id)],
         (old: any) => {

@@ -6,8 +6,8 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../../context/UserContext";
-import { useTweetsApi } from "../../../context/TweetContext";
+import { useUser } from "../../../../context/UserContext";
+import { useTweetsApi } from "../../../../context/TweetContext";
 import messaging from "@react-native-firebase/messaging";
 import * as SecureStore from "expo-secure-store";
 import { StreamChat } from "stream-chat";
@@ -20,9 +20,11 @@ import {
   Channel,
   MessageInput,
   messageActions as defaultMessageActions,
+  Thread,
 } from "stream-chat-expo";
-import { getDeviceType, DeviceType } from "../../../lib/helpers";
-import CustomMessageList from "../../../components/CustomMessageList";
+import { getDeviceType, DeviceType } from "../../../../lib/helpers";
+import CustomMessageList from "../../../../components/CustomMessageList";
+import CustomChatAvatar from "../../../../components/CustomChatAvatar";
 
 let areNotificationsEnabled = false;
 
@@ -233,6 +235,7 @@ const ChatScreen = () => {
         >
           <Chat client={streamChatClient}>
             <Channel
+              // MessageAvatar={CustomChatAvatar}
               channel={channel}
               messageActions={(param) => {
                 const { isMyMessage, muteUser } = param;
