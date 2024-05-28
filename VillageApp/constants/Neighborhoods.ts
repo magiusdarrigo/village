@@ -1,0 +1,40 @@
+export const ManhattanNeighborhoods = [
+  "Battery Park City",
+  "Carnegie Hill",
+  "Central Harlem",
+  "Chelsea",
+  "Chinatown",
+  "East Harlem",
+  "East Village",
+  "Fidi",
+  "Flatiron",
+  "Gramercy",
+  "Greenwich Village",
+  "Hell's Kitchen",
+  "Hudson Yards",
+  "Kips Bay",
+  "Lenox Hill",
+  "Little Italy",
+  "Lower East Side",
+  "Manhattanville",
+  "Meatpacking District",
+  "Midtown",
+  "Murray Hill",
+  "NoHo",
+  "Nolita",
+  "NoMad",
+  "SoHo",
+  "Tribeca",
+  "Turtle Bay",
+  "Two Bridges",
+  "Upper East Side",
+  "Upper West Side",
+  "West Harlem",
+  "West Village",
+  "Yorkville",
+];
+
+export const BrooklynNeighborhoods = ["All of Brooklyn"];
+export const QueensNeighborhoods = ["All of Queens"];
+export const BronxNeighborhoods = ["All of Bronx"];
+export const StatenIslandNeighborhoods = ["All of Staten Island"];

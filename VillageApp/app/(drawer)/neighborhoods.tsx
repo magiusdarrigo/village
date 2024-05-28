@@ -5,8 +5,17 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import Colors from "../../constants/Colors";
+import {
+  ManhattanNeighborhoods,
+  BrooklynNeighborhoods,
+  QueensNeighborhoods,
+  BronxNeighborhoods,
+  StatenIslandNeighborhoods,
+} from "../../constants/Neighborhoods";
+import { useUser } from "../../context/UserContext";
 
 type NeighborhoodProps = {
   neighborhood: string;
@@ -17,57 +26,23 @@ type NeighborhoodProps = {
 const neighborhoodsData = [
   {
     title: "Manhattan",
-    neighborhoods: [
-      "Battery Park City",
-      "Carnegie Hill",
-      "Central Harlem",
-      "Chelsea",
-      "Chinatown",
-      "East Harlem",
-      "East Village",
-      "Fidi",
-      "Flatiron",
-      "Gramercy",
-      "Greenwich Village",
-      "Hell's Kitchen",
-      "Hudson Yards",
-      "Kips Bay",
-      "Lenox Hill",
-      "Little Italy",
-      "Lower East Side",
-      "Manhattanville",
-      "Meatpacking District",
-      "Midtown",
-      "Murray Hill",
-      "NoHo",
-      "Nolita",
-      "NoMad",
-      "SoHo",
-      "Tribeca",
-      "Turtle Bay",
-      "Two Bridges",
-      "Upper East Side",
-      "Upper West Side",
-      "West Harlem",
-      "West Village",
-      "Yorkville",
-    ],
+    neighborhoods: ManhattanNeighborhoods,
   },
   {
     title: "Brooklyn",
-    neighborhoods: ["All of Brooklyn"],
+    neighborhoods: BrooklynNeighborhoods,
   },
   {
     title: "Queens",
-    neighborhoods: ["All of Queens"],
+    neighborhoods: QueensNeighborhoods,
   },
   {
     title: "Bronx",
-    neighborhoods: ["All of Bronx"],
+    neighborhoods: BronxNeighborhoods,
   },
   {
     title: "Staten Island",
-    neighborhoods: ["All of Staten Island"],
+    neighborhoods: StatenIslandNeighborhoods,
   },
 ];
 
@@ -127,36 +102,70 @@ const Category: React.FC<CategoryProps> = ({
 };
 
 const Neighborhoods: React.FC = () => {
-  const [selectedNeighborhoods, setSelectedNeighborhoods] = useState<string[]>(
-    []
-  );
+  const { user } = useUser();
+  if (user?.neighborhood?.name === undefined) {
+    throw new Error("User neighborhood is undefined");
+  }
+  const currentNeighborhoods = [user?.neighborhood?.name];
+  if (user?.selected_neighborhoods) {
+    user.selected_neighborhoods.forEach((neighborhood) => {
+      currentNeighborhoods.push(neighborhood.name);
+    });
+  }
+  const [selectedNeighborhoods, setSelectedNeighborhoods] =
+    useState<string[]>(currentNeighborhoods);
+  const [isLoading, setIsLoading] = useState(false);
+  const didSelectionChange =
+    selectedNeighborhoods.length !== currentNeighborhoods.length;
 
   const toggleNeighborhood = (neighborhood: string) => {
+    if (neighborhood === user?.neighborhood?.name) {
+      Alert.alert("You cannot remove the neighborhood you live in");
+      return;
+    }
     if (selectedNeighborhoods.includes(neighborhood)) {
       setSelectedNeighborhoods(
         selectedNeighborhoods.filter((item) => item !== neighborhood)
       );
-    } else if (selectedNeighborhoods.length < 5) {
+    } else if (selectedNeighborhoods.length < 6) {
       setSelectedNeighborhoods([...selectedNeighborhoods, neighborhood]);
     }
   };
 
+  const handleSave = () => {
+    console.log("Selected Neighborhoods: ", selectedNeighborhoods);
+    // Add your save functionality here
+  };
+
   return (
-    <ScrollView style={styles.parentContainer}>
-      <Text style={styles.explanationTitle}>
-        Select up to five other neighborhoods to pick between on your feed. More
-        neighborhoods on the way 👀
-      </Text>
-      {neighborhoodsData.map((category, index) => (
-        <Category
-          key={index}
-          title={category.title}
-          neighborhoods={category.neighborhoods}
-          selectedNeighborhoods={selectedNeighborhoods}
-          toggleNeighborhood={toggleNeighborhood}
-        />
-      ))}
-    </ScrollView>
+    <>
+      <ScrollView style={styles.parentContainer}>
+        <Text style={styles.explanationTitle}>
+          Select up to five other neighborhoods to pick between on your feed.
+          More neighborhoods on the way 👀
+        </Text>
+        {neighborhoodsData.map((category, index) => (
+          <Category
+            key={index}
+            title={category.title}
+            neighborhoods={category.neighborhoods}
+            selectedNeighborhoods={selectedNeighborhoods}
+            toggleNeighborhood={toggleNeighborhood}
+          />
+        ))}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+      <TouchableOpacity
+        style={[
+          styles.saveButton,
+          isLoading || !didSelectionChange ? styles.saveButtonDisabled : {},
+        ]}
+        onPress={handleSave}
+        disabled={isLoading || !didSelectionChange}
+      >
+        <Text style={styles.saveButtonText}>Save</Text>
+      </TouchableOpacity>
+    </>
   );
 };
 
@@ -204,6 +213,25 @@ const styles = StyleSheet.create({
   },
   neighborhoodButtonTextSelected: {
     color: "white",
+  },
+  saveButton: {
+    position: "absolute",
+    bottom: 34,
+    alignSelf: "center",
+    backgroundColor: "black",
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    width: 140,
+    alignItems: "center",
+  },
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
