@@ -29,10 +29,15 @@ const FeedScreen = () => {
     isFeedHot,
     updateIsFeedHot,
     user: currentUser,
+    activeNeighborhood,
   } = useUser();
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
+
+  if (!activeNeighborhood) {
+    return <Text>Loading...</Text>;
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,8 +95,9 @@ const FeedScreen = () => {
 
   const usePostsInfiniteQuery = (isHot: boolean) => {
     return useInfiniteQuery({
-      queryKey: ["infinitetweets", isHot],
-      queryFn: async ({ pageParam = 0 }) => listTweets(pageParam, isHot),
+      queryKey: ["infinitetweets", activeNeighborhood.id, isHot],
+      queryFn: async ({ pageParam = 0 }) =>
+        listTweets(activeNeighborhood.id, pageParam, isHot),
       getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     });
   };

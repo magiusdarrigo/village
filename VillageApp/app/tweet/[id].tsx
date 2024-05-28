@@ -55,7 +55,7 @@ const TweetScreen = () => {
   const queryClient = useQueryClient();
   const inputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
-  const { isFeedHot, user: currentUser } = useUser();
+  const { isFeedHot, user: currentUser, activeNeighborhood } = useUser();
 
   const [commentText, setCommentText] = useState("");
   const [selectedCommentID, setSelectedCommentID] = useState<
@@ -63,6 +63,10 @@ const TweetScreen = () => {
   >(undefined);
 
   const isPostButtonDisabled = commentText.length < 1;
+
+  if (activeNeighborhood === null) {
+    return <ActivityIndicator />;
+  }
 
   useEffect(() => {
     const keyboardHideListener = Keyboard.addListener(
@@ -143,26 +147,29 @@ const TweetScreen = () => {
         };
       });
       // update the tweet list cache with a +1 total comments count for the tweet
-      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
-        if (!old) return;
-        return {
-          ...old,
-          pages: old.pages.map((page: any) => {
-            return {
-              ...page,
-              data: page.data.map((tweet: any) => {
-                if (tweet.id === Number(tweetId)) {
-                  return {
-                    ...tweet,
-                    comments_count: tweet.comments_count + 1,
-                  };
-                }
-                return tweet;
-              }),
-            };
-          }),
-        };
-      });
+      queryClient.setQueryData(
+        ["infinitetweets", activeNeighborhood.id, isFeedHot],
+        (old: any) => {
+          if (!old) return;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => {
+              return {
+                ...page,
+                data: page.data.map((tweet: any) => {
+                  if (tweet.id === Number(tweetId)) {
+                    return {
+                      ...tweet,
+                      comments_count: tweet.comments_count + 1,
+                    };
+                  }
+                  return tweet;
+                }),
+              };
+            }),
+          };
+        }
+      );
       // update the profile tweets list cache with a +1 total comments count for the tweet
       queryClient.setQueryData(
         ["profiletweets", String(data?.user_id)],

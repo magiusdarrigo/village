@@ -41,9 +41,14 @@ const Tweet = ({
   const queryClient = useQueryClient();
   const navigation = useNavigation();
   const segments = useSegments();
-  const { user, isFeedHot } = useUser();
+  const { user, isFeedHot, activeNeighborhood } = useUser();
 
   if (!user) {
+    Alert.alert("Something went wrong. Try again.");
+    return null;
+  }
+
+  if (!activeNeighborhood) {
     Alert.alert("Something went wrong. Try again.");
     return null;
   }
@@ -69,13 +74,18 @@ const Tweet = ({
         // cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
-          queryClient.cancelQueries(["infinitetweets", isFeedHot]),
+          queryClient.cancelQueries([
+            "infinitetweets",
+            activeNeighborhood.id,
+            isFeedHot,
+          ]),
           queryClient.cancelQueries(["profiletweets", String(tweet.user_id)]),
         ]);
 
         // snapshot the previous value
         const previousTweets = queryClient.getQueryData([
           "infinitetweets",
+          activeNeighborhood.id,
           isFeedHot,
         ]);
         const previousTweet = queryClient.getQueryData([
@@ -96,29 +106,32 @@ const Tweet = ({
             likes_count: old?.likes_count + likeDelta,
           };
         });
-        queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
-          if (!old) return;
-          // Map over the pages
-          return {
-            ...old,
-            pages: old.pages.map((page: { data: any[] }) => {
-              // Map over the tweets in the page
-              return {
-                ...page,
-                data: page.data.map((tweet) =>
-                  tweet.id === Number(postID)
-                    ? {
-                        ...tweet,
-                        liked_by_user: !isDislike,
-                        disliked_by_user: isDislike,
-                        likes_count: tweet.likes_count + likeDelta,
-                      }
-                    : tweet
-                ),
-              };
-            }),
-          };
-        });
+        queryClient.setQueryData(
+          ["infinitetweets", activeNeighborhood.id, isFeedHot],
+          (old: any) => {
+            if (!old) return;
+            // Map over the pages
+            return {
+              ...old,
+              pages: old.pages.map((page: { data: any[] }) => {
+                // Map over the tweets in the page
+                return {
+                  ...page,
+                  data: page.data.map((tweet) =>
+                    tweet.id === Number(postID)
+                      ? {
+                          ...tweet,
+                          liked_by_user: !isDislike,
+                          disliked_by_user: isDislike,
+                          likes_count: tweet.likes_count + likeDelta,
+                        }
+                      : tweet
+                  ),
+                };
+              }),
+            };
+          }
+        );
         queryClient.setQueryData(
           ["profiletweets", String(tweet.user_id)],
           (old: any) => {
@@ -156,7 +169,7 @@ const Tweet = ({
         // revert to the previous value
         if (context?.previousTweets) {
           queryClient.setQueryData(
-            ["infinitetweets", isFeedHot],
+            ["infinitetweets", activeNeighborhood.id, isFeedHot],
             context.previousTweets
           );
         }
@@ -185,13 +198,18 @@ const Tweet = ({
         const likeDelta = isDislike ? -1 : 1;
         await Promise.all([
           queryClient.cancelQueries(["tweets", postID]),
-          queryClient.cancelQueries(["infinitetweets", isFeedHot]),
+          queryClient.cancelQueries([
+            "infinitetweets",
+            activeNeighborhood.id,
+            isFeedHot,
+          ]),
           queryClient.cancelQueries(["profiletweets", String(tweet.user_id)]),
         ]);
 
         // snapshot the previous values
         const previousTweets = queryClient.getQueryData([
           "infinitetweets",
+          activeNeighborhood.id,
           isFeedHot,
         ]);
         const previousTweet = queryClient.getQueryData([
@@ -212,29 +230,32 @@ const Tweet = ({
             likes_count: old?.likes_count - likeDelta,
           };
         });
-        queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
-          if (!old) return;
-          // Map over the pages
-          return {
-            ...old,
-            pages: old.pages.map((page: { data: any[] }) => {
-              // Map over the tweets in the page
-              return {
-                ...page,
-                data: page.data.map((tweet) =>
-                  tweet.id === Number(postID)
-                    ? {
-                        ...tweet,
-                        liked_by_user: false,
-                        disliked_by_user: false,
-                        likes_count: tweet.likes_count - likeDelta,
-                      }
-                    : tweet
-                ),
-              };
-            }),
-          };
-        });
+        queryClient.setQueryData(
+          ["infinitetweets", activeNeighborhood.id, isFeedHot],
+          (old: any) => {
+            if (!old) return;
+            // Map over the pages
+            return {
+              ...old,
+              pages: old.pages.map((page: { data: any[] }) => {
+                // Map over the tweets in the page
+                return {
+                  ...page,
+                  data: page.data.map((tweet) =>
+                    tweet.id === Number(postID)
+                      ? {
+                          ...tweet,
+                          liked_by_user: false,
+                          disliked_by_user: false,
+                          likes_count: tweet.likes_count - likeDelta,
+                        }
+                      : tweet
+                  ),
+                };
+              }),
+            };
+          }
+        );
         queryClient.setQueryData(
           ["profiletweets", String(tweet.user_id)],
           (old: any) => {
@@ -271,7 +292,7 @@ const Tweet = ({
         // revert to the previous value
         if (context?.previousTweets) {
           queryClient.setQueryData(
-            ["infinitetweets", isFeedHot],
+            ["infinitetweets", activeNeighborhood.id, isFeedHot],
             context.previousTweets
           );
         }
@@ -295,20 +316,23 @@ const Tweet = ({
   const { mutate: mutateDelete } = useMutation(deleteTweet, {
     onSuccess: (data) => {
       // update the list of tweets in the cache
-      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
-        if (!old) return;
-        // Map over the pages
-        return {
-          ...old,
-          pages: old.pages.map((page: { data: any[] }) => {
-            // Map over the tweets in the page
-            return {
-              ...page,
-              data: page.data.filter((tweet) => tweet.id !== data.id),
-            };
-          }),
-        };
-      });
+      queryClient.setQueryData(
+        ["infinitetweets", activeNeighborhood.id, isFeedHot],
+        (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.filter((tweet) => tweet.id !== data.id),
+              };
+            }),
+          };
+        }
+      );
       queryClient.setQueryData(
         ["profiletweets", String(tweet.user_id)],
         (old: any) => {
@@ -346,20 +370,23 @@ const Tweet = ({
   const { mutate: mutateHide } = useMutation(hideTweet, {
     onSuccess: (data) => {
       // update the list of tweets in the cache
-      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
-        if (!old) return;
-        // Map over the pages
-        return {
-          ...old,
-          pages: old.pages.map((page: { data: any[] }) => {
-            // Map over the tweets in the page
-            return {
-              ...page,
-              data: page.data.filter((tweet) => tweet.id !== data.id),
-            };
-          }),
-        };
-      });
+      queryClient.setQueryData(
+        ["infinitetweets", activeNeighborhood.id, isFeedHot],
+        (old: any) => {
+          if (!old) return;
+          // Map over the pages
+          return {
+            ...old,
+            pages: old.pages.map((page: { data: any[] }) => {
+              // Map over the tweets in the page
+              return {
+                ...page,
+                data: page.data.filter((tweet) => tweet.id !== data.id),
+              };
+            }),
+          };
+        }
+      );
       queryClient.setQueryData(
         ["profiletweets", String(tweet.user_id)],
         (old: any) => {

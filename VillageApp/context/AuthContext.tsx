@@ -21,7 +21,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
-  const { user, updateUser } = useUser();
+  const { user, updateUser, updateActiveNeighborhood, activeNeighborhood } =
+    useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const segments = useSegments();
@@ -88,6 +89,12 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
           try {
             const currentUser = await getUser(token);
             updateUser(currentUser);
+            if (!activeNeighborhood) {
+              updateActiveNeighborhood({
+                name: currentUser.neighborhood.name,
+                id: currentUser.neighborhood_id,
+              });
+            }
           } catch (error) {
             Sentry.Native.captureException(error);
             Alert.alert("We couldn't sign you in. Try again.");

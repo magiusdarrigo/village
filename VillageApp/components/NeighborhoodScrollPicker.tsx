@@ -11,7 +11,10 @@ import neighborhoodStyles from "../lib/styles/neighborhood";
 import { NeighborhoodType } from "../types";
 
 const NeighborhoodScrollPicker = () => {
-  const { user, updateActiveNeighborhoodFeed } = useUser();
+  const { user, updateActiveNeighborhood, activeNeighborhood } = useUser();
+  if (!activeNeighborhood) {
+    return null;
+  }
   const currentNeighborhoods = [
     { name: user?.neighborhood?.name, id: user?.neighborhood_id },
   ];
@@ -20,11 +23,9 @@ const NeighborhoodScrollPicker = () => {
       currentNeighborhoods.push(neighborhood);
     });
   }
-  const isSelected = false;
 
   const pressOnItem = (item: NeighborhoodType) => {
-    console.log(item);
-    updateActiveNeighborhoodFeed(item);
+    updateActiveNeighborhood(item);
   };
 
   if (currentNeighborhoods.length <= 1) {
@@ -38,29 +39,32 @@ const NeighborhoodScrollPicker = () => {
           showsHorizontalScrollIndicator={false}
           horizontal
           data={currentNeighborhoods}
-          renderItem={({ item }: any) => (
-            <TouchableOpacity
-              style={[
-                neighborhoodStyles.neighborhoodButton,
-                // { borderColor: !isSelected ? "black" : "white" },
-                isSelected && neighborhoodStyles.neighborhoodButtonSelected,
-              ]}
-              key={item.id}
-              onPress={() => pressOnItem(item)}
-              activeOpacity={0.8}
-            >
-              <Text
+          renderItem={({ item }: any) => {
+            const isSelected = activeNeighborhood.id === item.id;
+            return (
+              <TouchableOpacity
                 style={[
-                  neighborhoodStyles.neighborhoodButtonText,
-                  // { color: !isSelected ? "black" : "white" },
-                  isSelected &&
-                    neighborhoodStyles.neighborhoodButtonTextSelected,
+                  neighborhoodStyles.neighborhoodButton,
+                  { borderColor: "black" },
+                  isSelected && neighborhoodStyles.neighborhoodButtonSelected,
                 ]}
+                key={item.id}
+                onPress={() => pressOnItem(item)}
+                activeOpacity={0.8}
               >
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          )}
+                <Text
+                  style={[
+                    neighborhoodStyles.neighborhoodButtonText,
+                    // { color: !isSelected ? "black" : "white" },
+                    isSelected &&
+                      neighborhoodStyles.neighborhoodButtonTextSelected,
+                  ]}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
         />
       </View>
     </View>

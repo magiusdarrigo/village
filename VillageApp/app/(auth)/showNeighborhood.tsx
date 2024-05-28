@@ -11,7 +11,7 @@ const ShowNeighborhood = () => {
   const { neighborhoodName, buildingID, neighborhoodID } =
     useLocalSearchParams();
   const { updateUserAttributes } = useTweetsApi();
-  const { user, updateUser } = useUser();
+  const { user, updateUser, updateActiveNeighborhood } = useUser();
   const [isLoading, setIsLoading] = useState(false);
 
   const onEnter = async () => {
@@ -32,6 +32,10 @@ const ShowNeighborhood = () => {
         buildingID: buildingID,
       });
       updateUser(updatedUser);
+      updateActiveNeighborhood({
+        name: updatedUser.neighborhood.name,
+        id: updatedUser.neighborhood_id,
+      });
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");

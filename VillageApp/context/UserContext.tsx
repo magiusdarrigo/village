@@ -19,7 +19,8 @@ interface UserContextType {
   updateIsFeedHot: (isHot: boolean) => void;
   activeTab: string;
   updateActiveTab: (tab: string) => void;
-  updateActiveNeighborhoodFeed: (neighborhood: NeighborhoodType) => void;
+  activeNeighborhood: NeighborhoodType | null;
+  updateActiveNeighborhood: (neighborhood: NeighborhoodType) => void;
 }
 
 interface UserContextProviderProps {
@@ -40,11 +41,11 @@ const UserContextProvider = ({
   const flatListRef = useRef<FlatList>(null);
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const [activeTab, setActiveTab] = useState("home");
-  const [activeNeighborhoodFeed, setActiveNeighborhoodFeed] =
+  const [activeNeighborhood, setActiveNeighborhood] =
     useState<NeighborhoodType | null>(null);
 
-  const updateActiveNeighborhoodFeed = (neighborhood: NeighborhoodType) => {
-    setActiveNeighborhoodFeed(neighborhood);
+  const updateActiveNeighborhood = (neighborhood: NeighborhoodType) => {
+    setActiveNeighborhood(neighborhood);
   };
 
   const updateActiveTab = (tab: string) => {
@@ -98,7 +99,8 @@ const UserContextProvider = ({
         updateIsFeedHot,
         activeTab,
         updateActiveTab,
-        updateActiveNeighborhoodFeed,
+        activeNeighborhood,
+        updateActiveNeighborhood,
       }}
     >
       {children}
