@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   explanationTitle: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
     color: Colors.light.switchFontColor,
     marginBottom: 20,
     textAlign: "center",

@@ -20,7 +20,10 @@ export const unstable_settings = {
 
 function CustomDrawerContent(props: any) {
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView
+      {...props}
+      style={{ backgroundColor: Colors.light.tertiary }}
+    >
       <View>
         <Image
           source={require("../../assets/images/transparent-icon-crop.png")}
