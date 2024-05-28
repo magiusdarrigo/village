@@ -100,7 +100,7 @@ const NewTweet = () => {
     mutationFn: createTweet,
     onSuccess: (newData) => {
       queryClient.setQueryData(
-        ["infinitetweets", activeNeighborhood.id, isFeedHot],
+        ["infinitetweets", user?.neighborhood_id, isFeedHot],
         (old: any) => {
           if (!old) {
             return {
