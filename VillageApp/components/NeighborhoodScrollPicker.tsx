@@ -6,43 +6,59 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import { useUser } from "../context/UserContext";
+import neighborhoodStyles from "../lib/styles/neighborhood";
+import { NeighborhoodType } from "../types";
 
 const NeighborhoodScrollPicker = () => {
-  const pressOnItem = (item: any) => {
-    //do something with selected label
+  const { user, updateActiveNeighborhoodFeed } = useUser();
+  const currentNeighborhoods = [
+    { name: user?.neighborhood?.name, id: user?.neighborhood_id },
+  ];
+  if (user?.selected_neighborhoods) {
+    user.selected_neighborhoods.forEach((neighborhood) => {
+      currentNeighborhoods.push(neighborhood);
+    });
+  }
+  const isSelected = false;
+
+  const pressOnItem = (item: NeighborhoodType) => {
+    console.log(item);
+    updateActiveNeighborhoodFeed(item);
   };
+
+  if (currentNeighborhoods.length <= 1) {
+    return null;
+  }
 
   return (
     <View style={styles.scrollParentContainer}>
-      <View style={{ height: 40 }}>
+      <View style={{ height: 44 }}>
         <FlatList
           showsHorizontalScrollIndicator={false}
           horizontal
-          data={[
-            { id: 1, label: "Lower East Side" },
-            { id: 2, label: "West Village" },
-            { id: 3, label: "SoHo" },
-            { id: 4, label: "Lenox Hill" },
-            { id: 5, label: "Murray Hill" },
-            { id: 6, label: "Upper East Side" },
-            { id: 7, label: "Hudson Yards" },
-            { id: 8, label: "Chelsea" },
-            { id: 9, label: "Midtown" },
-            { id: 10, label: "Gramercy Park" },
-            { id: 11, label: "East Village" },
-            { id: 12, label: "Greenwich Village" },
-            { id: 13, label: "Tribeca" },
-            { id: 14, label: "Financial District" },
-            { id: 15, label: "Williamsburg" },
-          ]}
-          renderItem={({ item, index }: any) => (
+          data={currentNeighborhoods}
+          renderItem={({ item }: any) => (
             <TouchableOpacity
+              style={[
+                neighborhoodStyles.neighborhoodButton,
+                // { borderColor: !isSelected ? "black" : "white" },
+                isSelected && neighborhoodStyles.neighborhoodButtonSelected,
+              ]}
               key={item.id}
               onPress={() => pressOnItem(item)}
-              style={styles.item}
               activeOpacity={0.8}
             >
-              <Text style={styles.itemLabel}>{item.label}</Text>
+              <Text
+                style={[
+                  neighborhoodStyles.neighborhoodButtonText,
+                  // { color: !isSelected ? "black" : "white" },
+                  isSelected &&
+                    neighborhoodStyles.neighborhoodButtonTextSelected,
+                ]}
+              >
+                {item.name}
+              </Text>
             </TouchableOpacity>
           )}
         />
@@ -60,25 +76,6 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     zIndex: 5,
-  },
-  item: {
-    padding: 5,
-    borderWidth: 1,
-    borderColor: "red",
-    backgroundColor: "white",
-    borderRadius: 20,
-    minWidth: 70,
-    paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    margin: 3,
-  },
-  itemLabel: {},
-  itemImage: {
-    width: 20,
-    height: 20,
-    marginHorizontal: 5,
   },
 });
 

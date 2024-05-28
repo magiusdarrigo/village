@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 import Colors from "../../constants/Colors";
+import neighborhoodStyles from "../../lib/styles/neighborhood";
 import {
   ManhattanNeighborhoods,
   BrooklynNeighborhoods,
@@ -57,15 +58,15 @@ const NeighborhoodButton: React.FC<NeighborhoodProps> = ({
   return (
     <TouchableOpacity
       style={[
-        styles.neighborhoodButton,
-        isSelected && styles.neighborhoodButtonSelected,
+        neighborhoodStyles.neighborhoodButton,
+        isSelected && neighborhoodStyles.neighborhoodButtonSelected,
       ]}
       onPress={onPress}
     >
       <Text
         style={[
-          styles.neighborhoodButtonText,
-          isSelected && styles.neighborhoodButtonTextSelected,
+          neighborhoodStyles.neighborhoodButtonText,
+          isSelected && neighborhoodStyles.neighborhoodButtonTextSelected,
         ]}
       >
         {neighborhood.name}
@@ -229,26 +230,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  neighborhoodButton: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    borderColor: Colors.light.neighborhoodButtonColor,
-    borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    margin: 5,
-  },
-  neighborhoodButtonSelected: {
-    backgroundColor: "black",
-  },
-  neighborhoodButtonText: {
-    fontSize: 14,
-    color: Colors.light.neighborhoodButtonColor,
-    fontWeight: "bold",
-  },
-  neighborhoodButtonTextSelected: {
-    color: "white",
-  },
+
   saveButton: {
     position: "absolute",
     bottom: 34,

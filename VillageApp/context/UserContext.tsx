@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useRef } from "react";
 import { StreamChat, Channel as ChannelType } from "stream-chat";
 import { FlatList } from "react-native";
 import notifee from "@notifee/react-native";
-import { UserType } from "../types/index";
+import { NeighborhoodType, UserType } from "../types/index";
 
 interface UserContextType {
   user: UserType | null;
@@ -19,6 +19,7 @@ interface UserContextType {
   updateIsFeedHot: (isHot: boolean) => void;
   activeTab: string;
   updateActiveTab: (tab: string) => void;
+  updateActiveNeighborhoodFeed: (neighborhood: NeighborhoodType) => void;
 }
 
 interface UserContextProviderProps {
@@ -39,6 +40,12 @@ const UserContextProvider = ({
   const flatListRef = useRef<FlatList>(null);
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const [activeTab, setActiveTab] = useState("home");
+  const [activeNeighborhoodFeed, setActiveNeighborhoodFeed] =
+    useState<NeighborhoodType | null>(null);
+
+  const updateActiveNeighborhoodFeed = (neighborhood: NeighborhoodType) => {
+    setActiveNeighborhoodFeed(neighborhood);
+  };
 
   const updateActiveTab = (tab: string) => {
     setActiveTab(tab);
@@ -91,6 +98,7 @@ const UserContextProvider = ({
         updateIsFeedHot,
         activeTab,
         updateActiveTab,
+        updateActiveNeighborhoodFeed,
       }}
     >
       {children}
