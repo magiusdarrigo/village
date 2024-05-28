@@ -1,11 +1,11 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Octicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Octicons, Ionicons } from "@expo/vector-icons";
+import { Tabs, useNavigation } from "expo-router";
 import { Pressable, AppState, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
-import { useUser } from "../../../context/UserContext";
-import { useAuth } from "../../../context/AuthContext";
-import Colors from "../../../constants/Colors";
+import { useUser } from "../../../../context/UserContext";
+import { useAuth } from "../../../../context/AuthContext";
+import Colors from "../../../../constants/Colors";
 import notifee, { EventType } from "@notifee/react-native";
 import * as Sentry from "sentry-expo";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -13,8 +13,8 @@ import {
   DeviceType,
   getDeviceType,
   handlePressButtonAsync,
-} from "../../../lib/helpers";
-import { useTweetsApi } from "../../../context/TweetContext";
+} from "../../../../lib/helpers";
+import { useTweetsApi } from "../../../../context/TweetContext";
 import { Linking } from "react-native";
 
 const TERMS_OF_SERVICE_URL =
@@ -79,6 +79,8 @@ notifee.onBackgroundEvent(async ({ type }) => {
 });
 
 export default function TabLayout() {
+  const navigation = useNavigation();
+
   const {
     user,
     chatTabBadgeCount,
@@ -88,6 +90,7 @@ export default function TabLayout() {
     getStreamChatClient,
     activeTab,
     updateActiveTab,
+    activeNeighborhood,
   } = useUser();
   const { removeAuthToken } = useAuth();
   const { addBuildingChangeRequest, accountDeletionRequest } = useTweetsApi();
@@ -274,10 +277,34 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          headerTitle: user?.neighborhood?.name || "Home",
+          headerTitle: activeNeighborhood?.name || "Home",
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
+          ),
+          headerLeft: () => (
+            <Pressable onPress={navigation.openDrawer}>
+              {({ pressed }) => (
+                <Ionicons
+                  name="menu"
+                  size={28}
+                  color={Colors.light.text}
+                  style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          ),
+          headerRight: () => (
+            <Pressable onPress={() => {}}>
+              {({ pressed }) => (
+                <Ionicons
+                  name="search"
+                  size={25}
+                  color={Colors.light.text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
           ),
         }}
         listeners={{

@@ -45,7 +45,7 @@ const NewTweet = () => {
   const [text, setText] = useState("");
   const router = useRouter();
   const { createTweet } = useTweetsApi();
-  const { user, isFeedHot, scrollToTop } = useUser();
+  const { user, isFeedHot, scrollToTop, activeNeighborhood } = useUser();
   const queryClient = useQueryClient();
   const tweetTextRef = useRef<TextInput>(null);
   const [image, setImage] = useState<string | undefined>(undefined);
@@ -59,6 +59,10 @@ const NewTweet = () => {
 
   const isPostButtonDisabled = !image && text.length < 1;
   const keyboardVerticalOffset = Platform.OS === "ios" ? 64 : 0;
+
+  if (!activeNeighborhood) {
+    return <Text>Loading...</Text>;
+  }
 
   useEffect(() => {
     if (!image) {
@@ -95,25 +99,28 @@ const NewTweet = () => {
   const { isLoading, mutateAsync } = useMutation({
     mutationFn: createTweet,
     onSuccess: (newData) => {
-      queryClient.setQueryData(["infinitetweets", isFeedHot], (old: any) => {
-        if (!old) {
+      queryClient.setQueryData(
+        ["infinitetweets", activeNeighborhood.id, isFeedHot],
+        (old: any) => {
+          if (!old) {
+            return {
+              pageParams: [],
+              pages: [{ data: [newData], nextCursor: null, prevCursor: null }],
+            };
+          }
+
           return {
-            pageParams: [],
-            pages: [{ data: [newData], nextCursor: null, prevCursor: null }],
+            ...old,
+            pages: [
+              {
+                ...old.pages[0],
+                data: [newData, ...old.pages[0].data],
+              },
+              ...old.pages.slice(1),
+            ],
           };
         }
-
-        return {
-          ...old,
-          pages: [
-            {
-              ...old.pages[0],
-              data: [newData, ...old.pages[0].data],
-            },
-            ...old.pages.slice(1),
-          ],
-        };
-      });
+      );
       queryClient.setQueryData(
         ["profiletweets", String(user?.id)],
         (old: any) => {

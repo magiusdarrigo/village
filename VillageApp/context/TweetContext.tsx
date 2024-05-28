@@ -3,6 +3,7 @@ import { API_URL } from "../lib/api/config";
 import { useAuth } from "./AuthContext";
 import { useUser } from "./UserContext";
 import { getFileType } from "../lib/helpers";
+import { NeighborhoodType } from "../types";
 
 const DEFAULT_IMAGE_BASE_URL =
   "https://zgsgsszttvkptdpijrzb.supabase.co/storage/v1/object/public/profile_pictures/defaults";
@@ -39,7 +40,11 @@ interface TweetsApiContextType {
   listTweetsForProfile: (userID: string, page: number) => Promise<any>;
   listUserFollowers: (userID: string, page: number) => Promise<any>;
   listUserFollowing: (userID: string, page: number) => Promise<any>;
-  listTweets: (page: number, isHot: boolean) => Promise<any>;
+  listTweets: (
+    neighborhoodID: number,
+    page: number,
+    isHot: boolean
+  ) => Promise<any>;
   listNotifications: (page: number) => Promise<any>;
   updateNotifications: (data: {
     notificationIDs: number[];
@@ -59,6 +64,7 @@ interface TweetsApiContextType {
     buildingID?: string;
     neighborhoodID?: string;
     fcmToken?: string;
+    selectedNeighborhoods?: NeighborhoodType[];
   }) => Promise<any>;
   checkIfUserAccountWasDeleted: () => Promise<any>;
   uploadProfileWithCustomPic: (formData: FormData) => Promise<any>;
@@ -588,11 +594,15 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
-  const listTweets = async (page: number, isHot: boolean) => {
+  const listTweets = async (
+    neighborhoodID: number,
+    page: number,
+    isHot: boolean
+  ) => {
     if (!authToken) {
       return {};
     }
-    const url = `${API_URL}/v1/neighborhoods/${user?.neighborhood_id}/posts?cursor=${page}&is_hot=${isHot}`;
+    const url = `${API_URL}/v1/neighborhoods/${neighborhoodID}/posts?cursor=${page}&is_hot=${isHot}`;
 
     const res = await fetch(url, {
       headers: {
@@ -756,6 +766,7 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     buildingID?: string;
     neighborhoodID?: string;
     fcmToken?: string;
+    selectedNeighborhoods?: NeighborhoodType[];
   }) => {
     if (!authToken) {
       return {};
@@ -795,6 +806,13 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
 
     if (data.fcmToken) {
       formData.append("fcmToken", data.fcmToken);
+    }
+
+    if (data.selectedNeighborhoods) {
+      formData.append(
+        "selectedNeighborhoods",
+        JSON.stringify(data.selectedNeighborhoods)
+      );
     }
 
     const url = `${API_URL}/v1/users`;
