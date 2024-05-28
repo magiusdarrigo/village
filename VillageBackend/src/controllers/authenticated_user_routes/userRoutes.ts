@@ -68,7 +68,7 @@ router.put("/", upload.single("image"), async (req, res) => {
   // change selectedNeighborhoods to an array of objects
   selectedNeighborhoods = selectedNeighborhoods
     ? JSON.parse(selectedNeighborhoods)
-    : [];
+    : undefined;
   try {
     const updatedUser = await prisma.users.update({
       where: {

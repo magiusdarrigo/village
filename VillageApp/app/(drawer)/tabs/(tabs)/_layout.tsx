@@ -90,13 +90,13 @@ export default function TabLayout() {
     getStreamChatClient,
     activeTab,
     updateActiveTab,
+    activeNeighborhood,
   } = useUser();
   const { removeAuthToken } = useAuth();
   const { addBuildingChangeRequest, accountDeletionRequest } = useTweetsApi();
   const [appState, setAppState] = useState(AppState.currentState);
   const streamChatClient = getStreamChatClient();
   const { showActionSheetWithOptions } = useActionSheet();
-  const selectedNeighborhoodsCount = user?.selected_neighborhoods?.length ?? 0;
 
   // badge count for when chat tab comes into foreground from background state
   useEffect(() => {
@@ -277,9 +277,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          headerTitle: selectedNeighborhoodsCount
-            ? "Home"
-            : user?.neighborhood?.name || "Home",
+          headerTitle: activeNeighborhood?.name || "Home",
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
