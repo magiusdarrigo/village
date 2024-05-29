@@ -300,18 +300,18 @@ export default function TabLayout() {
               )}
             </Pressable>
           ),
-          headerRight: () => (
-            <Pressable onPress={() => {}}>
-              {({ pressed }) => (
-                <Ionicons
-                  name="search"
-                  size={25}
-                  color={Colors.light.text}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
-          ),
+          // headerRight: () => (
+          //   <Pressable onPress={() => {}}>
+          //     {({ pressed }) => (
+          //       <Ionicons
+          //         name="search"
+          //         size={25}
+          //         color={Colors.light.text}
+          //         style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          //       />
+          //     )}
+          //   </Pressable>
+          // ),
         }}
         listeners={{
           focus: (_) => {
