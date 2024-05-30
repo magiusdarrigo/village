@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Pressable,
 } from "react-native";
 import Colors from "../../constants/Colors";
 import neighborhoodStyles from "../../lib/styles/neighborhood";
@@ -50,11 +51,11 @@ const neighborhoodsData = [
   },
 ];
 
-const NeighborhoodButton: React.FC<NeighborhoodProps> = ({
+const NeighborhoodButton = ({
   neighborhood,
   isSelected,
   onPress,
-}) => {
+}: NeighborhoodProps) => {
   return (
     <TouchableOpacity
       style={[
@@ -191,7 +192,7 @@ const Neighborhoods: React.FC = () => {
         ))}
         <View style={{ height: 100 }} />
       </ScrollView>
-      <TouchableOpacity
+      <Pressable
         style={[
           styles.saveButton,
           isLoading || !didSelectionChange ? styles.saveButtonDisabled : {},
@@ -200,7 +201,7 @@ const Neighborhoods: React.FC = () => {
         disabled={isLoading || !didSelectionChange}
       >
         <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
+      </Pressable>
     </>
   );
 };
@@ -230,17 +231,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
-
   saveButton: {
     position: "absolute",
-    bottom: 34,
-    alignSelf: "center",
+    bottom: 35,
+    left: 20,
+    right: 20,
     backgroundColor: "black",
-    paddingVertical: 10,
-    paddingHorizontal: 40,
     borderRadius: 25,
-    width: 140,
     alignItems: "center",
+    justifyContent: "center",
+    height: 50,
   },
   saveButtonDisabled: {
     opacity: 0.5,
