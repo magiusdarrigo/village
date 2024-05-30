@@ -5,6 +5,8 @@ import { ProfileRowType } from "../types";
 import postStyles from "../lib/styles/post";
 import { Link } from "expo-router";
 import Colors from "../constants/Colors";
+import { truncateText } from "../lib/helpers";
+import { profileStyles } from "../components/Profile";
 
 type ProfileRowProps = {
   profile: ProfileRowType;
@@ -77,6 +79,28 @@ const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
             </View>
           </Pressable>
         </Link>
+        <View
+          style={[
+            profileStyles.followButtonContainer,
+            { justifyContent: "center" },
+          ]}
+        >
+          {profile.followed_by_user ? (
+            <Pressable
+              style={[profileStyles.unfollowButton, { width: 100 }]}
+              // onPress={handleUnfollowUser}
+            >
+              <Text style={profileStyles.unfollowButtonText}>Following</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={[profileStyles.followButton, { width: 100 }]}
+              // onPress={handleFollowUser}
+            >
+              <Text style={profileStyles.followButtonText}>Follow</Text>
+            </Pressable>
+          )}
+        </View>
       </View>
     </View>
   );

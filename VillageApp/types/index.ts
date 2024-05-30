@@ -81,4 +81,5 @@ export type ProfileRowType = {
   neighborhood_name: string;
   profile_image: string;
   username: string;
+  followed_by_user: boolean;
 };

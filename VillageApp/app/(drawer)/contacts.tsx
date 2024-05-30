@@ -60,7 +60,7 @@ const ContactsScreen = (props: ContactProps) => {
   const handleInvite = async (phoneNumber: string) => {
     const { result } = await SMS.sendSMSAsync(
       [phoneNumber],
-      "Join me on Village!"
+      "Add me on Village."
     );
     console.log(result);
   };
@@ -89,6 +89,7 @@ const ContactsScreen = (props: ContactProps) => {
       )}
       {permissions && (
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={contacts}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (

@@ -257,7 +257,7 @@ const Profile = ({ user }: ProfileProps) => {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={profileStyles.container}
       onScroll={handleScroll}
       scrollEventThrottle={500}
       refreshControl={
@@ -267,8 +267,8 @@ const Profile = ({ user }: ProfileProps) => {
       {profileEditLoading ? (
         <ActivityIndicator size="small" />
       ) : (
-        <View style={styles.profileHeader}>
-          <View style={styles.profilePhoto}>
+        <View style={profileStyles.profileHeader}>
+          <View style={profileStyles.profilePhoto}>
             <Image
               source={user.image}
               contentFit="cover"
@@ -277,7 +277,7 @@ const Profile = ({ user }: ProfileProps) => {
             {usersProfile && isEditingProfile && (
               <TouchableOpacity
                 style={[
-                  styles.cameraIconContainer,
+                  profileStyles.cameraIconContainer,
                   user.image ? { opacity: 0.25 } : { opacity: 0.35 },
                 ]}
                 onPress={handleUpdateProfilePic}
@@ -290,16 +290,18 @@ const Profile = ({ user }: ProfileProps) => {
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.username}>@{user.username}</Text>
-          <Text style={styles.bio}>Lives in {user.neighborhood?.name}</Text>
-          <View style={styles.countContainer}>
+          <Text style={profileStyles.username}>@{user.username}</Text>
+          <Text style={profileStyles.bio}>
+            Lives in {user.neighborhood?.name}
+          </Text>
+          <View style={profileStyles.countContainer}>
             <TouchableOpacity
               onPress={() => {
                 setModalVisible(true);
                 setModalTitle("Following");
               }}
             >
-              <Text style={styles.countText}>
+              <Text style={profileStyles.countText}>
                 Following: {user.following_count ?? ""}
               </Text>
             </TouchableOpacity>
@@ -309,7 +311,7 @@ const Profile = ({ user }: ProfileProps) => {
                 setModalTitle("Followers");
               }}
             >
-              <Text style={styles.countText}>
+              <Text style={profileStyles.countText}>
                 Followers: {user.followers_count ?? ""}
               </Text>
             </TouchableOpacity>
@@ -318,42 +320,46 @@ const Profile = ({ user }: ProfileProps) => {
             <>
               {!isEditingProfile ? (
                 <Pressable
-                  style={styles.followButton}
+                  style={profileStyles.followButton}
                   onPress={handleEditProfile}
                 >
-                  <Text style={styles.followButtonText}>Edit Profile</Text>
+                  <Text style={profileStyles.followButtonText}>
+                    Edit Profile
+                  </Text>
                 </Pressable>
               ) : (
                 <Pressable
-                  style={styles.cancelButton}
+                  style={profileStyles.cancelButton}
                   onPress={handleCancelEditProfile}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={profileStyles.cancelButtonText}>Cancel</Text>
                 </Pressable>
               )}
             </>
           ) : (
-            <View style={styles.followButtonContainer}>
+            <View style={profileStyles.followButtonContainer}>
               {user.followed_by_user ? (
                 <Pressable
-                  style={styles.unfollowButton}
+                  style={profileStyles.unfollowButton}
                   onPress={handleUnfollowUser}
                 >
-                  <Text style={styles.unfollowButtonText}>Following</Text>
+                  <Text style={profileStyles.unfollowButtonText}>
+                    Following
+                  </Text>
                 </Pressable>
               ) : (
                 <Pressable
-                  style={styles.followButton}
+                  style={profileStyles.followButton}
                   onPress={handleFollowUser}
                 >
-                  <Text style={styles.followButtonText}>Follow</Text>
+                  <Text style={profileStyles.followButtonText}>Follow</Text>
                 </Pressable>
               )}
             </View>
           )}
         </View>
       )}
-      <View style={styles.tweetsContainer}>
+      <View style={profileStyles.tweetsContainer}>
         <FlatList
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
@@ -397,7 +403,7 @@ const Profile = ({ user }: ProfileProps) => {
   );
 };
 
-const styles = StyleSheet.create({
+export const profileStyles = StyleSheet.create({
   bio: {
     lineHeight: 20,
     marginBottom: 8,

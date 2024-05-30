@@ -3,6 +3,7 @@ import prisma from "../../clients/prismaClient";
 import { getNumberFromQuery } from "../../utils/casting";
 import { MAX_INT4_VALUE } from "../../utils/constants";
 import { getUserFollowers, getUserFollowing } from "../../sql_queries/users";
+import { AuthenticatedRequest } from "../../middleware/auth";
 
 const router = Router();
 
@@ -10,6 +11,7 @@ const router = Router();
 router.get("/:id/following", async (req, res) => {
   console.log(`get who user_id: ${req.params.id} is following`);
   const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   const userID = id;
   const lastFollowingID =
     getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
@@ -19,7 +21,11 @@ router.get("/:id/following", async (req, res) => {
   }
 
   try {
-    const getFollowingSqlQuery = getUserFollowing(userID, lastFollowingID);
+    const getFollowingSqlQuery = getUserFollowing(
+      currentUser.id,
+      userID,
+      lastFollowingID
+    );
     const following = (await prisma.$queryRaw(getFollowingSqlQuery)) as any;
 
     const nextCursor = following.length < 10 ? undefined : following[9].id;
@@ -37,6 +43,7 @@ router.get("/:id/following", async (req, res) => {
 router.get("/:id/followers", async (req, res) => {
   console.log("get followers for, user_id: ", req.params.id);
   const { id } = req.params;
+  const currentUser = (req as unknown as AuthenticatedRequest).user;
   const userID = id;
   const lastFollowerID = getNumberFromQuery(req.query.cursor) || MAX_INT4_VALUE;
 
@@ -45,7 +52,11 @@ router.get("/:id/followers", async (req, res) => {
   }
 
   try {
-    const getFollowersSqlQuery = getUserFollowers(userID, lastFollowerID);
+    const getFollowersSqlQuery = getUserFollowers(
+      currentUser.id,
+      userID,
+      lastFollowerID
+    );
     const followers = (await prisma.$queryRaw(getFollowersSqlQuery)) as any;
 
     const nextCursor = followers.length < 10 ? undefined : followers[9].id;
