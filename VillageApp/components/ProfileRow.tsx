@@ -5,15 +5,53 @@ import { ProfileRowType } from "../types";
 import postStyles from "../lib/styles/post";
 import { Link } from "expo-router";
 import Colors from "../constants/Colors";
-import { truncateText } from "../lib/helpers";
-import { profileStyles } from "../components/Profile";
+import profileStyles from "../lib/styles/profile";
+import { useFollowUser, useUnfollowUser } from "../mutations/Followers";
+import { useUser } from "../context/UserContext";
 
 type ProfileRowProps = {
   profile: ProfileRowType;
   handleClose: () => void; // Add handleClose prop
+  userIDOfProfile: string;
 };
 
-const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
+const ProfileRow = ({
+  profile,
+  handleClose,
+  userIDOfProfile,
+}: ProfileRowProps) => {
+  const followUserMutation = useFollowUser();
+  const unfollowUserMutation = useUnfollowUser();
+  const { user } = useUser();
+
+  const userIDOfRow = profile.follower_user_id ?? profile.following_user_id;
+  if (!userIDOfRow) {
+    return null;
+  }
+
+  // check if the user is the same as the profile
+  const isOwnUser = user?.id === userIDOfRow;
+
+  const handleFollowUser = () => {
+    if (followUserMutation.isLoading || unfollowUserMutation.isLoading) {
+      return;
+    }
+    followUserMutation.mutate({
+      userIDToFollow: userIDOfRow,
+      userIDOfProfile,
+    });
+  };
+
+  const handleUnfollowUser = () => {
+    if (followUserMutation.isLoading || unfollowUserMutation.isLoading) {
+      return;
+    }
+    unfollowUserMutation.mutate({
+      userIDToUnfollow: userIDOfRow,
+      userIDOfProfile,
+    });
+  };
+
   return (
     <View style={postStyles.parentContainer}>
       <View style={[styles.imageParentContainer, { backgroundColor: "white" }]}>
@@ -22,7 +60,7 @@ const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
             href={{
               pathname: `/profile/${profile.follower_user_id}`,
               params: {
-                userID: profile.follower_user_id,
+                userID: userIDOfRow,
                 username: profile.username,
               },
             }}
@@ -47,7 +85,7 @@ const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
             href={{
               pathname: `/profile/${profile.follower_user_id}`,
               params: {
-                userID: profile.follower_user_id,
+                userID: userIDOfRow,
                 username: profile.username,
               },
             }}
@@ -61,7 +99,7 @@ const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
           href={{
             pathname: `/profile/${profile.follower_user_id}`,
             params: {
-              userID: profile.follower_user_id,
+              userID: userIDOfRow,
               username: profile.username,
             },
           }}
@@ -79,28 +117,30 @@ const ProfileRow = ({ profile, handleClose }: ProfileRowProps) => {
             </View>
           </Pressable>
         </Link>
-        <View
-          style={[
-            profileStyles.followButtonContainer,
-            { justifyContent: "center" },
-          ]}
-        >
-          {profile.followed_by_user ? (
-            <Pressable
-              style={[profileStyles.unfollowButton, { width: 100 }]}
-              // onPress={handleUnfollowUser}
-            >
-              <Text style={profileStyles.unfollowButtonText}>Following</Text>
-            </Pressable>
-          ) : (
-            <Pressable
-              style={[profileStyles.followButton, { width: 100 }]}
-              // onPress={handleFollowUser}
-            >
-              <Text style={profileStyles.followButtonText}>Follow</Text>
-            </Pressable>
-          )}
-        </View>
+        {isOwnUser ? null : (
+          <View
+            style={[
+              profileStyles.followButtonContainer,
+              { justifyContent: "center" },
+            ]}
+          >
+            {profile.followed_by_user ? (
+              <Pressable
+                style={[profileStyles.unfollowButton, { width: 100 }]}
+                onPress={handleUnfollowUser}
+              >
+                <Text style={profileStyles.unfollowButtonText}>Following</Text>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={[profileStyles.followButton, { width: 100 }]}
+                onPress={handleFollowUser}
+              >
+                <Text style={profileStyles.followButtonText}>Follow</Text>
+              </Pressable>
+            )}
+          </View>
+        )}
       </View>
     </View>
   );

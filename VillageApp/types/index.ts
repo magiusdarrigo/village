@@ -76,7 +76,8 @@ export type NotificationType = {
 
 export type ProfileRowType = {
   created_at: string;
-  follower_user_id: string;
+  follower_user_id: string | undefined;
+  following_user_id: string | undefined;
   id: number;
   neighborhood_name: string;
   profile_image: string;

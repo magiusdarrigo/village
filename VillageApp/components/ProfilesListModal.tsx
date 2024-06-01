@@ -20,6 +20,7 @@ type ProfilesListModalProps = {
   modalTitle: string;
   handleLoadMoreProfiles: () => void;
   isFetchingNextProfilesPage: boolean;
+  userIDOfProfile: string;
 };
 
 const ProfilesListModal = ({
@@ -29,6 +30,7 @@ const ProfilesListModal = ({
   modalTitle,
   handleLoadMoreProfiles,
   isFetchingNextProfilesPage,
+  userIDOfProfile,
 }: ProfilesListModalProps) => {
   const flatListRef = useRef<FlatList>(null);
 
@@ -69,6 +71,7 @@ const ProfilesListModal = ({
                     profile={item}
                     key={item.id}
                     handleClose={onClose}
+                    userIDOfProfile={userIDOfProfile}
                   />
                 )}
                 onEndReached={handleLoadMoreProfiles}
