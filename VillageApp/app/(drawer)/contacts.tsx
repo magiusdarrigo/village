@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Button,
   FlatList,
   TouchableOpacity,
   StyleSheet,
@@ -14,13 +13,31 @@ import * as SMS from "expo-sms";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
+import { useTweetsApi } from "../../context/TweetContext";
+import { ProfileRowType } from "../../types";
 
 type ContactProps = {};
 
+const getPhoneNumbersFromContacts = (contacts: Contacts.Contact[]) => {
+  const phoneNumbers: string[] = [];
+  for (const contact of contacts) {
+    if (contact.phoneNumbers) {
+      for (const phoneNumber of contact.phoneNumbers) {
+        if (phoneNumber.number) {
+          phoneNumbers.push(phoneNumber.number);
+        }
+      }
+    }
+  }
+  return phoneNumbers;
+};
+
 const ContactsScreen = (props: ContactProps) => {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
+  const [profiles, setProfiles] = useState<ProfileRowType[]>([]);
   const [permissions, setPermissions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { getUsersFromPhoneNumbers } = useTweetsApi();
 
   useEffect(() => {
     const checkPermissions = async () => {
@@ -49,9 +66,16 @@ const ContactsScreen = (props: ContactProps) => {
       setLoading(true);
       const { data } = await Contacts.getContactsAsync();
       setContacts(data);
+      const numbers = getPhoneNumbersFromContacts(data);
+      console.log("numbers", numbers);
+      // fetch all contacts that are village users
+      const profilesData = await getUsersFromPhoneNumbers(numbers);
+      const profiles = profilesData?.data ?? [];
+      console.log("profiles", profiles);
+      setProfiles(profiles);
     } catch (error) {
       Alert.alert("Error", "Failed to load contacts");
-      Sentry.Native.captureException(error);
+      // Sentry.Native.captureException(error);
     } finally {
       setLoading(false);
     }

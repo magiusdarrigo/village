@@ -78,7 +78,7 @@ export type ProfileRowType = {
   created_at: string;
   follower_user_id: string | undefined;
   following_user_id: string | undefined;
-  id: number;
+  id: number | string;
   neighborhood_name: string;
   profile_image: string;
   username: string;
