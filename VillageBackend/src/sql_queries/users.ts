@@ -94,9 +94,6 @@ export const getProfilesFromPhoneNumbers = (
   userID: string,
   phoneNumbers: string[]
 ) => {
-  const phoneNumberList = phoneNumbers
-    .map((num) => `'${num.replace(/'/g, "''")}'`)
-    .join(",");
   return Prisma.sql`
         SELECT 
             users.id,
@@ -115,6 +112,6 @@ export const getProfilesFromPhoneNumbers = (
         LEFT JOIN 
             neighborhoods ON users.neighborhood_id = neighborhoods.id
         WHERE 
-            users.phone_number = ANY(ARRAY[${phoneNumberList}]::text[])
+            users.phone_number IN (${Prisma.join(phoneNumbers)})
         `;
 };

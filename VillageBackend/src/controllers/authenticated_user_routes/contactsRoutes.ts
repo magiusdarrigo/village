@@ -19,7 +19,6 @@ router.post("/", async (req, res) => {
     const profiles = (await prisma.$queryRaw(
       getProfilesFromPhoneNumbersSqlQuery
     )) as any;
-    console.log("profiles", profiles);
     res.json({ data: profiles });
   } catch (error) {
     console.error(error);

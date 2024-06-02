@@ -14,7 +14,9 @@ import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
 import { useTweetsApi } from "../../context/TweetContext";
+import { useUser } from "../../context/UserContext";
 import { ProfileRowType } from "../../types";
+import ProfileRow from "../../components/ProfileRow";
 
 type ContactProps = {};
 
@@ -38,6 +40,10 @@ const ContactsScreen = (props: ContactProps) => {
   const [permissions, setPermissions] = useState(false);
   const [loading, setLoading] = useState(false);
   const { getUsersFromPhoneNumbers } = useTweetsApi();
+  const { user } = useUser();
+  if (!user) {
+    return null;
+  }
 
   useEffect(() => {
     const checkPermissions = async () => {
@@ -75,7 +81,7 @@ const ContactsScreen = (props: ContactProps) => {
       setProfiles(profiles);
     } catch (error) {
       Alert.alert("Error", "Failed to load contacts");
-      // Sentry.Native.captureException(error);
+      Sentry.Native.captureException(error);
     } finally {
       setLoading(false);
     }
@@ -114,20 +120,15 @@ const ContactsScreen = (props: ContactProps) => {
       {permissions && (
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={contacts}
-          keyExtractor={(item) => item.id}
+          data={profiles}
+          keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
-            <View style={styles.contactRow}>
-              <Text style={styles.contactName}>{item.name}</Text>
-              {item.phoneNumbers && (
-                <TouchableOpacity
-                  style={styles.followButton}
-                  onPress={() => console.log("Follow", item.name)}
-                >
-                  <Text style={styles.buttonText}>Follow</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+            <ProfileRow
+              profile={item}
+              key={item.id}
+              handleClose={() => {}}
+              userIDOfProfile={user?.id}
+            />
           )}
           ListFooterComponent={() => (
             <View>
@@ -156,6 +157,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingHorizontal: 10,
     backgroundColor: "white",
   },
   infoText: {
