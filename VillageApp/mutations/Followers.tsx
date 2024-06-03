@@ -52,6 +52,7 @@ export const useFollowUser = () => {
             };
           }
         );
+        // Update the profile's following cache
         queryClient.setQueryData(
           ["profilefollowing", variables.userIDOfProfile],
           (oldData: any) => {
@@ -75,6 +76,18 @@ export const useFollowUser = () => {
             };
           }
         );
+        queryClient.setQueriesData(["contacts"], (oldData: any) => {
+          if (!oldData) {
+            return;
+          }
+          const updatedContacts = oldData.data.map((contact: any) => {
+            if (contact.id === variables.userIDToFollow) {
+              return { ...contact, followed_by_user: true };
+            }
+            return contact;
+          });
+          return { data: updatedContacts };
+        });
       },
       onError: (error) => {
         console.log(error);
@@ -110,7 +123,7 @@ export const useUnfollowUser = () => {
           }
         );
 
-        // Update the profile following cache
+        // Update the profile followers cache
         queryClient.setQueryData(
           ["profilefollowers", variables.userIDOfProfile],
           (oldData: any) => {
@@ -157,6 +170,18 @@ export const useUnfollowUser = () => {
             };
           }
         );
+        queryClient.setQueriesData(["contacts"], (oldData: any) => {
+          if (!oldData) {
+            return;
+          }
+          const updatedContacts = oldData.data.map((contact: any) => {
+            if (contact.id === variables.userIDToUnfollow) {
+              return { ...contact, followed_by_user: false };
+            }
+            return contact;
+          });
+          return { data: updatedContacts };
+        });
       },
       onError: (error) => {
         console.log(error);

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
   StyleSheet,
   Pressable,
   Alert,
@@ -15,8 +14,8 @@ import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useUser } from "../../context/UserContext";
-import { ProfileRowType } from "../../types";
 import ProfileRow from "../../components/ProfileRow";
+import { useQuery } from "@tanstack/react-query";
 
 type ContactProps = {};
 
@@ -36,7 +35,7 @@ const getPhoneNumbersFromContacts = (contacts: Contacts.Contact[]) => {
 
 const ContactsScreen = (props: ContactProps) => {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
-  const [profiles, setProfiles] = useState<ProfileRowType[]>([]);
+  const [numbers, setNumbers] = useState<string[]>([]);
   const [permissions, setPermissions] = useState(false);
   const [loading, setLoading] = useState(false);
   const { getUsersFromPhoneNumbers } = useTweetsApi();
@@ -67,18 +66,29 @@ const ContactsScreen = (props: ContactProps) => {
     }
   };
 
+  const contactsUseQuery = () => {
+    return useQuery({
+      queryKey: ["contacts"],
+      queryFn: async () => {
+        if (numbers.length === 0) {
+          return Promise.resolve({ data: [] });
+        }
+        return getUsersFromPhoneNumbers(numbers);
+      },
+      enabled: !!numbers.length,
+    });
+  };
+
+  const { data: profiles, isLoading, error, refetch } = contactsUseQuery();
+  console.log("profiles", profiles);
+
   const loadContacts = async () => {
     try {
       setLoading(true);
       const { data } = await Contacts.getContactsAsync();
       setContacts(data);
-      const numbers = getPhoneNumbersFromContacts(data);
-      console.log("numbers", numbers);
-      // fetch all contacts that are village users
-      const profilesData = await getUsersFromPhoneNumbers(numbers);
-      const profiles = profilesData?.data ?? [];
-      console.log("profiles", profiles);
-      setProfiles(profiles);
+      const numbersData = getPhoneNumbersFromContacts(data);
+      setNumbers(numbersData);
     } catch (error) {
       Alert.alert("Error", "Failed to load contacts");
       Sentry.Native.captureException(error);
@@ -99,7 +109,13 @@ const ContactsScreen = (props: ContactProps) => {
   return (
     <View style={styles.container}>
       {!permissions && (
-        <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "space-between",
+            paddingVertical: 20,
+          }}
+        >
           <Text style={styles.infoText}>
             Sync contacts to find friends on Village or invite them if they're
             in NYC 🗽
@@ -119,9 +135,15 @@ const ContactsScreen = (props: ContactProps) => {
       )}
       {permissions && (
         <FlatList
+          ListHeaderComponent={
+            <View style={styles.contactsTitleContainer}>
+              <Text style={styles.contactsTitle}>Friends on Village</Text>
+            </View>
+          }
           showsVerticalScrollIndicator={false}
-          data={profiles}
+          data={profiles?.data ?? []}
           keyExtractor={(item) => String(item.id)}
+          stickyHeaderIndices={[0]}
           renderItem={({ item }) => (
             <ProfileRow
               profile={item}
@@ -129,23 +151,6 @@ const ContactsScreen = (props: ContactProps) => {
               handleClose={() => {}}
               userIDOfProfile={user?.id}
             />
-          )}
-          ListFooterComponent={() => (
-            <View>
-              {contacts.map((item, index) => (
-                <View key={index} style={styles.contactRow}>
-                  <Text style={styles.contactName}>{item.name}</Text>
-                  {item.phoneNumbers && (
-                    <TouchableOpacity
-                      style={styles.inviteButton}
-                      onPress={() => handleInvite(item.phoneNumbers[0].number)}
-                    >
-                      <Text style={styles.buttonText}>Invite</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              ))}
-            </View>
           )}
         />
       )}
@@ -156,9 +161,17 @@ const ContactsScreen = (props: ContactProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     paddingHorizontal: 10,
     backgroundColor: "white",
+  },
+  contactsTitleContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    backgroundColor: "white",
+  },
+  contactsTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
   },
   infoText: {
     fontSize: 16,
