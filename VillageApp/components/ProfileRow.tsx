@@ -11,14 +11,16 @@ import { useUser } from "../context/UserContext";
 
 type ProfileRowProps = {
   profile: ProfileRowType;
-  handleClose: () => void; // Add handleClose prop
+  handleClose: () => void;
   userIDOfProfile: string;
+  isInviteRow?: boolean;
 };
 
 const ProfileRow = ({
   profile,
   handleClose,
   userIDOfProfile,
+  isInviteRow,
 }: ProfileRowProps) => {
   const followUserMutation = useFollowUser();
   const unfollowUserMutation = useUnfollowUser();
@@ -55,7 +57,9 @@ const ProfileRow = ({
   return (
     <View style={postStyles.parentContainer}>
       <View style={[styles.imageParentContainer, { backgroundColor: "white" }]}>
-        <View style={postStyles.imageContainer}>
+        <View
+          style={[postStyles.imageContainer, isInviteRow ? { width: 20 } : {}]}
+        >
           <Link
             href={{
               pathname: `/profile/${profile.follower_user_id}`,
@@ -73,10 +77,10 @@ const ProfileRow = ({
               }}
               onPress={handleClose}
             >
-              <View style={styles.userImage}>
+              <View style={[styles.userImage]}>
                 <Image
                   source={profile.profile_image}
-                  style={styles.userImage}
+                  style={[styles.userImage]}
                 />
               </View>
             </Pressable>
@@ -117,7 +121,25 @@ const ProfileRow = ({
             </View>
           </Pressable>
         </Link>
-        {isOwnUser ? null : (
+        {isInviteRow && (
+          <View
+            style={[
+              profileStyles.followButtonContainer,
+              { justifyContent: "center" },
+            ]}
+          >
+            <Pressable
+              style={[
+                profileStyles.followButton,
+                { width: 100, backgroundColor: "#4CBB17" },
+              ]}
+              onPress={() => {}}
+            >
+              <Text style={profileStyles.followButtonText}>Invite</Text>
+            </Pressable>
+          </View>
+        )}
+        {isOwnUser || isInviteRow ? null : (
           <View
             style={[
               profileStyles.followButtonContainer,
@@ -144,6 +166,10 @@ const ProfileRow = ({
       </View>
     </View>
   );
+};
+
+ProfileRow.defaultProps = {
+  isInviteRow: false,
 };
 
 const styles = StyleSheet.create({

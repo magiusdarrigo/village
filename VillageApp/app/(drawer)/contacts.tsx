@@ -165,15 +165,16 @@ const ContactsScreen = (props: ContactProps) => {
       {permissions && (
         <FlatList
           ListHeaderComponent={() => {
-            if (profilesCount !== 0) {
-              return (
-                <View style={styles.contactsTitleContainer}>
-                  <Text style={styles.contactsTitle}>Friends on Village</Text>
-                </View>
-              );
-            } else {
-              return null;
-            }
+            return (
+              <View
+                style={[
+                  styles.contactsTitleContainer,
+                  profilesCount == 0 ? { height: 0 } : {},
+                ]}
+              >
+                <Text style={styles.contactsTitle}>Friends on Village</Text>
+              </View>
+            );
           }}
           showsVerticalScrollIndicator={false}
           data={allProfiles}
@@ -191,6 +192,7 @@ const ContactsScreen = (props: ContactProps) => {
                 key={item.id}
                 handleClose={() => {}}
                 userIDOfProfile={user?.id}
+                isInviteRow={index >= profilesCount}
               />
             </>
           )}
