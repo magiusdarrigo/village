@@ -83,4 +83,5 @@ export type ProfileRowType = {
   profile_image: string;
   username: string;
   followed_by_user: boolean;
+  phone_number: string | undefined;
 };

@@ -15,7 +15,9 @@ import * as Sentry from "sentry-expo";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useUser } from "../../context/UserContext";
 import ProfileRow from "../../components/ProfileRow";
+import { ProfileRowType } from "../../types/index";
 import { useQuery } from "@tanstack/react-query";
+import Profile from "../../components/Profile";
 
 type ContactProps = {};
 
@@ -106,6 +108,33 @@ const ContactsScreen = (props: ContactProps) => {
   };
   const isButtonDisabled = loading || permissions;
 
+  // we need to create a list of profiles from phone numbers first and then append the rest of the contacts
+  const formattedProfiles = profiles?.data ?? [];
+  const profilePhoneNumbersSet = new Set(
+    formattedProfiles.map((profile: any) => profile.phone_number)
+  );
+  console.log("profilePhoneNumbersSet", profilePhoneNumbersSet);
+  const formattedContacts = contacts.reduce(
+    (accumulator: any, current: any) => {
+      if (profilePhoneNumbersSet.has(current.phoneNumbers?.[0].number)) {
+        return accumulator;
+      }
+      const prof = {
+        created_at: "NA",
+        follower_user_id: "NA",
+        id: current.id,
+        neighborhood_name: current.phoneNumbers?.[0].number ?? "",
+        profile_image: current.imageAvailable ? current.image?.uri : "",
+        username: current.name,
+        followed_by_user: false,
+      } as ProfileRowType;
+      accumulator.push(prof);
+      return accumulator;
+    },
+    []
+  );
+  const profilesCount = formattedProfiles.length;
+  const allProfiles = [...formattedProfiles, ...formattedContacts];
   return (
     <View style={styles.container}>
       {!permissions && (
@@ -135,22 +164,35 @@ const ContactsScreen = (props: ContactProps) => {
       )}
       {permissions && (
         <FlatList
-          ListHeaderComponent={
-            <View style={styles.contactsTitleContainer}>
-              <Text style={styles.contactsTitle}>Friends on Village</Text>
-            </View>
-          }
+          ListHeaderComponent={() => {
+            if (profilesCount !== 0) {
+              return (
+                <View style={styles.contactsTitleContainer}>
+                  <Text style={styles.contactsTitle}>Friends on Village</Text>
+                </View>
+              );
+            } else {
+              return null;
+            }
+          }}
           showsVerticalScrollIndicator={false}
-          data={profiles?.data ?? []}
+          data={allProfiles}
           keyExtractor={(item) => String(item.id)}
           stickyHeaderIndices={[0]}
-          renderItem={({ item }) => (
-            <ProfileRow
-              profile={item}
-              key={item.id}
-              handleClose={() => {}}
-              userIDOfProfile={user?.id}
-            />
+          renderItem={({ item, index }) => (
+            <>
+              {index == profilesCount && (
+                <View style={styles.contactsTitleContainer}>
+                  <Text style={styles.contactsTitle}>Invite Friends</Text>
+                </View>
+              )}
+              <ProfileRow
+                profile={item}
+                key={item.id}
+                handleClose={() => {}}
+                userIDOfProfile={user?.id}
+              />
+            </>
           )}
         />
       )}

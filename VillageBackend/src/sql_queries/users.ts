@@ -99,6 +99,7 @@ export const getProfilesFromPhoneNumbers = (
             users.id,
             users.id AS follower_user_id,
             users.username,
+            users.phone_number,
             users.image AS profile_image,
             neighborhoods.name AS neighborhood_name,
             CASE 
