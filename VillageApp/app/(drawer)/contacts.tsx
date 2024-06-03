@@ -179,7 +179,7 @@ const ContactsScreen = (props: ContactProps) => {
           showsVerticalScrollIndicator={false}
           data={allProfiles}
           keyExtractor={(item) => String(item.id)}
-          stickyHeaderIndices={[0]}
+          // stickyHeaderIndices={[0]}
           renderItem={({ item, index }) => (
             <>
               {index == profilesCount && (

@@ -61,6 +61,7 @@ const ProfileRow = ({
           style={[postStyles.imageContainer, isInviteRow ? { width: 20 } : {}]}
         >
           <Link
+            disabled={isInviteRow}
             href={{
               pathname: `/profile/${profile.follower_user_id}`,
               params: {
@@ -86,6 +87,7 @@ const ProfileRow = ({
             </Pressable>
           </Link>
           <Link
+            disabled={isInviteRow}
             href={{
               pathname: `/profile/${profile.follower_user_id}`,
               params: {
@@ -100,6 +102,7 @@ const ProfileRow = ({
           </Link>
         </View>
         <Link
+          disabled={isInviteRow}
           href={{
             pathname: `/profile/${profile.follower_user_id}`,
             params: {
@@ -116,7 +119,9 @@ const ProfileRow = ({
                 <Text style={styles.titleContent}>{profile.username}</Text>
               </View>
               <Text style={styles.messageContent}>
-                Lives in {profile.neighborhood_name}
+                {!isInviteRow
+                  ? `Lives in ${profile.neighborhood_name}`
+                  : profile.neighborhood_name}
               </Text>
             </View>
           </Pressable>
