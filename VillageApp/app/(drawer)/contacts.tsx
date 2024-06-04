@@ -8,7 +8,6 @@ import {
   Alert,
 } from "react-native";
 import * as Contacts from "expo-contacts";
-import * as SMS from "expo-sms";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
@@ -17,7 +16,7 @@ import { useUser } from "../../context/UserContext";
 import ProfileRow from "../../components/ProfileRow";
 import { ProfileRowType } from "../../types/index";
 import { useQuery } from "@tanstack/react-query";
-import Profile from "../../components/Profile";
+import LoadingScreen from "../../components/LoadingScreen";
 
 type ContactProps = {};
 
@@ -81,8 +80,7 @@ const ContactsScreen = (props: ContactProps) => {
     });
   };
 
-  const { data: profiles, isLoading, error, refetch } = contactsUseQuery();
-  console.log("profiles", profiles);
+  const { data: profiles, fetchStatus } = contactsUseQuery();
 
   const loadContacts = async () => {
     try {
@@ -99,13 +97,6 @@ const ContactsScreen = (props: ContactProps) => {
     }
   };
 
-  const handleInvite = async (phoneNumber: string) => {
-    const { result } = await SMS.sendSMSAsync(
-      [phoneNumber],
-      "Add me on Village."
-    );
-    console.log(result);
-  };
   const isButtonDisabled = loading || permissions;
 
   // we need to create a list of profiles from phone numbers first and then append the rest of the contacts
@@ -113,7 +104,6 @@ const ContactsScreen = (props: ContactProps) => {
   const profilePhoneNumbersSet = new Set(
     formattedProfiles.map((profile: any) => profile.phone_number)
   );
-  console.log("profilePhoneNumbersSet", profilePhoneNumbersSet);
   const formattedContacts = contacts.reduce(
     (accumulator: any, current: any) => {
       if (profilePhoneNumbersSet.has(current.phoneNumbers?.[0].number)) {
@@ -135,6 +125,11 @@ const ContactsScreen = (props: ContactProps) => {
   );
   const profilesCount = formattedProfiles.length;
   const allProfiles = [...formattedProfiles, ...formattedContacts];
+
+  if (fetchStatus === "fetching") {
+    return <LoadingScreen />;
+  }
+
   return (
     <View style={styles.container}>
       {!permissions && (

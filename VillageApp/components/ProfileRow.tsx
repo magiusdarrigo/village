@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { Image } from "expo-image";
 import { ProfileRowType } from "../types";
 import postStyles from "../lib/styles/post";
@@ -8,6 +8,8 @@ import Colors from "../constants/Colors";
 import profileStyles from "../lib/styles/profile";
 import { useFollowUser, useUnfollowUser } from "../mutations/Followers";
 import { useUser } from "../context/UserContext";
+import * as SMS from "expo-sms";
+import * as Sentry from "sentry-expo";
 
 type ProfileRowProps = {
   profile: ProfileRowType;
@@ -52,6 +54,23 @@ const ProfileRow = ({
       userIDToUnfollow: userIDOfRow,
       userIDOfProfile,
     });
+  };
+
+  const handleInvite = async () => {
+    try {
+      if (!profile.phone_number) {
+        throw new Error("No phone number found");
+      }
+      const { result } = await SMS.sendSMSAsync(
+        [profile.phone_number],
+        "Add me on Village."
+      );
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+      Sentry.Native.captureException(error);
+      Alert.alert("Error", "Failed to send invite");
+    }
   };
 
   return (
@@ -138,7 +157,7 @@ const ProfileRow = ({
                 profileStyles.followButton,
                 { width: 100, backgroundColor: "#4CBB17" },
               ]}
-              onPress={() => {}}
+              onPress={handleInvite}
             >
               <Text style={profileStyles.followButtonText}>Invite</Text>
             </Pressable>
