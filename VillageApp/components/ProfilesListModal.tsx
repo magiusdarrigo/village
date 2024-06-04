@@ -122,30 +122,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonClose: {
-    backgroundColor: "#2196F3",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   modalTitle: {
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  scrollViewContent: {
-    flexGrow: 1,
   },
 });
 

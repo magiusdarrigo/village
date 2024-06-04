@@ -17,6 +17,7 @@ import ProfileRow from "../../components/ProfileRow";
 import { ProfileRowType } from "../../types/index";
 import { useQuery } from "@tanstack/react-query";
 import LoadingScreen from "../../components/LoadingScreen";
+import OpenSettingsModal from "../../components/OpenSettingsModal";
 
 type ContactProps = {};
 
@@ -39,6 +40,7 @@ const ContactsScreen = (props: ContactProps) => {
   const [numbers, setNumbers] = useState<string[]>([]);
   const [permissions, setPermissions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const { getUsersFromPhoneNumbers } = useTweetsApi();
   const { user } = useUser();
   if (!user) {
@@ -63,7 +65,7 @@ const ContactsScreen = (props: ContactProps) => {
       setPermissions(true);
       loadContacts();
     } else {
-      alert("Permission to access contacts is required!");
+      setModalVisible(true);
     }
   };
 
@@ -193,6 +195,15 @@ const ContactsScreen = (props: ContactProps) => {
           )}
         />
       )}
+      <OpenSettingsModal
+        isVisible={modalVisible}
+        onClose={() => {
+          setModalVisible(false);
+        }}
+        modalTitle="Contacts Share is off"
+        modalDescription="Enable contacts on Village - NYC in settings and then try again."
+        buttonTitle="Go to Settings"
+      />
     </View>
   );
 };

@@ -1,43 +1,32 @@
-import React, { useRef } from "react";
+import React from "react";
 import {
   Modal,
   Text,
   View,
   StyleSheet,
   Dimensions,
-  FlatList,
   TouchableWithoutFeedback,
-  ActivityIndicator,
+  Pressable,
+  Linking,
 } from "react-native";
-import { ProfileRowType } from "../types";
-import EmptyListView from "./EmptyListView";
-import ProfileRow from "./ProfileRow";
+import onboardingStyles from "../lib/styles/onboarding";
+import Colors from "../constants/Colors";
 
 type OpenSettingsModalProps = {
   onClose: () => void;
+  isVisible: boolean;
   modalTitle: string;
   modalDescription: string;
+  buttonTitle: string;
 };
 
 const OpenSettingsModal = ({
   onClose,
+  isVisible,
   modalTitle,
   modalDescription,
+  buttonTitle,
 }: OpenSettingsModalProps) => {
-  const flatListRef = useRef<FlatList>(null);
-
-  const renderEmptyListComponent = () => {
-    if (modalTitle === "Followers") {
-      return (
-        <View style={styles.emptyProfilesView}>
-          {EmptyListView("No followers yet.")}
-        </View>
-      );
-    } else {
-      return EmptyListView("Not following anyone yet.");
-    }
-  };
-
   return (
     <Modal
       animationType="slide"
@@ -52,29 +41,18 @@ const OpenSettingsModal = ({
               <View>
                 <Text style={styles.modalTitle}>{modalTitle}</Text>
               </View>
-              <FlatList
-                style={styles.flatList}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
-                ref={flatListRef}
-                data={profiles}
-                renderItem={({ item }) => (
-                  <ProfileRow
-                    profile={item}
-                    key={item.id}
-                    handleClose={onClose}
-                    userIDOfProfile={userIDOfProfile}
-                  />
-                )}
-                onEndReached={handleLoadMoreProfiles}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={
-                  isFetchingNextProfilesPage
-                    ? () => <ActivityIndicator size="small" />
-                    : null
-                }
-                ListEmptyComponent={renderEmptyListComponent}
-              />
+              <View style={{ flex: 1, justifyContent: "space-between" }}>
+                <Text style={styles.modalDescription}>{modalDescription}</Text>
+                <Pressable
+                  style={[
+                    onboardingStyles.button,
+                    { marginBottom: 15, backgroundColor: "#0000FF" },
+                  ]}
+                  onPress={() => Linking.openSettings()}
+                >
+                  <Text style={onboardingStyles.buttonText}>{buttonTitle}</Text>
+                </Pressable>
+              </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -89,21 +67,21 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
   },
-  flatList: {
-    width: "100%",
-    marginTop: 10,
-  },
-  emptyProfilesView: {
-    minHeight: "90%",
+
+  modalDescription: {
+    fontSize: 15,
+    textAlign: "center",
+    marginVertical: 15,
+    color: Colors.light.switchFontColor,
+    fontWeight: "600",
   },
   modalView: {
     width: "100%",
-    height: Dimensions.get("window").height * 0.75,
+    height: Dimensions.get("window").height * 0.35,
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    paddingHorizontal: 10,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -114,22 +92,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   modalTitle: {
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  scrollViewContent: {
-    flexGrow: 1,
   },
 });
 
