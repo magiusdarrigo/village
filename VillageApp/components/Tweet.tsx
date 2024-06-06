@@ -5,6 +5,7 @@ import {
   Pressable,
   Alert,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { Image } from "expo-image";
 import { TweetType } from "../types";
@@ -652,6 +653,7 @@ const Tweet = ({
                   <AntIcon icon="like1" iconColor="red" size={22} />
                 )) || <AntIcon icon="like2" iconColor="#b2b2b2" size={22} />}
               </Pressable>
+              {/* <TouchableOpacity> */}
               <Text
                 style={{
                   fontSize: 16,
@@ -663,6 +665,7 @@ const Tweet = ({
               >
                 {tweet.likes_count}
               </Text>
+              {/* </TouchableOpacity> */}
               <Pressable onPress={() => handleToggleLike(true)}>
                 {(tweet.disliked_by_user && (
                   <AntIcon icon="dislike1" iconColor="red" size={22} />

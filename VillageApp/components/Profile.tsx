@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import {
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
   Alert,
@@ -13,11 +12,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { UserType } from "../types/index";
-import {
-  useMutation,
-  useQueryClient,
-  useInfiniteQuery,
-} from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
 import EmptyListView from "./EmptyListView";
 import { useUser } from "../context/UserContext";
@@ -26,18 +21,16 @@ import { MaterialCommunityIcon } from "./Icons";
 import * as Sentry from "sentry-expo";
 import { PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD } from "../lib/api/pagination";
 import Tweet from "./Tweet";
-import Colors from "../constants/Colors";
 import ProfilesListModal from "./ProfilesListModal";
+import { useFollowUser, useUnfollowUser } from "../mutations/Followers";
+import profileStyles from "../lib/styles/profile";
 
 type ProfileProps = {
   user: UserType;
 };
 
 const Profile = ({ user }: ProfileProps) => {
-  const queryClient = useQueryClient();
   const {
-    followUser,
-    unFollowUser,
     updateUserAttributes,
     listTweetsForProfile,
     listUserFollowers,
@@ -60,18 +53,22 @@ const Profile = ({ user }: ProfileProps) => {
 
   const useProfileFollowingInfiniteQuery = () => {
     return useInfiniteQuery({
-      queryKey: ["profilefollowing", String(user.id)],
+      queryKey: ["profilefollowing", user.id],
       queryFn: async ({ pageParam = 0 }) =>
         listUserFollowing(user.id, pageParam),
       getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
     });
   };
 
+  const followUserMutation = useFollowUser();
+  const unfollowUserMutation = useUnfollowUser();
+
   const {
     data: profileFollowingData,
     fetchNextPage: fetchNextFollowingPage,
     isFetchingNextPage: isFetchingNextFollowingPage,
     hasNextPage: hasNextFollowingPage,
+    refetch: isRefetchingFollowing,
   } = useProfileFollowingInfiniteQuery();
 
   const handleLoadMoreFollowing = () => {
@@ -83,7 +80,7 @@ const Profile = ({ user }: ProfileProps) => {
 
   const useProfileFollowersInfiniteQuery = () => {
     return useInfiniteQuery({
-      queryKey: ["profilefollowers", String(user.id)],
+      queryKey: ["profilefollowers", user.id],
       queryFn: async ({ pageParam = 0 }) =>
         listUserFollowers(user.id, pageParam),
       getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
@@ -95,6 +92,7 @@ const Profile = ({ user }: ProfileProps) => {
     fetchNextPage: fetchNextFollowersPage,
     isFetchingNextPage: isFetchingNextFollowersPage,
     hasNextPage: hasNextFollowersPage,
+    refetch: isRefetchingFollowers,
   } = useProfileFollowersInfiniteQuery();
 
   const handleLoadMoreFollowers = () => {
@@ -114,7 +112,7 @@ const Profile = ({ user }: ProfileProps) => {
 
   const useProfileTweetsInfiniteQuery = () => {
     return useInfiniteQuery({
-      queryKey: ["profiletweets", String(user.id)],
+      queryKey: ["profiletweets", user.id],
       queryFn: async ({ pageParam = 0 }) =>
         listTweetsForProfile(user.id, pageParam),
       getNextPageParam: (lastPage, _) => lastPage?.nextCursor,
@@ -177,53 +175,24 @@ const Profile = ({ user }: ProfileProps) => {
     }
   };
 
-  const { mutate: mutateFollowUser, isLoading: isLoadingFollow } = useMutation(
-    followUser,
-    {
-      onSuccess: (data) => {
-        console.log("onSuccess data", data);
-        queryClient.setQueryData(["profiles", String(user.id)], (_: any) => {
-          return {
-            ...data,
-            followed_by_user: true,
-          };
-        });
-      },
-      onError: (error) => {
-        console.log(error);
-        Alert.alert("We had an issue following this user. Try again.");
-      },
-    }
-  );
-
-  const { mutate: mutateUnfollowUser, isLoading: isLoadingUnfollow } =
-    useMutation(unFollowUser, {
-      onSuccess: (data) => {
-        queryClient.setQueryData(["profiles", String(user.id)], (_: any) => {
-          return {
-            ...data,
-            followed_by_user: false,
-          };
-        });
-      },
-      onError: (error) => {
-        console.log(error);
-        Alert.alert("We had an issue unfollowing this user. Try again.");
-      },
-    });
-
   const handleFollowUser = () => {
-    if (isLoadingFollow || isLoadingUnfollow) {
+    if (followUserMutation.isLoading || unfollowUserMutation.isLoading) {
       return;
     }
-    mutateFollowUser(String(user.id));
+    followUserMutation.mutate({
+      userIDToFollow: user.id,
+      userIDOfProfile: user.id,
+    });
   };
 
   const handleUnfollowUser = () => {
-    if (isLoadingFollow || isLoadingUnfollow) {
+    if (followUserMutation.isLoading || unfollowUserMutation.isLoading) {
       return;
     }
-    mutateUnfollowUser(String(user.id));
+    unfollowUserMutation.mutate({
+      userIDToUnfollow: user.id,
+      userIDOfProfile: user.id,
+    });
   };
 
   const handleEditProfile = () => {
@@ -257,7 +226,7 @@ const Profile = ({ user }: ProfileProps) => {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={profileStyles.container}
       onScroll={handleScroll}
       scrollEventThrottle={500}
       refreshControl={
@@ -267,8 +236,8 @@ const Profile = ({ user }: ProfileProps) => {
       {profileEditLoading ? (
         <ActivityIndicator size="small" />
       ) : (
-        <View style={styles.profileHeader}>
-          <View style={styles.profilePhoto}>
+        <View style={profileStyles.profileHeader}>
+          <View style={profileStyles.profilePhoto}>
             <Image
               source={user.image}
               contentFit="cover"
@@ -277,7 +246,7 @@ const Profile = ({ user }: ProfileProps) => {
             {usersProfile && isEditingProfile && (
               <TouchableOpacity
                 style={[
-                  styles.cameraIconContainer,
+                  profileStyles.cameraIconContainer,
                   user.image ? { opacity: 0.25 } : { opacity: 0.35 },
                 ]}
                 onPress={handleUpdateProfilePic}
@@ -290,16 +259,19 @@ const Profile = ({ user }: ProfileProps) => {
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.username}>@{user.username}</Text>
-          <Text style={styles.bio}>Lives in {user.neighborhood?.name}</Text>
-          <View style={styles.countContainer}>
+          <Text style={profileStyles.username}>@{user.username}</Text>
+          <Text style={profileStyles.bio}>
+            Lives in {user.neighborhood?.name}
+          </Text>
+          <View style={profileStyles.countContainer}>
             <TouchableOpacity
               onPress={() => {
                 setModalVisible(true);
                 setModalTitle("Following");
+                isRefetchingFollowing();
               }}
             >
-              <Text style={styles.countText}>
+              <Text style={profileStyles.countText}>
                 Following: {user.following_count ?? ""}
               </Text>
             </TouchableOpacity>
@@ -307,9 +279,10 @@ const Profile = ({ user }: ProfileProps) => {
               onPress={() => {
                 setModalVisible(true);
                 setModalTitle("Followers");
+                isRefetchingFollowers();
               }}
             >
-              <Text style={styles.countText}>
+              <Text style={profileStyles.countText}>
                 Followers: {user.followers_count ?? ""}
               </Text>
             </TouchableOpacity>
@@ -318,42 +291,46 @@ const Profile = ({ user }: ProfileProps) => {
             <>
               {!isEditingProfile ? (
                 <Pressable
-                  style={styles.followButton}
+                  style={profileStyles.followButton}
                   onPress={handleEditProfile}
                 >
-                  <Text style={styles.followButtonText}>Edit Profile</Text>
+                  <Text style={profileStyles.followButtonText}>
+                    Edit Profile
+                  </Text>
                 </Pressable>
               ) : (
                 <Pressable
-                  style={styles.cancelButton}
+                  style={profileStyles.cancelButton}
                   onPress={handleCancelEditProfile}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={profileStyles.cancelButtonText}>Cancel</Text>
                 </Pressable>
               )}
             </>
           ) : (
-            <View style={styles.followButtonContainer}>
+            <View style={profileStyles.followButtonContainer}>
               {user.followed_by_user ? (
                 <Pressable
-                  style={styles.unfollowButton}
+                  style={profileStyles.unfollowButton}
                   onPress={handleUnfollowUser}
                 >
-                  <Text style={styles.unfollowButtonText}>Following</Text>
+                  <Text style={profileStyles.unfollowButtonText}>
+                    Following
+                  </Text>
                 </Pressable>
               ) : (
                 <Pressable
-                  style={styles.followButton}
+                  style={profileStyles.followButton}
                   onPress={handleFollowUser}
                 >
-                  <Text style={styles.followButtonText}>Follow</Text>
+                  <Text style={profileStyles.followButtonText}>Follow</Text>
                 </Pressable>
               )}
             </View>
           )}
         </View>
       )}
-      <View style={styles.tweetsContainer}>
+      <View style={profileStyles.tweetsContainer}>
         <FlatList
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
@@ -382,7 +359,6 @@ const Profile = ({ user }: ProfileProps) => {
         isVisible={modalVisible}
         profiles={modalTitle === "Followers" ? followers : following}
         onClose={() => {
-          // console.log("closing modal");
           setModalVisible(false);
         }}
         modalTitle={modalTitle}
@@ -392,131 +368,10 @@ const Profile = ({ user }: ProfileProps) => {
             ? isFetchingNextFollowersPage
             : isFetchingNextFollowingPage
         }
+        userIDOfProfile={user.id}
       />
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  bio: {
-    lineHeight: 20,
-    marginBottom: 8,
-    fontSize: 15,
-    fontWeight: "600",
-    color: Colors.light.switchFontColor,
-  },
-  followButtonContainer: {
-    backgroundColor: "transparent",
-  },
-  followButton: {
-    marginVertical: 8,
-    backgroundColor: "black",
-    borderRadius: 50,
-    padding: 5,
-    paddingHorizontal: 15,
-    width: 120,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  followButtonText: {
-    fontWeight: "600",
-    color: "white",
-    fontSize: 14,
-  },
-  unfollowButton: {
-    marginVertical: 8,
-    backgroundColor: "transparent",
-    borderRadius: 50,
-    padding: 5,
-    paddingHorizontal: 15,
-    borderColor: "lightgrey",
-    borderWidth: 1,
-    width: 120,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  unfollowButtonText: {
-    fontWeight: "600",
-    color: "black",
-    fontSize: 14,
-  },
-  cancelButton: {
-    marginVertical: 8,
-    backgroundColor: "transparent",
-    borderRadius: 50,
-    padding: 5,
-    paddingHorizontal: 15,
-    borderColor: "lightgrey",
-    borderWidth: 1,
-    width: 120,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cancelButtonText: {
-    fontWeight: "600",
-    color: Colors.light.cancelRed,
-    fontSize: 14,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  },
-  profileHeader: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  profilePhoto: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-  },
-  cameraIconContainer: {
-    position: "absolute",
-    backgroundColor: "black",
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    paddingTop: 2,
-    paddingLeft: 6,
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  username: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  countContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    marginVertical: 8,
-  },
-  countText: {
-    fontSize: 16,
-  },
-  tweetsContainer: {
-    flex: 1,
-  },
-  tweet: {
-    width: "90%",
-    backgroundColor: "lightgrey",
-    padding: 16,
-    borderRadius: 10,
-    marginVertical: 8,
-  },
-});
 
 export default Profile;

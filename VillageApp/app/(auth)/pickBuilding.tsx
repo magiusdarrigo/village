@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Pressable,
   Alert,
   KeyboardAvoidingView,
