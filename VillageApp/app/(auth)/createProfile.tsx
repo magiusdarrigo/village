@@ -106,7 +106,14 @@ const CreateProfile = () => {
         Alert.alert(
           "This phone number was previously used. Welcome back! Please submit a building change request if you've moved."
         );
-        router.replace("/showNeighborhood");
+        router.replace({
+          pathname: "/showNeighborhood",
+          params: {
+            neighborhoodName: building?.neighborhood?.name,
+            buildingID: building.id,
+            neighborhoodID: building.neighborhood_id,
+          },
+        });
         return;
       }
       router.replace("/pickBuilding");

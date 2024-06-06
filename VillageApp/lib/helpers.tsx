@@ -125,3 +125,7 @@ export const addParenthesesToPhoneNumber = (text: string) => {
 
 export const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
+
+export const truncateText = (message: string, length: number) => {
+  return message.length > length ? message.slice(0, length) + "..." : message;
+};

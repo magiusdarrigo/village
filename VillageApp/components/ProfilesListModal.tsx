@@ -20,6 +20,7 @@ type ProfilesListModalProps = {
   modalTitle: string;
   handleLoadMoreProfiles: () => void;
   isFetchingNextProfilesPage: boolean;
+  userIDOfProfile: string;
 };
 
 const ProfilesListModal = ({
@@ -29,6 +30,7 @@ const ProfilesListModal = ({
   modalTitle,
   handleLoadMoreProfiles,
   isFetchingNextProfilesPage,
+  userIDOfProfile,
 }: ProfilesListModalProps) => {
   const flatListRef = useRef<FlatList>(null);
 
@@ -69,6 +71,7 @@ const ProfilesListModal = ({
                     profile={item}
                     key={item.id}
                     handleClose={onClose}
+                    userIDOfProfile={userIDOfProfile}
                   />
                 )}
                 onEndReached={handleLoadMoreProfiles}
@@ -108,6 +111,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingHorizontal: 10,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -118,30 +122,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonClose: {
-    backgroundColor: "#2196F3",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   modalTitle: {
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  scrollViewContent: {
-    flexGrow: 1,
   },
 });
 

@@ -169,6 +169,7 @@ export default function TabLayout() {
   const onSettingsPress = () => {
     const options = [
       "Request Building Change",
+      "Request Neighborhood Change",
       "Terms of Service",
       "Privacy Policy",
       "Report A Bug",
@@ -178,14 +179,15 @@ export default function TabLayout() {
       "Cancel",
     ];
     const requestBuildingChangeIndex = 0;
-    const termsOfServiceIndex = 1;
-    const privacyPolicyIndex = 2;
-    const reportABugIndex = 3;
-    const contactUsIndex = 4;
-    const deleteAccountIndex = 5;
-    const logOutIndex = 6;
+    const requestNeighborhoodChangeIndex = 1;
+    const termsOfServiceIndex = 2;
+    const privacyPolicyIndex = 3;
+    const reportABugIndex = 4;
+    const contactUsIndex = 5;
+    const deleteAccountIndex = 6;
+    const logOutIndex = 7;
     const destructiveButtonIndexes = [deleteAccountIndex, logOutIndex];
-    const cancelButtonIndex = 7;
+    const cancelButtonIndex = 8;
 
     showActionSheetWithOptions(
       {
@@ -203,6 +205,10 @@ export default function TabLayout() {
               "plain-text"
             );
             break;
+          case requestNeighborhoodChangeIndex:
+            Linking.openURL(
+              "mailto:magiusdarrigo@gmail.com?subject=Neighborhood%20Change%20Request&body=I'd%20like%20to%20change%20me%20and%20my%20building's%20neighborhood%20to%3A%0D%0A%0D%0A%3CEnter%20new%20neighborhood%20here%3E"
+            );
           case termsOfServiceIndex:
             handlePressButtonAsync(TERMS_OF_SERVICE_URL);
             break;
@@ -294,18 +300,18 @@ export default function TabLayout() {
               )}
             </Pressable>
           ),
-          headerRight: () => (
-            <Pressable onPress={() => {}}>
-              {({ pressed }) => (
-                <Ionicons
-                  name="search"
-                  size={25}
-                  color={Colors.light.text}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
-          ),
+          // headerRight: () => (
+          //   <Pressable onPress={() => {}}>
+          //     {({ pressed }) => (
+          //       <Ionicons
+          //         name="search"
+          //         size={25}
+          //         color={Colors.light.text}
+          //         style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          //       />
+          //     )}
+          //   </Pressable>
+          // ),
         }}
         listeners={{
           focus: (_) => {

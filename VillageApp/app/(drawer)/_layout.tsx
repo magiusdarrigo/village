@@ -68,7 +68,32 @@ export default function DrawerLayout() {
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
           drawerLabelStyle: { color: "black" },
-          drawerItemStyle: { marginTop: -10, marginBottom: 25 },
+          drawerItemStyle: { marginTop: -10 },
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()}>
+              {({ pressed }) => (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={28}
+                  color={Colors.light.text}
+                  style={{ opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="contacts"
+        options={{
+          headerShown: true,
+          headerBackTitleVisible: false,
+          headerTintColor: "black",
+          title: "Contacts",
+          drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
+          drawerInactiveBackgroundColor: "transparent",
+          drawerLabelStyle: { color: "black" },
+          drawerItemStyle: { marginTop: -10 },
           headerLeft: () => (
             <Pressable onPress={() => router.back()}>
               {({ pressed }) => (

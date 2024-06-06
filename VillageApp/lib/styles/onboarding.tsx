@@ -14,13 +14,14 @@ const onboardingStyles = StyleSheet.create({
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
+    borderRadius: 25,
     marginTop: 5, // space above the button
-    marginBottom: 25, // space below the button
+    marginBottom: 35, // space below the button
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   buttonDisabled: {
     opacity: 0.5,
