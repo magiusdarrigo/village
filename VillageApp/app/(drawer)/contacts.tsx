@@ -116,7 +116,7 @@ const ContactsScreen = (props: ContactProps) => {
         follower_user_id: "NA",
         id: current.id,
         neighborhood_name: current.phoneNumbers?.[0].number ?? "",
-        profile_image: current.imageAvailable ? current.image?.uri : "",
+        profile_image: "",
         username: current.name,
         followed_by_user: false,
       } as ProfileRowType;
@@ -126,11 +126,32 @@ const ContactsScreen = (props: ContactProps) => {
     []
   );
   const profilesCount = formattedProfiles.length;
+  // sort them in alphabetical order by username
+  formattedProfiles.sort((a: any, b: any) => {
+    if (a.username < b.username) {
+      return -1;
+    }
+    if (a.username > b.username) {
+      return 1;
+    }
+    return 0;
+  });
+  formattedContacts.sort((a: any, b: any) => {
+    if (a.username < b.username) {
+      return -1;
+    }
+    if (a.username > b.username) {
+      return 1;
+    }
+    return 0;
+  });
   const allProfiles = [...formattedProfiles, ...formattedContacts];
 
   if (fetchStatus === "fetching") {
     return <LoadingScreen />;
   }
+
+  console.log("allProfiles", allProfiles);
 
   return (
     <View style={styles.container}>

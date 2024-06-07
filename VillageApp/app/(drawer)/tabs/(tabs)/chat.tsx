@@ -20,7 +20,6 @@ import {
   Channel,
   MessageInput,
   messageActions as defaultMessageActions,
-  Thread,
 } from "stream-chat-expo";
 import { getDeviceType, DeviceType } from "../../../../lib/helpers";
 import CustomMessageList from "../../../../components/CustomMessageList";
