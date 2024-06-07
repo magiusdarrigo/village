@@ -18,6 +18,7 @@ import { ProfileRowType } from "../../types/index";
 import { useQuery } from "@tanstack/react-query";
 import LoadingScreen from "../../components/LoadingScreen";
 import OpenSettingsModal from "../../components/OpenSettingsModal";
+import { getDDBReadableNumber } from "../../lib/helpers";
 
 type ContactProps = {};
 
@@ -27,7 +28,7 @@ const getPhoneNumbersFromContacts = (contacts: Contacts.Contact[]) => {
     if (contact.phoneNumbers) {
       for (const phoneNumber of contact.phoneNumbers) {
         if (phoneNumber.number) {
-          phoneNumbers.push(phoneNumber.number);
+          phoneNumbers.push(getDDBReadableNumber(phoneNumber.number));
         }
       }
     }
@@ -108,14 +109,17 @@ const ContactsScreen = (props: ContactProps) => {
   );
   const formattedContacts = contacts.reduce(
     (accumulator: any, current: any) => {
-      if (profilePhoneNumbersSet.has(current.phoneNumbers?.[0].number)) {
+      const formattedNumber = getDDBReadableNumber(
+        current.phoneNumbers?.[0].number
+      );
+      if (profilePhoneNumbersSet.has(formattedNumber)) {
         return accumulator;
       }
       const prof = {
         created_at: "NA",
         follower_user_id: "NA",
         id: current.id,
-        neighborhood_name: current.phoneNumbers?.[0].number ?? "",
+        neighborhood_name: formattedNumber ?? "",
         profile_image: "",
         username: current.name,
         followed_by_user: false,
