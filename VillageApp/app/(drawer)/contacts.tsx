@@ -155,8 +155,6 @@ const ContactsScreen = (props: ContactProps) => {
     return <LoadingScreen />;
   }
 
-  console.log("allProfiles", allProfiles);
-
   return (
     <View style={styles.container}>
       {!permissions && (
@@ -198,7 +196,7 @@ const ContactsScreen = (props: ContactProps) => {
               </View>
             );
           }}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
           data={allProfiles}
           keyExtractor={(item) => String(item.id)}
           // stickyHeaderIndices={[0]}
