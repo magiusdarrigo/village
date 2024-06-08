@@ -58,11 +58,11 @@ const ProfileRow = ({
 
   const handleInvite = async () => {
     try {
-      if (!profile.phone_number) {
+      if (!profile.neighborhood_name) {
         throw new Error("No phone number found");
       }
       const { result } = await SMS.sendSMSAsync(
-        [profile.phone_number],
+        [profile.neighborhood_name],
         "Add me on Village."
       );
       console.log(result);
