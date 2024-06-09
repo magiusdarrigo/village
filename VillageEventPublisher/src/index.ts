@@ -54,22 +54,14 @@ app.post("/newaccountdeletionrequest", async (req: Request, res: Response) => {
     accountDeletionRequestEvent
   );
 
-  // send email to support
-  const { data: _, error } = await resend.emails.send({
-    from: "Support <noreply@support.villageapp.nyc>",
-    to: ["magiusdarrigo@gmail.com"],
-    subject: "Account Deletion Request",
-    html: `
-      <h1>New Account Deletion Request</h1>
-      <p>User ID: ${accountDeletionRequestEvent.record.user_id}</p>
-      `,
-  });
-
-  if (error) {
-    return res.status(500).send("Failed to send email to support");
-  }
-
-  return res.status(200);
+  channel.sendToQueue(
+    "account-deletion-queue",
+    Buffer.from(JSON.stringify(accountDeletionRequestEvent)),
+    {
+      persistent: true,
+    }
+  );
+  res.status(200).send("Account deletion request event received and published");
 });
 
 // new building change request. Send a email to support
