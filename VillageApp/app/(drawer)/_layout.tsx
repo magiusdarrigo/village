@@ -54,7 +54,7 @@ export default function DrawerLayout() {
           title: "Home",
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
-          drawerLabelStyle: { color: "black" },
+          drawerLabelStyle: { color: "black", fontSize: 18 },
           drawerItemStyle: { marginTop: -10 },
         }}
       />
@@ -67,7 +67,7 @@ export default function DrawerLayout() {
           title: "Neighborhoods",
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
-          drawerLabelStyle: { color: "black" },
+          drawerLabelStyle: { color: "black", fontSize: 18 },
           drawerItemStyle: { marginTop: -10 },
           headerLeft: () => (
             <Pressable onPress={() => router.back()}>
@@ -92,7 +92,7 @@ export default function DrawerLayout() {
           title: "Contacts",
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
-          drawerLabelStyle: { color: "black" },
+          drawerLabelStyle: { color: "black", fontSize: 18 },
           drawerItemStyle: { marginTop: -10 },
           headerLeft: () => (
             <Pressable onPress={() => router.back()}>

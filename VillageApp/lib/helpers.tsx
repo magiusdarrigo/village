@@ -123,6 +123,30 @@ export const addParenthesesToPhoneNumber = (text: string) => {
   return `(${text.slice(0, 3)})${text.slice(3)}`;
 };
 
+// format phone number from 1234567890 to (123) 456-7890
+export const formatPhoneNumber = (text: string) => {
+  return `(${text.slice(0, 3)}) ${text.slice(3, 6)}-${text.slice(6)}`;
+};
+
+// +1 (123) 456-7890 -> (123) 456-7890
+// +11234567890 -> (123) 456-7890
+// 1234567890 -> (123) 456-7890
+export const getDDBReadableNumber = (text: any) => {
+  if (!text) {
+    return undefined;
+  }
+  // strip all non-numeric characters
+  const stripped = text.replace(/\D/g, "");
+  if (stripped.length === 11) {
+    return formatPhoneNumber(stripped.slice(1));
+  } else if (stripped.length === 10) {
+    return formatPhoneNumber(stripped);
+  } else {
+    // if the number is greater than 11 digits, it is an international number and we don't support that yet.
+    return text;
+  }
+};
+
 export const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 

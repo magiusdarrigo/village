@@ -2,8 +2,13 @@ import "dotenv/config";
 import amqp from "amqplib";
 import { checkAbuse } from "./analyze";
 import { banPost } from "./ban";
-import { notifyUser } from "./notify";
-import { NewPostWebhookEvent } from "./types/custom";
+import { notifyUser, emailSupportAcctDeletionReq } from "./notify";
+import {
+  NewPostWebhookEvent,
+  NewAccountDeletionRequestWebhookEvent,
+} from "./types/custom";
+import { deleteUser } from "./delete";
+import { decrementFollowingCount, decrementFollowersCount } from "./counts";
 
 const rabbitMQURL = process.env.RABBITMQ_PRIVATE_URL;
 if (!rabbitMQURL) {
@@ -47,6 +52,29 @@ async function consumeEvents() {
     },
     { noAck: false }
   );
+
+  channel.consume("account-deletion-queue", async (message) => {
+    if (!message) {
+      return;
+    }
+
+    const accountDeletionEvent = JSON.parse(
+      message.content.toString()
+    ) as NewAccountDeletionRequestWebhookEvent;
+    console.log(
+      "Received new account deletion request event:",
+      accountDeletionEvent
+    );
+    const userID = accountDeletionEvent.record.user_id;
+    await Promise.all([
+      emailSupportAcctDeletionReq(userID),
+      decrementFollowingCount(userID),
+      decrementFollowersCount(userID),
+    ]);
+    await deleteUser(userID);
+    // ack
+    channel.ack(message);
+  });
 }
 
 export async function init() {

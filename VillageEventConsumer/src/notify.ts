@@ -2,6 +2,9 @@ import supabaseClient from "./clients/supabaseClient";
 import { sendNotification } from "./clients/firebaseClient";
 import { villageAppUserID } from "./ban";
 import { NewPostWebhookEvent } from "./types/custom";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const notifyUser = async (postEvent: NewPostWebhookEvent) => {
   try {
@@ -46,5 +49,20 @@ export const notifyUser = async (postEvent: NewPostWebhookEvent) => {
     }
   } catch (err: any) {
     console.error("Error in notifyUser:", err);
+  }
+};
+
+export const emailSupportAcctDeletionReq = async (user_id: string) => {
+  const { data: _, error } = await resend.emails.send({
+    from: "Support <noreply@support.villageapp.nyc>",
+    to: ["magiusdarrigo@gmail.com"],
+    subject: "Account Deletion Request",
+    html: `
+      <h1>New Account Deletion Request</h1>
+      <p>User ID: ${user_id}</p>
+      `,
+  });
+  if (error) {
+    console.error("Failed to send email to support");
   }
 };
