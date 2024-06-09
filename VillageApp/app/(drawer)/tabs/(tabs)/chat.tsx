@@ -234,7 +234,7 @@ const ChatScreen = () => {
         >
           <Chat client={streamChatClient}>
             <Channel
-              // MessageAvatar={CustomChatAvatar}
+              MessageAvatar={CustomChatAvatar}
               channel={channel}
               messageActions={(param) => {
                 const { isMyMessage, muteUser } = param;
