@@ -482,12 +482,27 @@ router.delete("/", async (req, res) => {
       },
     });
 
+    // get user
+    const user = await prisma.users.findUnique({
+      where: {
+        id: currentUser.id,
+      },
+      select: {
+        building_id: true,
+        username: true,
+      },
+    });
+
+    if (!user || !user.building_id) {
+      return res.status(404).json({ error: "user or building id not found" });
+    }
+
     await prisma.account_deletion_requests.create({
       data: {
         user_id: currentUser.id,
-        username: "N/A",
+        username: user.username,
         phone_number: currentUser.phone,
-        building_id: -1,
+        building_id: user?.building_id,
       },
     });
     console.log("user delete request processed: ", currentUser.id);
