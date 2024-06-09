@@ -9,6 +9,7 @@ import { Entypo } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import * as Sentry from "sentry-expo";
 import { useUser } from "../../context/UserContext";
+import * as Sharing from "expo-sharing";
 
 const OtherUserProfileScreen = () => {
   const { user: currentUser, updateUser } = useUser();
@@ -18,10 +19,22 @@ const OtherUserProfileScreen = () => {
   const { getUserProfile, blockUser, unFollowUser } = useTweetsApi();
   const { showActionSheetWithOptions } = useActionSheet();
 
+  const onShareProfile = async () => {
+    try {
+      await Sharing.shareAsync(
+        `https://api.villageapp.nyc/tweet/${userID}?tweetId=${userID}`
+      );
+    } catch (error) {
+      Sentry.Native.captureException(error);
+      Alert.alert("We couldn't share this post. Try again.");
+    }
+  };
+
   const onOtherUserSettingsPress = () => {
-    const options = ["Block", "Cancel"];
-    const blockUserIndex = 0;
-    const cancelButtonIndex = 1;
+    const options = ["Share", "Block", "Cancel"];
+    const shareProfileIndex = 0;
+    const blockUserIndex = 1;
+    const cancelButtonIndex = 2;
     showActionSheetWithOptions(
       {
         options,
@@ -30,6 +43,9 @@ const OtherUserProfileScreen = () => {
       },
       (selectedIndex: any) => {
         switch (selectedIndex) {
+          case shareProfileIndex:
+            onShareProfile();
+            break;
           case blockUserIndex:
             Alert.alert(
               "Are you sure you want block this user?",

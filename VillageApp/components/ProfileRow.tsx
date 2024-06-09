@@ -74,6 +74,8 @@ const ProfileRow = ({
     }
   };
 
+  const isWaitlisted = profile.neighborhood_name === "WAITLISTED";
+
   return (
     <View style={postStyles.parentContainer}>
       <View style={[styles.imageParentContainer, { backgroundColor: "white" }]}>
@@ -140,7 +142,9 @@ const ProfileRow = ({
               </View>
               <Text style={styles.messageContent}>
                 {!isInviteRow
-                  ? `Lives in ${profile.neighborhood_name}`
+                  ? !isWaitlisted
+                    ? `Lives in ${profile.neighborhood_name}`
+                    : "On the waitlist"
                   : profile.neighborhood_name}
               </Text>
             </View>

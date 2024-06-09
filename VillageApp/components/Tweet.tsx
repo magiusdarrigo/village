@@ -5,7 +5,6 @@ import {
   Pressable,
   Alert,
   Dimensions,
-  TouchableOpacity,
 } from "react-native";
 import { Image } from "expo-image";
 import { TweetType } from "../types";
