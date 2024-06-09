@@ -58,12 +58,13 @@ const ProfileRow = ({
 
   const handleInvite = async () => {
     try {
-      if (!profile.phone_number) {
+      if (!profile.neighborhood_name) {
         throw new Error("No phone number found");
       }
+      const userProfileLink = `https://api.villageapp.nyc/profile/${user?.id}?userID=${user?.id}&username=${user?.username}`;
       const { result } = await SMS.sendSMSAsync(
-        [profile.phone_number],
-        "Add me on Village."
+        [profile.neighborhood_name],
+        `${userProfileLink} Add me on Village.`
       );
       console.log(result);
     } catch (error) {
@@ -72,6 +73,8 @@ const ProfileRow = ({
       Alert.alert("Error", "Failed to send invite");
     }
   };
+
+  const isWaitlisted = profile.neighborhood_name === "WAITLISTED";
 
   return (
     <View style={postStyles.parentContainer}>
@@ -139,7 +142,9 @@ const ProfileRow = ({
               </View>
               <Text style={styles.messageContent}>
                 {!isInviteRow
-                  ? `Lives in ${profile.neighborhood_name}`
+                  ? !isWaitlisted
+                    ? `Lives in ${profile.neighborhood_name}`
+                    : "On the waitlist"
                   : profile.neighborhood_name}
               </Text>
             </View>

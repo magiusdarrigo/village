@@ -20,7 +20,6 @@ import {
   Channel,
   MessageInput,
   messageActions as defaultMessageActions,
-  Thread,
 } from "stream-chat-expo";
 import { getDeviceType, DeviceType } from "../../../../lib/helpers";
 import CustomMessageList from "../../../../components/CustomMessageList";
@@ -235,7 +234,7 @@ const ChatScreen = () => {
         >
           <Chat client={streamChatClient}>
             <Channel
-              // MessageAvatar={CustomChatAvatar}
+              MessageAvatar={CustomChatAvatar}
               channel={channel}
               messageActions={(param) => {
                 const { isMyMessage, muteUser } = param;

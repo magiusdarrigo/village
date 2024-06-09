@@ -46,7 +46,10 @@ const OpenSettingsModal = ({
                 <Pressable
                   style={[
                     onboardingStyles.button,
-                    { marginBottom: 15, backgroundColor: "#0000FF" },
+                    {
+                      marginBottom: 15,
+                      backgroundColor: Colors.light.openSettingsBlue,
+                    },
                   ]}
                   onPress={() => Linking.openSettings()}
                 >

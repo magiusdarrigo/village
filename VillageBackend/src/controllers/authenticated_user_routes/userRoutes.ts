@@ -475,36 +475,22 @@ router.delete("/", async (req, res) => {
   console.log("delete user called");
   const currentUser = (req as unknown as AuthenticatedRequest).user;
   try {
-    const deleteUser = await prisma.users.delete({
-      where: {
-        id: currentUser.id,
-      },
-    });
-
-    if (!deleteUser || !deleteUser.building_id) {
-      return res.status(404).json({ error: "user account never finished" });
-    }
-
     // if an account_deletion_requests with the same phone_number exists, delete it
     await prisma.account_deletion_requests.deleteMany({
       where: {
-        phone_number: deleteUser.phone_number,
+        phone_number: currentUser.phone,
       },
     });
 
     await prisma.account_deletion_requests.create({
       data: {
         user_id: currentUser.id,
-        username: deleteUser.username,
-        phone_number: deleteUser.phone_number,
-        building_id: deleteUser.building_id,
+        username: "N/A",
+        phone_number: currentUser.phone,
+        building_id: -1,
       },
     });
-
-    // delete user from stream chat
-    await streamChatClient.deleteUser(currentUser.id.toString());
-
-    console.log("user deleted: ", currentUser.id);
+    console.log("user delete request processed: ", currentUser.id);
     res.json({ success: true });
   } catch (error) {
     console.error(error);

@@ -18,6 +18,7 @@ import { ProfileRowType } from "../../types/index";
 import { useQuery } from "@tanstack/react-query";
 import LoadingScreen from "../../components/LoadingScreen";
 import OpenSettingsModal from "../../components/OpenSettingsModal";
+import { getDDBReadableNumber } from "../../lib/helpers";
 
 type ContactProps = {};
 
@@ -27,7 +28,7 @@ const getPhoneNumbersFromContacts = (contacts: Contacts.Contact[]) => {
     if (contact.phoneNumbers) {
       for (const phoneNumber of contact.phoneNumbers) {
         if (phoneNumber.number) {
-          phoneNumbers.push(phoneNumber.number);
+          phoneNumbers.push(getDDBReadableNumber(phoneNumber.number));
         }
       }
     }
@@ -108,15 +109,18 @@ const ContactsScreen = (props: ContactProps) => {
   );
   const formattedContacts = contacts.reduce(
     (accumulator: any, current: any) => {
-      if (profilePhoneNumbersSet.has(current.phoneNumbers?.[0].number)) {
+      const formattedNumber = getDDBReadableNumber(
+        current.phoneNumbers?.[0].number
+      );
+      if (profilePhoneNumbersSet.has(formattedNumber)) {
         return accumulator;
       }
       const prof = {
         created_at: "NA",
         follower_user_id: "NA",
         id: current.id,
-        neighborhood_name: current.phoneNumbers?.[0].number ?? "",
-        profile_image: current.imageAvailable ? current.image?.uri : "",
+        neighborhood_name: formattedNumber ?? "",
+        profile_image: "",
         username: current.name,
         followed_by_user: false,
       } as ProfileRowType;
@@ -126,6 +130,25 @@ const ContactsScreen = (props: ContactProps) => {
     []
   );
   const profilesCount = formattedProfiles.length;
+  // sort them in alphabetical order by username
+  formattedProfiles.sort((a: any, b: any) => {
+    if (a.username < b.username) {
+      return -1;
+    }
+    if (a.username > b.username) {
+      return 1;
+    }
+    return 0;
+  });
+  formattedContacts.sort((a: any, b: any) => {
+    if (a.username < b.username) {
+      return -1;
+    }
+    if (a.username > b.username) {
+      return 1;
+    }
+    return 0;
+  });
   const allProfiles = [...formattedProfiles, ...formattedContacts];
 
   if (fetchStatus === "fetching") {
@@ -173,7 +196,7 @@ const ContactsScreen = (props: ContactProps) => {
               </View>
             );
           }}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
           data={allProfiles}
           keyExtractor={(item) => String(item.id)}
           // stickyHeaderIndices={[0]}

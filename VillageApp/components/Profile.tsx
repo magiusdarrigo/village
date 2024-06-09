@@ -224,6 +224,8 @@ const Profile = ({ user }: ProfileProps) => {
     setIsEditingProfile(false);
   };
 
+  const isWaitlisted = user.neighborhood?.name === "WAITLISTED";
+
   return (
     <ScrollView
       style={profileStyles.container}
@@ -261,7 +263,9 @@ const Profile = ({ user }: ProfileProps) => {
           </View>
           <Text style={profileStyles.username}>@{user.username}</Text>
           <Text style={profileStyles.bio}>
-            Lives in {user.neighborhood?.name}
+            {!isWaitlisted
+              ? `Lives in ${user.neighborhood?.name}`
+              : "On the waitlist"}
           </Text>
           <View style={profileStyles.countContainer}>
             <TouchableOpacity

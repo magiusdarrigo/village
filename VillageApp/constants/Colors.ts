@@ -15,6 +15,7 @@ export default {
     switchBackgroundColor: "#F3F7F9",
     switchFontColor: "#AEB5BC",
     neighborhoodButtonColor: "#91959A",
+    openSettingsBlue: "#0000FF",
   },
   dark: {
     text: "#ffffff",
