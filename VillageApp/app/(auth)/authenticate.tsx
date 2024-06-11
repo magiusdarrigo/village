@@ -29,7 +29,7 @@ const Authenticate = () => {
   phoneNumber = addParenthesesToPhoneNumber(phoneNumber.toString());
   const router = useRouter();
   const { updateAuthToken } = useAuth();
-  const { user } = useUser();
+  const { user, updateActiveNeighborhood } = useUser();
   const otpCodeRef = useRef<TextInput>(null);
   const isCodeInvalid = code.length < 6;
 
@@ -56,6 +56,12 @@ const Authenticate = () => {
       updateAuthToken(res.token);
       if (continueOnboarding()) {
         router.replace("/createProfile");
+      }
+      if (user?.neighborhood_id && user?.neighborhood?.name) {
+        updateActiveNeighborhood({
+          name: user?.neighborhood?.name,
+          id: user?.neighborhood_id,
+        });
       }
     } catch (e) {
       Alert.alert("Your OTP code expired or doesn't match. Try again.");
