@@ -3,7 +3,7 @@ import { useAssets } from "expo-asset";
 import { Asset } from "expo-asset";
 
 const assetPaths = [
-  require("../assets/images/transparent-icon-crop.png"),
+  require("../assets/images/village-drawer-logo.png"),
   require("../assets/images/warning.png"),
 ];
 
