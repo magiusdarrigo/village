@@ -1,17 +1,25 @@
 import React from "react";
-import { Pressable, View, Text, StyleSheet } from "react-native";
+import {
+  Pressable,
+  View,
+  Text,
+  StyleSheet,
+  ImageSourcePropType,
+} from "react-native";
 import { Image } from "expo-image";
 import { NotificationType } from "../types";
 import postStyles from "../lib/styles/post";
 import { Link } from "expo-router";
 import Colors from "../constants/Colors";
-const warning = require("../assets/images/warning.png");
+import { useAssetContext } from "../context/AssetsContext";
 
 type NotificationProps = {
   notification: NotificationType;
 };
 
 const Notification = ({ notification }: NotificationProps) => {
+  const assets = useAssetContext();
+  const warning = assets?.[1];
   const disablePostPressable = notification.for_post_id === null;
   const notificationHasBeenSeen = notification.read;
   return (
@@ -43,7 +51,10 @@ const Notification = ({ notification }: NotificationProps) => {
             >
               <View style={styles.userImage}>
                 <Image
-                  source={notification.from_profile_image ?? warning}
+                  source={
+                    notification.from_profile_image ??
+                    (warning as ImageSourcePropType)
+                  }
                   style={styles.userImage}
                 />
               </View>

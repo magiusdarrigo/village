@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { Alert } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
+import AssetsContextProvider from "../context/AssetsContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TweetsApiContextProvider from "../context/TweetContext";
 import {
@@ -85,83 +86,85 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <>
-      <UserContextProvider streamChatClient={streamChatClient}>
-        <AuthContextProvider>
-          <TweetsApiContextProvider>
-            <QueryClientProvider client={queryClient}>
-              <ThemeProvider value={DefaultTheme}>
-                <ActionSheetProvider>
-                  <GestureHandlerRootView style={{ flex: 1 }}>
-                    <Stack>
-                      <Stack.Screen
-                        name="(drawer)"
-                        options={{
-                          headerShown: false,
-                          headerBackTitleVisible: false,
-                          headerTintColor: "black",
-                        }}
-                      />
-                      <Stack.Screen
-                        name="profile/[id]"
-                        options={{
-                          headerBackTitleVisible: false,
-                          headerTintColor: "black",
-                        }}
-                      />
-                      <Stack.Screen
-                        name="tweet/[id]"
-                        options={{
-                          title: "Post",
-                          headerBackTitleVisible: false,
-                          headerTintColor: "black",
-                        }}
-                      />
-                      <Stack.Screen
-                        name="new-tweet"
-                        options={{
-                          title: "New Post",
-                          headerShown: true,
-                          headerBackTitleVisible: false,
-                          headerTintColor: "black",
-                        }}
-                      />
-                      <Stack.Screen
-                        name="(auth)/signIn"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(auth)/authenticate"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(auth)/createProfile"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(auth)/pickBuilding"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(auth)/waitlist"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(auth)/pickNeighborhood"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(auth)/showNeighborhood"
-                        options={{ headerShown: false }}
-                      />
-                    </Stack>
-                    <DeepLinkHandler />
-                  </GestureHandlerRootView>
-                </ActionSheetProvider>
-              </ThemeProvider>
-            </QueryClientProvider>
-          </TweetsApiContextProvider>
-        </AuthContextProvider>
-      </UserContextProvider>
+      <AssetsContextProvider>
+        <UserContextProvider streamChatClient={streamChatClient}>
+          <AuthContextProvider>
+            <TweetsApiContextProvider>
+              <QueryClientProvider client={queryClient}>
+                <ThemeProvider value={DefaultTheme}>
+                  <ActionSheetProvider>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                      <Stack>
+                        <Stack.Screen
+                          name="(drawer)"
+                          options={{
+                            headerShown: false,
+                            headerBackTitleVisible: false,
+                            headerTintColor: "black",
+                          }}
+                        />
+                        <Stack.Screen
+                          name="profile/[id]"
+                          options={{
+                            headerBackTitleVisible: false,
+                            headerTintColor: "black",
+                          }}
+                        />
+                        <Stack.Screen
+                          name="tweet/[id]"
+                          options={{
+                            title: "Post",
+                            headerBackTitleVisible: false,
+                            headerTintColor: "black",
+                          }}
+                        />
+                        <Stack.Screen
+                          name="new-tweet"
+                          options={{
+                            title: "New Post",
+                            headerShown: true,
+                            headerBackTitleVisible: false,
+                            headerTintColor: "black",
+                          }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/signIn"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/authenticate"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/createProfile"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/pickBuilding"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/waitlist"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/pickNeighborhood"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/showNeighborhood"
+                          options={{ headerShown: false }}
+                        />
+                      </Stack>
+                      <DeepLinkHandler />
+                    </GestureHandlerRootView>
+                  </ActionSheetProvider>
+                </ThemeProvider>
+              </QueryClientProvider>
+            </TweetsApiContextProvider>
+          </AuthContextProvider>
+        </UserContextProvider>
+      </AssetsContextProvider>
     </>
   );
 }

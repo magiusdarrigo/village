@@ -4,11 +4,17 @@ import {
   DrawerItemList,
   createDrawerNavigator,
 } from "@react-navigation/drawer";
-import { ActivityIndicator, Image, Pressable } from "react-native";
+import {
+  ActivityIndicator,
+  ImageSourcePropType,
+  Pressable,
+} from "react-native";
+import { Image } from "expo-image";
 import { useAuth } from "../../context/AuthContext";
 import { View } from "../../components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
+import { useAssetContext } from "../../context/AssetsContext";
 
 const DrawerNavigator = createDrawerNavigator().Navigator;
 const Drawer = withLayoutContext(DrawerNavigator);
@@ -19,17 +25,22 @@ export const unstable_settings = {
 };
 
 function CustomDrawerContent(props: any) {
+  const assets = useAssetContext();
+  const villageIcon = assets?.[0];
+
   return (
     <DrawerContentScrollView
       {...props}
       style={{ backgroundColor: Colors.light.tertiary }}
     >
       <View>
-        <Image
-          source={require("../../assets/images/transparent-icon-crop.png")}
-          style={{ width: 150, height: 100 }}
-          resizeMode="contain"
-        />
+        {villageIcon && (
+          <Image
+            source={villageIcon as ImageSourcePropType}
+            style={{ width: 150, height: 100 }}
+            contentFit="contain"
+          />
+        )}
       </View>
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
