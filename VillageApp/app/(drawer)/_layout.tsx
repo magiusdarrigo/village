@@ -28,7 +28,7 @@ function CustomDrawerContent(props: any) {
       <View>
         <View
           style={{
-            backgroundColor: "transparent",
+            backgroundColor: Colors.light.tertiary,
             width: "100%",
             height: 85,
             display: "flex",
@@ -37,7 +37,9 @@ function CustomDrawerContent(props: any) {
             paddingBottom: 5,
           }}
         >
-          <DynaPuffText style={{ fontSize: 38 }}>Village</DynaPuffText>
+          <DynaPuffText style={{ fontSize: 38, color: "black" }}>
+            Village
+          </DynaPuffText>
         </View>
       </View>
       <DrawerItemList {...props} />
