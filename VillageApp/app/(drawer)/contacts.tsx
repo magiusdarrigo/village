@@ -253,6 +253,7 @@ const ContactsScreen = (props: ContactProps) => {
                   style={[
                     styles.contactsTitleContainer,
                     isOnboarding ? {} : { backgroundColor: "white" },
+                    profilesCount === 0 ? { paddingTop: 0 } : {},
                   ]}
                 >
                   <Text style={styles.contactsTitle}>Invite Friends</Text>
