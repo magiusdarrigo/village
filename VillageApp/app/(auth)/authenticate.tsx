@@ -17,7 +17,14 @@ import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
-import { addParenthesesToPhoneNumber } from "../../lib/helpers";
+import {
+  addParenthesesToPhoneNumber,
+  getDeviceType,
+  DeviceType,
+} from "../../lib/helpers";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const Authenticate = () => {
   const [code, setCode] = useState("");
@@ -78,7 +85,9 @@ const Authenticate = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
       >
-        <Text style={onboardingStyles.label}>
+        <Text
+          style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
+        >
           Paste the code we texted you.
         </Text>
         <View style={{ flex: 1, justifyContent: "space-between" }}>
@@ -97,6 +106,7 @@ const Authenticate = () => {
             style={[
               onboardingStyles.button,
               isCodeInvalid || isLoading ? onboardingStyles.buttonDisabled : {},
+              smallDevice ? { marginBottom: 18 } : {},
             ]}
             onPress={onConfirm}
             disabled={isCodeInvalid || isLoading}

@@ -16,6 +16,7 @@ type ProfileRowProps = {
   handleClose: () => void;
   userIDOfProfile: string;
   isInviteRow?: boolean;
+  isOnboarding: boolean;
 };
 
 const ProfileRow = ({
@@ -23,6 +24,7 @@ const ProfileRow = ({
   handleClose,
   userIDOfProfile,
   isInviteRow,
+  isOnboarding,
 }: ProfileRowProps) => {
   const followUserMutation = useFollowUser();
   const unfollowUserMutation = useUnfollowUser();
@@ -78,7 +80,14 @@ const ProfileRow = ({
 
   return (
     <View style={postStyles.parentContainer}>
-      <View style={[styles.imageParentContainer, { backgroundColor: "white" }]}>
+      <View
+        style={[
+          styles.imageParentContainer,
+          isOnboarding
+            ? { backgroundColor: Colors.light.tertiary }
+            : { backgroundColor: "white" },
+        ]}
+      >
         <View
           style={[postStyles.imageContainer, isInviteRow ? { width: 20 } : {}]}
         >
@@ -140,7 +149,12 @@ const ProfileRow = ({
               <View style={{ flexDirection: "row" }}>
                 <Text style={styles.titleContent}>{profile.username}</Text>
               </View>
-              <Text style={styles.messageContent}>
+              <Text
+                style={[
+                  styles.messageContent,
+                  isOnboarding ? { color: "black", fontSize: 14 } : {},
+                ]}
+              >
                 {!isInviteRow
                   ? !isWaitlisted
                     ? `Lives in ${profile.neighborhood_name}`

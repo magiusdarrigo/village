@@ -30,6 +30,7 @@ import Hyperlink from "react-native-hyperlink";
 import { handlePressButtonAsync } from "../../lib/helpers";
 
 const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const CreateProfile = () => {
   const { updateUser } = useUser();
@@ -43,7 +44,7 @@ const CreateProfile = () => {
   const renderColorOptions = () => {
     let images = [...defaultImages]; // Create a copy using spread syntax
     // remove the last 2 colors for small devices
-    if (deviceType === DeviceType.iPhoneSmall) {
+    if (smallDevice) {
       images.pop();
       images.pop();
     }
@@ -138,10 +139,17 @@ const CreateProfile = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
       >
-        <Text style={onboardingStyles.label}>
+        <Text
+          style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
+        >
           Create your anonymous profile.
         </Text>
-        <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "space-between",
+          }}
+        >
           <View>
             <Text style={styles.inputLabel}>Username</Text>
             <TextInput
@@ -218,6 +226,7 @@ const CreateProfile = () => {
               style={[
                 onboardingStyles.button,
                 isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+                smallDevice ? { marginBottom: 18 } : {},
               ]}
               onPress={onSave}
               disabled={isButtonDisabled}

@@ -155,6 +155,14 @@ function RootLayoutNav() {
                           name="(auth)/showNeighborhood"
                           options={{ headerShown: false }}
                         />
+                        <Stack.Screen
+                          name="(auth)/notifications"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(auth)/contacts"
+                          options={{ headerShown: false }}
+                        />
                       </Stack>
                       <DeepLinkHandler />
                     </GestureHandlerRootView>

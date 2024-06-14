@@ -14,6 +14,10 @@ import {
   BronxNeighborhoods,
   StatenIslandNeighborhoods,
 } from "../../constants/Neighborhoods";
+import { getDeviceType, DeviceType } from "../../lib/helpers";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const PickNeighborhood = () => {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
@@ -61,7 +65,9 @@ const PickNeighborhood = () => {
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <Text style={onboardingStyles.label}>
+        <Text
+          style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
+        >
           What neighborhood is your building in?
         </Text>
         <Picker
@@ -82,6 +88,7 @@ const PickNeighborhood = () => {
           style={[
             onboardingStyles.button,
             isLoading ? onboardingStyles.buttonDisabled : {},
+            smallDevice ? { marginBottom: 18 } : {},
           ]}
           onPress={onSubmit}
           disabled={isLoading}

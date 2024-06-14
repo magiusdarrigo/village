@@ -19,6 +19,10 @@ import { router } from "expo-router";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
+import { getDeviceType, DeviceType } from "../../lib/helpers";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const PickBuilding = () => {
   const [address, setAddress] = useState("");
@@ -89,7 +93,11 @@ const PickBuilding = () => {
           paddingHorizontal: 24,
         }}
       >
-        <Text style={onboardingStyles.label}>Add your building address.</Text>
+        <Text
+          style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
+        >
+          Add your building address.
+        </Text>
         <View
           style={{
             flex: 1,
@@ -151,6 +159,7 @@ const PickBuilding = () => {
             style={[
               onboardingStyles.button,
               isButtonDisabled ? onboardingStyles.buttonDisabled : {},
+              smallDevice ? { marginBottom: 18 } : {},
             ]}
             onPress={onSubmit}
             disabled={isButtonDisabled}
