@@ -1,4 +1,4 @@
-import { useRouter, useSegments } from "expo-router";
+import { SplashScreen, useRouter, useSegments } from "expo-router";
 import {
   PropsWithChildren,
   createContext,
@@ -70,6 +70,15 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
     if (authToken && user?.neighborhood?.name === "WAITLISTED") {
       router.replace("/waitlist");
+      return;
+    }
+
+    if (
+      authToken &&
+      user?.neighborhood?.name &&
+      segments[0] === "(auth)" &&
+      (segments[1] === "contacts" || segments[1] === "notifications")
+    ) {
       return;
     }
 

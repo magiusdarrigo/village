@@ -91,6 +91,8 @@ export default function TabLayout() {
     activeTab,
     updateActiveTab,
     activeNeighborhood,
+    removeUser,
+    updateActiveNeighborhood,
   } = useUser();
   const { removeAuthToken } = useAuth();
   const { addBuildingChangeRequest, accountDeletionRequest } = useTweetsApi();
@@ -238,6 +240,8 @@ export default function TabLayout() {
                       await accountDeletionRequest();
                       streamChatClient.disconnectUser();
                       removeAuthToken();
+                      removeUser();
+                      updateActiveNeighborhood(null);
                     } catch (error) {
                       Sentry.Native.captureException(error);
                       Alert.alert(
@@ -261,6 +265,8 @@ export default function TabLayout() {
                 onPress: async () => {
                   streamChatClient.disconnectUser();
                   removeAuthToken();
+                  removeUser();
+                  updateActiveNeighborhood(null);
                 },
               },
             ]);

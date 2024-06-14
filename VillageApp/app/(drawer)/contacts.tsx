@@ -18,7 +18,15 @@ import { ProfileRowType } from "../../types/index";
 import { useQuery } from "@tanstack/react-query";
 import LoadingScreen from "../../components/LoadingScreen";
 import OpenSettingsModal from "../../components/OpenSettingsModal";
-import { getDDBReadableNumber } from "../../lib/helpers";
+import {
+  getDDBReadableNumber,
+  getDeviceType,
+  DeviceType,
+} from "../../lib/helpers";
+import { router, useSegments } from "expo-router";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 type ContactProps = {};
 
@@ -44,9 +52,12 @@ const ContactsScreen = (props: ContactProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { getUsersFromPhoneNumbers } = useTweetsApi();
   const { user } = useUser();
+  const segments = useSegments();
   if (!user) {
     return null;
   }
+
+  const isOnboarding = segments[0] === "(auth)";
 
   useEffect(() => {
     const checkPermissions = async () => {
@@ -65,6 +76,8 @@ const ContactsScreen = (props: ContactProps) => {
     if (status === "granted") {
       setPermissions(true);
       loadContacts();
+    } else if (isOnboarding) {
+      router.replace("/tabs");
     } else {
       setModalVisible(true);
     }
@@ -155,17 +168,48 @@ const ContactsScreen = (props: ContactProps) => {
     return <LoadingScreen />;
   }
 
+  const onDone = () => {
+    router.replace("/tabs");
+  };
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        isOnboarding
+          ? { paddingHorizontal: 10 }
+          : { backgroundColor: "white", paddingHorizontal: 10 },
+      ]}
+    >
       {!permissions && (
         <View
-          style={{
-            flex: 1,
-            justifyContent: "space-between",
-            paddingVertical: 20,
-          }}
+          style={[
+            {
+              flex: 1,
+              justifyContent: "space-between",
+            },
+            isOnboarding ? {} : { paddingTop: 20 },
+          ]}
         >
-          <Text style={styles.infoText}>
+          <Text
+            style={[
+              styles.infoText,
+              isOnboarding
+                ? {
+                    textAlign: "left",
+                    color: "black",
+                    fontWeight: "bold",
+                    fontSize: 36,
+                    paddingHorizontal: 14,
+                  }
+                : { lineHeight: 22 },
+              isOnboarding
+                ? smallDevice
+                  ? { marginTop: 12 }
+                  : { marginTop: 36 }
+                : {},
+            ]}
+          >
             Sync contacts to find friends on Village or invite them if they're
             in NYC 🗽
           </Text>
@@ -173,7 +217,7 @@ const ContactsScreen = (props: ContactProps) => {
             style={[
               onboardingStyles.button,
               isButtonDisabled ? onboardingStyles.buttonDisabled : {},
-              { marginBottom: 15 },
+              smallDevice ? { marginBottom: 18 } : {},
             ]}
             onPress={askForPermissions}
             disabled={isButtonDisabled}
@@ -190,6 +234,7 @@ const ContactsScreen = (props: ContactProps) => {
                 style={[
                   styles.contactsTitleContainer,
                   profilesCount == 0 ? { height: 0 } : {},
+                  isOnboarding ? {} : { backgroundColor: "white" },
                 ]}
               >
                 <Text style={styles.contactsTitle}>Friends on Village</Text>
@@ -198,12 +243,19 @@ const ContactsScreen = (props: ContactProps) => {
           }}
           showsVerticalScrollIndicator={true}
           data={allProfiles}
+          style={isOnboarding ? { marginTop: 24 } : {}}
           keyExtractor={(item) => String(item.id)}
           // stickyHeaderIndices={[0]}
           renderItem={({ item, index }) => (
             <>
               {index == profilesCount && (
-                <View style={styles.contactsTitleContainer}>
+                <View
+                  style={[
+                    styles.contactsTitleContainer,
+                    isOnboarding ? {} : { backgroundColor: "white" },
+                    profilesCount === 0 ? { paddingTop: 0 } : {},
+                  ]}
+                >
                   <Text style={styles.contactsTitle}>Invite Friends</Text>
                 </View>
               )}
@@ -213,10 +265,22 @@ const ContactsScreen = (props: ContactProps) => {
                 handleClose={() => {}}
                 userIDOfProfile={user?.id}
                 isInviteRow={index >= profilesCount}
+                isOnboarding={isOnboarding}
               />
             </>
           )}
         />
+      )}
+      {permissions && isOnboarding && (
+        <Pressable
+          style={[
+            onboardingStyles.button,
+            smallDevice ? { marginBottom: 18 } : {},
+          ]}
+          onPress={onDone}
+        >
+          <Text style={onboardingStyles.buttonText}>Done</Text>
+        </Pressable>
       )}
       <OpenSettingsModal
         isVisible={modalVisible}
@@ -234,13 +298,10 @@ const ContactsScreen = (props: ContactProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 10,
-    backgroundColor: "white",
   },
   contactsTitleContainer: {
     paddingHorizontal: 10,
     paddingVertical: 20,
-    backgroundColor: "white",
   },
   contactsTitle: {
     fontSize: 24,
@@ -252,7 +313,6 @@ const styles = StyleSheet.create({
     color: Colors.light.switchFontColor,
     marginBottom: 20,
     textAlign: "center",
-    lineHeight: 22,
   },
   contactRow: {
     flexDirection: "row",

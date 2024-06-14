@@ -20,7 +20,7 @@ interface UserContextType {
   activeTab: string;
   updateActiveTab: (tab: string) => void;
   activeNeighborhood: NeighborhoodType | null;
-  updateActiveNeighborhood: (neighborhood: NeighborhoodType) => void;
+  updateActiveNeighborhood: (neighborhood: NeighborhoodType | null) => void;
 }
 
 interface UserContextProviderProps {
@@ -44,7 +44,7 @@ const UserContextProvider = ({
   const [activeNeighborhood, setActiveNeighborhood] =
     useState<NeighborhoodType | null>(null);
 
-  const updateActiveNeighborhood = (neighborhood: NeighborhoodType) => {
+  const updateActiveNeighborhood = (neighborhood: NeighborhoodType | null) => {
     setActiveNeighborhood(neighborhood);
   };
 

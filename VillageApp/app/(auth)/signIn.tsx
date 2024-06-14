@@ -17,7 +17,10 @@ import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
-import { stripParentheses } from "../../lib/helpers";
+import { stripParentheses, getDeviceType, DeviceType } from "../../lib/helpers";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const SignIn = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -92,7 +95,11 @@ const SignIn = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
       >
-        <Text style={onboardingStyles.label}>Enter your phone number.</Text>
+        <Text
+          style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
+        >
+          Enter your phone number.
+        </Text>
         <View style={{ flex: 1, justifyContent: "space-between" }}>
           <TextInput
             ref={phoneNumberInputRef}
@@ -118,6 +125,7 @@ const SignIn = () => {
                 isNumberInvalid || isLoading
                   ? onboardingStyles.buttonDisabled
                   : {},
+                smallDevice ? { marginBottom: 18 } : {},
               ]}
               onPress={onSignIn}
               disabled={isNumberInvalid || isLoading}
