@@ -4,11 +4,12 @@ import {
   DrawerItemList,
   createDrawerNavigator,
 } from "@react-navigation/drawer";
-import { ActivityIndicator, Image, Pressable } from "react-native";
+import { ActivityIndicator, Pressable } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { View } from "../../components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
+import { DynaPuffText } from "../../components/StyledText";
 
 const DrawerNavigator = createDrawerNavigator().Navigator;
 const Drawer = withLayoutContext(DrawerNavigator);
@@ -25,11 +26,21 @@ function CustomDrawerContent(props: any) {
       style={{ backgroundColor: Colors.light.tertiary }}
     >
       <View>
-        <Image
-          source={require("../../assets/images/transparent-icon-crop.png")}
-          style={{ width: 150, height: 100 }}
-          resizeMode="contain"
-        />
+        <View
+          style={{
+            backgroundColor: Colors.light.tertiary,
+            width: "100%",
+            height: 85,
+            display: "flex",
+            justifyContent: "center",
+            paddingLeft: 18,
+            paddingBottom: 5,
+          }}
+        >
+          <DynaPuffText style={{ fontSize: 38, color: "black" }}>
+            Village
+          </DynaPuffText>
+        </View>
       </View>
       <DrawerItemList {...props} />
     </DrawerContentScrollView>

@@ -17,7 +17,14 @@ import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
-import { addParenthesesToPhoneNumber } from "../../lib/helpers";
+import {
+  addParenthesesToPhoneNumber,
+  getDeviceType,
+  DeviceType,
+} from "../../lib/helpers";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const Authenticate = () => {
   const [code, setCode] = useState("");
@@ -29,7 +36,7 @@ const Authenticate = () => {
   phoneNumber = addParenthesesToPhoneNumber(phoneNumber.toString());
   const router = useRouter();
   const { updateAuthToken } = useAuth();
-  const { user } = useUser();
+  const { user, updateActiveNeighborhood } = useUser();
   const otpCodeRef = useRef<TextInput>(null);
   const isCodeInvalid = code.length < 6;
 
@@ -57,6 +64,12 @@ const Authenticate = () => {
       if (continueOnboarding()) {
         router.replace("/createProfile");
       }
+      if (user?.neighborhood_id && user?.neighborhood?.name) {
+        updateActiveNeighborhood({
+          name: user?.neighborhood?.name,
+          id: user?.neighborhood_id,
+        });
+      }
     } catch (e) {
       Alert.alert("Your OTP code expired or doesn't match. Try again.");
       // send the user back to the sign in page
@@ -72,7 +85,9 @@ const Authenticate = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
       >
-        <Text style={onboardingStyles.label}>
+        <Text
+          style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
+        >
           Paste the code we texted you.
         </Text>
         <View style={{ flex: 1, justifyContent: "space-between" }}>
@@ -91,6 +106,7 @@ const Authenticate = () => {
             style={[
               onboardingStyles.button,
               isCodeInvalid || isLoading ? onboardingStyles.buttonDisabled : {},
+              smallDevice ? { marginBottom: 18 } : {},
             ]}
             onPress={onConfirm}
             disabled={isCodeInvalid || isLoading}

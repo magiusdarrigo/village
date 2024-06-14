@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, Pressable, Alert } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
+import { getDeviceType, DeviceType } from "../../lib/helpers";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const ShowNeighborhood = () => {
   const { neighborhoodName, buildingID, neighborhoodID } =
@@ -36,6 +40,7 @@ const ShowNeighborhood = () => {
         name: updatedUser.neighborhood.name,
         id: updatedUser.neighborhood_id,
       });
+      router.replace("/(auth)/notifications");
     } catch (error) {
       Sentry.Native.captureException(error);
       Alert.alert("We had an issue adding you to the neighborhood. Try again.");
@@ -47,13 +52,16 @@ const ShowNeighborhood = () => {
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <Text style={styles.welcomeLabel}>
+        <Text
+          style={[styles.welcomeLabel, smallDevice ? { marginTop: 12 } : {}]}
+        >
           Welcome to {neighborhoodName} on Village.
         </Text>
         <Pressable
           style={[
             onboardingStyles.button,
             isLoading ? onboardingStyles.buttonDisabled : {},
+            smallDevice ? { marginBottom: 18 } : {},
           ]}
           onPress={onEnter}
           disabled={isLoading}
