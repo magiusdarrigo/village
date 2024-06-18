@@ -48,8 +48,8 @@ const OtherUserProfileScreen = () => {
             break;
           case blockUserIndex:
             Alert.alert(
-              "Are you sure you want block this user?",
-              "This action cannot be undone.",
+              "are you sure you want block this user?",
+              "this action cannot be undone.",
               [
                 {
                   text: "Cancel",

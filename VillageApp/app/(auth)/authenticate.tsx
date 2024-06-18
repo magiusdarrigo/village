@@ -88,7 +88,7 @@ const Authenticate = () => {
         <Text
           style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
         >
-          Paste the code we texted you.
+          paste the code we texted you.
         </Text>
         <View style={{ flex: 1, justifyContent: "space-between" }}>
           <TextInput
@@ -111,7 +111,7 @@ const Authenticate = () => {
             onPress={onConfirm}
             disabled={isCodeInvalid || isLoading}
           >
-            <Text style={onboardingStyles.buttonText}>Confirm</Text>
+            <Text style={onboardingStyles.buttonText}>confirm</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>

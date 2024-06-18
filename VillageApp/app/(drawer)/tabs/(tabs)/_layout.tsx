@@ -170,15 +170,15 @@ export default function TabLayout() {
 
   const onSettingsPress = () => {
     const options = [
-      "Request Building Change",
-      "Request Neighborhood Change",
-      "Terms of Service",
-      "Privacy Policy",
-      "Report A Bug",
-      "Contact Us",
-      "Delete Account",
-      "Log Out",
-      "Cancel",
+      "request building change",
+      "request neighborhood change",
+      "terms of service",
+      "privacy policy",
+      "report a bug",
+      "contact us",
+      "delete account",
+      "log out",
+      "cancel",
     ];
     const requestBuildingChangeIndex = 0;
     const requestNeighborhoodChangeIndex = 1;
@@ -201,8 +201,8 @@ export default function TabLayout() {
         switch (selectedIndex) {
           case requestBuildingChangeIndex:
             Alert.prompt(
-              "Building Change Request",
-              "What's the address of the building?",
+              "building change request",
+              "what's the address of the building?",
               (text) => handleBuildingChangeRequest(text),
               "plain-text"
             );
@@ -225,15 +225,15 @@ export default function TabLayout() {
             break;
           case deleteAccountIndex:
             Alert.alert(
-              "Are you sure you want to delete your account?",
-              "All related data will be permanently deleted within 48 hours. This action cannot be undone.",
+              "are you sure you want to delete your account?",
+              "all related data will be deleted within 48 hours. this action cannot be undone.",
               [
                 {
-                  text: "Cancel",
+                  text: "cancel",
                   style: "cancel",
                 },
                 {
-                  text: "Delete Account",
+                  text: "delete account",
                   onPress: async () => {
                     try {
                       // delete account request submitted
@@ -245,8 +245,8 @@ export default function TabLayout() {
                     } catch (error) {
                       Sentry.Native.captureException(error);
                       Alert.alert(
-                        "Error",
-                        "There was an error deleting your account. Please try again."
+                        "error",
+                        "there was an error deleting your account. please try again."
                       );
                     }
                   },
@@ -255,13 +255,13 @@ export default function TabLayout() {
             );
             break;
           case logOutIndex:
-            Alert.alert("Are you sure you want to log out?", "", [
+            Alert.alert("are you sure you want to log out?", "", [
               {
-                text: "Cancel",
+                text: "cancel",
                 style: "cancel",
               },
               {
-                text: "Log out",
+                text: "log out",
                 onPress: async () => {
                   streamChatClient.disconnectUser();
                   removeAuthToken();
@@ -288,8 +288,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          headerTitle: activeNeighborhood?.name || "Home",
+          title: "home",
+          headerTitle: activeNeighborhood?.name || "home",
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
@@ -336,7 +336,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: "Building",
+          title: "building",
           headerTitle: user?.building?.address || "Building",
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
@@ -361,7 +361,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="notifications"
         options={{
-          title: "Activity",
+          title: "activity",
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconOcticons name="bell-fill" color={color} />
@@ -376,7 +376,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "You",
+          title: "you",
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="user" color={color} />

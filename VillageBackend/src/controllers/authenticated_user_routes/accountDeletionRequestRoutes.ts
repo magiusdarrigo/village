@@ -35,6 +35,11 @@ router.get("/", async (req, res) => {
         id: true,
         neighborhood_id: true,
         address: true,
+        neighborhood: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 

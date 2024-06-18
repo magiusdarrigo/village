@@ -71,8 +71,8 @@ const FeedSwitch = ({ isHot, setIsHot }: FeedSwitchProps) => {
             alignItems: "center",
           }}
         >
-          <Text style={[styles.textOption]}>Hot</Text>
-          <Text style={[styles.textOption]}>New</Text>
+          <Text style={[styles.textOption]}>hot</Text>
+          <Text style={[styles.textOption]}>new</Text>
         </View>
       </View>
     </TouchableWithoutFeedback>

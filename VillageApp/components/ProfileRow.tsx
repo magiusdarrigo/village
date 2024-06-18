@@ -157,8 +157,8 @@ const ProfileRow = ({
               >
                 {!isInviteRow
                   ? !isWaitlisted
-                    ? `Lives in ${profile.neighborhood_name}`
-                    : "On the waitlist"
+                    ? `lives in ${profile.neighborhood_name}`
+                    : "on the waitlist"
                   : profile.neighborhood_name}
               </Text>
             </View>
@@ -178,7 +178,7 @@ const ProfileRow = ({
               ]}
               onPress={handleInvite}
             >
-              <Text style={profileStyles.followButtonText}>Invite</Text>
+              <Text style={profileStyles.followButtonText}>invite</Text>
             </Pressable>
           </View>
         )}
@@ -194,14 +194,14 @@ const ProfileRow = ({
                 style={[profileStyles.unfollowButton, { width: 100 }]}
                 onPress={handleUnfollowUser}
               >
-                <Text style={profileStyles.unfollowButtonText}>Following</Text>
+                <Text style={profileStyles.unfollowButtonText}>following</Text>
               </Pressable>
             ) : (
               <Pressable
                 style={[profileStyles.followButton, { width: 100 }]}
                 onPress={handleFollowUser}
               >
-                <Text style={profileStyles.followButtonText}>Follow</Text>
+                <Text style={profileStyles.followButtonText}>follow</Text>
               </Pressable>
             )}
           </View>

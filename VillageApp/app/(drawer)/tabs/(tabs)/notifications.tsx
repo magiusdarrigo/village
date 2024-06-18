@@ -87,7 +87,7 @@ const NotificationsScreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        ListEmptyComponent={() => EmptyListView("No Notifications Yet.")}
+        ListEmptyComponent={() => EmptyListView("no notifications yet.")}
         contentContainerStyle={{ flexGrow: 1 }}
       />
     </View>

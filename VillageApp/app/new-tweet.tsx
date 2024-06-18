@@ -206,7 +206,7 @@ const NewTweet = () => {
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
           <Link href="../" style={{ fontSize: 16 }}>
-            Cancel
+            cancel
           </Link>
           {isLoading && <ActivityIndicator />}
           <Pressable
@@ -219,7 +219,7 @@ const NewTweet = () => {
             ]}
             disabled={isPostButtonDisabled || tweetUploading}
           >
-            <Text style={styles.buttonText}>Post</Text>
+            <Text style={styles.buttonText}>post</Text>
           </Pressable>
         </View>
         <View style={styles.inputContainer}>
@@ -231,7 +231,7 @@ const NewTweet = () => {
             autoFocus={false}
             value={text}
             onChangeText={(value) => setText(value)}
-            placeholder={`What's going on in ${user?.neighborhood?.name}?`}
+            placeholder={`what's going on in ${user?.neighborhood?.name}?`}
             placeholderTextColor={"#c5c5c7"}
             multiline
             style={{
