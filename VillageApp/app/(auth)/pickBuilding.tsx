@@ -96,7 +96,7 @@ const PickBuilding = () => {
         <Text
           style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
         >
-          Add your building address.
+          add your building address.
         </Text>
         <View
           style={{
@@ -105,7 +105,7 @@ const PickBuilding = () => {
         >
           <GooglePlacesAutocomplete
             ref={ref}
-            placeholder="Enter Building Address"
+            placeholder="enter building address"
             fetchDetails={true}
             GooglePlacesSearchQuery={{
               rankby: "distance",
@@ -164,7 +164,7 @@ const PickBuilding = () => {
             onPress={onSubmit}
             disabled={isButtonDisabled}
           >
-            <Text style={onboardingStyles.buttonText}>Submit</Text>
+            <Text style={onboardingStyles.buttonText}>submit</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>

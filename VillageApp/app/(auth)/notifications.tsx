@@ -35,7 +35,7 @@ const Notifications = () => {
       <Text
         style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
       >
-        Get notified when someone in your apartment sends you a message.
+        get notified when someone in your apartment sends you a message.
       </Text>
       <Pressable
         style={[
@@ -44,7 +44,7 @@ const Notifications = () => {
         ]}
         onPress={onAllow}
       >
-        <Text style={onboardingStyles.buttonText}>Allow Notifications</Text>
+        <Text style={onboardingStyles.buttonText}>allow notifications</Text>
       </Pressable>
     </KeyboardAvoidingView>
   );

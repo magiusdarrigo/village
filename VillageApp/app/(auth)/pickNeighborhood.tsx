@@ -68,7 +68,7 @@ const PickNeighborhood = () => {
         <Text
           style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
         >
-          What neighborhood is your building in?
+          what neighborhood is your building in?
         </Text>
         <Picker
           selectedValue={selectedNeighborhood}
@@ -93,7 +93,7 @@ const PickNeighborhood = () => {
           onPress={onSubmit}
           disabled={isLoading}
         >
-          <Text style={onboardingStyles.buttonText}>Submit</Text>
+          <Text style={onboardingStyles.buttonText}>submit</Text>
         </Pressable>
       </View>
     </View>

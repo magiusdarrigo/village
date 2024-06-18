@@ -310,7 +310,7 @@ const TweetScreen = () => {
   const renderEmptyListComponent = () => (
     <View style={postStyles.emptyCommentsContainer}>
       <DynaPuffText style={postStyles.emptyCommentsContainerText}>
-        No comments yet.
+        no comments yet.
       </DynaPuffText>
     </View>
   );
@@ -379,7 +379,7 @@ const TweetScreen = () => {
       <View style={styles.footer}>
         <TextInput
           ref={inputRef}
-          placeholder="Add a comment..."
+          placeholder="add a comment..."
           placeholderTextColor={"lightgrey"}
           style={styles.footerTextInput}
           onChangeText={setCommentText}

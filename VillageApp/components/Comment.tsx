@@ -329,8 +329,8 @@ const Comment = ({
       ]);
     } else {
       Alert.alert(
-        "Delete Comment?",
-        "Are you sure you want to delete this Comment?",
+        "delete comment?",
+        "are you sure you want to delete this comment?",
         [
           {
             text: "Cancel",

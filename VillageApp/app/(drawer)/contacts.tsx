@@ -210,8 +210,8 @@ const ContactsScreen = (props: ContactProps) => {
                 : {},
             ]}
           >
-            Sync contacts to find friends on Village or invite them if they're
-            in NYC 🗽
+            sync contacts to find friends on Village or invite them if they're
+            in nyc 🗽
           </Text>
           <Pressable
             style={[
@@ -222,7 +222,7 @@ const ContactsScreen = (props: ContactProps) => {
             onPress={askForPermissions}
             disabled={isButtonDisabled}
           >
-            <Text style={onboardingStyles.buttonText}>Sync Contacts</Text>
+            <Text style={onboardingStyles.buttonText}>sync contacts</Text>
           </Pressable>
         </View>
       )}
@@ -237,7 +237,7 @@ const ContactsScreen = (props: ContactProps) => {
                   isOnboarding ? {} : { backgroundColor: "white" },
                 ]}
               >
-                <Text style={styles.contactsTitle}>Friends on Village</Text>
+                <Text style={styles.contactsTitle}>friends on Village</Text>
               </View>
             );
           }}
@@ -256,7 +256,7 @@ const ContactsScreen = (props: ContactProps) => {
                     profilesCount === 0 ? { paddingTop: 0 } : {},
                   ]}
                 >
-                  <Text style={styles.contactsTitle}>Invite Friends</Text>
+                  <Text style={styles.contactsTitle}>invite friends</Text>
                 </View>
               )}
               <ProfileRow
@@ -279,7 +279,7 @@ const ContactsScreen = (props: ContactProps) => {
           ]}
           onPress={onDone}
         >
-          <Text style={onboardingStyles.buttonText}>Done</Text>
+          <Text style={onboardingStyles.buttonText}>done</Text>
         </Pressable>
       )}
       <OpenSettingsModal

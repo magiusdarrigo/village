@@ -264,8 +264,8 @@ const Profile = ({ user }: ProfileProps) => {
           <Text style={profileStyles.username}>@{user.username}</Text>
           <Text style={profileStyles.bio}>
             {!isWaitlisted
-              ? `Lives in ${user.neighborhood?.name}`
-              : "On the waitlist"}
+              ? `lives in ${user.neighborhood?.name}`
+              : "on the waitlist"}
           </Text>
           <View style={profileStyles.countContainer}>
             <TouchableOpacity
@@ -276,7 +276,7 @@ const Profile = ({ user }: ProfileProps) => {
               }}
             >
               <Text style={profileStyles.countText}>
-                Following: {user.following_count ?? ""}
+                following: {user.following_count ?? ""}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -287,7 +287,7 @@ const Profile = ({ user }: ProfileProps) => {
               }}
             >
               <Text style={profileStyles.countText}>
-                Followers: {user.followers_count ?? ""}
+                followers: {user.followers_count ?? ""}
               </Text>
             </TouchableOpacity>
           </View>
@@ -299,7 +299,7 @@ const Profile = ({ user }: ProfileProps) => {
                   onPress={handleEditProfile}
                 >
                   <Text style={profileStyles.followButtonText}>
-                    Edit Profile
+                    edit profile
                   </Text>
                 </Pressable>
               ) : (
@@ -307,7 +307,7 @@ const Profile = ({ user }: ProfileProps) => {
                   style={profileStyles.cancelButton}
                   onPress={handleCancelEditProfile}
                 >
-                  <Text style={profileStyles.cancelButtonText}>Cancel</Text>
+                  <Text style={profileStyles.cancelButtonText}>cancel</Text>
                 </Pressable>
               )}
             </>
@@ -319,7 +319,7 @@ const Profile = ({ user }: ProfileProps) => {
                   onPress={handleUnfollowUser}
                 >
                   <Text style={profileStyles.unfollowButtonText}>
-                    Following
+                    following
                   </Text>
                 </Pressable>
               ) : (
@@ -327,7 +327,7 @@ const Profile = ({ user }: ProfileProps) => {
                   style={profileStyles.followButton}
                   onPress={handleFollowUser}
                 >
-                  <Text style={profileStyles.followButtonText}>Follow</Text>
+                  <Text style={profileStyles.followButtonText}>follow</Text>
                 </Pressable>
               )}
             </View>
@@ -354,7 +354,7 @@ const Profile = ({ user }: ProfileProps) => {
               ? () => <ActivityIndicator size="small" />
               : null
           }
-          ListEmptyComponent={() => EmptyListView("No posts yet.")}
+          ListEmptyComponent={() => EmptyListView("no posts yet.")}
           contentContainerStyle={{ flexGrow: 1 }}
           scrollEnabled={false}
         />

@@ -24,7 +24,8 @@ export const calculateHoursAgo = (time: string) => {
       .toDateString()
       .split(" ")
       .slice(0, 3)
-      .join(" ");
+      .join(" ")
+      .toLowerCase();
     return <Text style={postStyles.timeContent}>· {dateWithoutYear}</Text>;
   }
 };

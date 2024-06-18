@@ -55,7 +55,7 @@ const ShowNeighborhood = () => {
         <Text
           style={[styles.welcomeLabel, smallDevice ? { marginTop: 12 } : {}]}
         >
-          Welcome to {neighborhoodName} on Village.
+          welcome to {neighborhoodName} on Village.
         </Text>
         <Pressable
           style={[
@@ -66,7 +66,7 @@ const ShowNeighborhood = () => {
           onPress={onEnter}
           disabled={isLoading}
         >
-          <Text style={onboardingStyles.buttonText}>Enter</Text>
+          <Text style={onboardingStyles.buttonText}>next</Text>
         </Pressable>
       </View>
     </View>

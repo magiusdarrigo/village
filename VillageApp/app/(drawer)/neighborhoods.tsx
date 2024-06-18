@@ -30,23 +30,23 @@ type NeighborhoodProps = {
 
 const neighborhoodsData = [
   {
-    title: "Manhattan",
+    title: "manhattan",
     neighborhoods: ManhattanNeighborhoods,
   },
   {
-    title: "Brooklyn",
+    title: "brooklyn",
     neighborhoods: BrooklynNeighborhoods,
   },
   {
-    title: "Queens",
+    title: "queens",
     neighborhoods: QueensNeighborhoods,
   },
   {
-    title: "Bronx",
+    title: "bronx",
     neighborhoods: BronxNeighborhoods,
   },
   {
-    title: "Staten Island",
+    title: "staten island",
     neighborhoods: StatenIslandNeighborhoods,
   },
 ];
@@ -178,8 +178,8 @@ const Neighborhoods: React.FC = () => {
     <>
       <ScrollView style={styles.parentContainer}>
         <Text style={styles.explanationTitle}>
-          Select up to five other neighborhoods to pick between on your feed.
-          More neighborhoods on the way 👀
+          select up to five other neighborhoods to pick between on your feed.
+          more neighborhoods on the way 👀
         </Text>
         {neighborhoodsData.map((category, index) => (
           <Category
@@ -200,7 +200,7 @@ const Neighborhoods: React.FC = () => {
         onPress={handleSave}
         disabled={isLoading || !didSelectionChange}
       >
-        <Text style={styles.saveButtonText}>Save</Text>
+        <Text style={styles.saveButtonText}>save</Text>
       </Pressable>
     </>
   );

@@ -26,15 +26,15 @@ const Waitlist = () => {
         }}
       >
         <Text style={styles.waitlistTitle}>
-          You've been added to the waitlist 🎉
+          you've been added to the waitlist 🎉
         </Text>
         <Text style={styles.contactSupportLabel}>
-          We'll text you once we've added your neighborhood to Village.{" "}
+          we'll text you once we've added your neighborhood to Village.{" "}
           <Text
             style={styles.contactSupportLink}
             onPress={handleContactSupport}
           >
-            Contact support
+            contact support
           </Text>
         </Text>
       </View>
