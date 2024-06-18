@@ -290,7 +290,7 @@ router.post("/:id/likes", async (req, res) => {
           is_banned: true,
         },
       });
-      const title = "Your post has been banned.";
+      const title = "your post has been banned.";
       const message = truncateNotificationMessage(
         updatedPost.text_content ?? ""
       );

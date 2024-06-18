@@ -463,10 +463,10 @@ const Tweet = ({
     }
 
     Alert.alert(
-      userID !== tweet.user_id ? "Harmful Post?" : "Delete Post?",
+      userID !== tweet.user_id ? "harmful post?" : "delete post?",
       userID !== tweet.user_id
         ? ""
-        : "Are you sure you want to delete this post?",
+        : "are you sure you want to delete this post?",
       alertOptions
     );
   };

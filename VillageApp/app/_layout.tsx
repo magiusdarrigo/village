@@ -113,7 +113,7 @@ function RootLayoutNav() {
                         <Stack.Screen
                           name="tweet/[id]"
                           options={{
-                            title: "Post",
+                            title: "post",
                             headerBackTitleVisible: false,
                             headerTintColor: "black",
                           }}
@@ -121,7 +121,7 @@ function RootLayoutNav() {
                         <Stack.Screen
                           name="new-tweet"
                           options={{
-                            title: "New Post",
+                            title: "new post",
                             headerShown: true,
                             headerBackTitleVisible: false,
                             headerTintColor: "black",

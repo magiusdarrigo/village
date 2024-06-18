@@ -98,7 +98,7 @@ const SignIn = () => {
         <Text
           style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
         >
-          Enter your phone number.
+          enter your phone number.
         </Text>
         <View style={{ flex: 1, justifyContent: "space-between" }}>
           <TextInput
@@ -116,7 +116,7 @@ const SignIn = () => {
 
           <View>
             <Text style={styles.optInText}>
-              By selecting Get Code, you agree to receiving SMS verification
+              by selecting get code, you agree to receiving sms verification
               messages from Village.
             </Text>
             <Pressable
@@ -130,7 +130,7 @@ const SignIn = () => {
               onPress={onSignIn}
               disabled={isNumberInvalid || isLoading}
             >
-              <Text style={onboardingStyles.buttonText}>Get Code</Text>
+              <Text style={onboardingStyles.buttonText}>get code</Text>
             </Pressable>
           </View>
         </View>

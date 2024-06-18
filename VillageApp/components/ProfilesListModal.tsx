@@ -38,11 +38,11 @@ const ProfilesListModal = ({
     if (modalTitle === "Followers") {
       return (
         <View style={styles.emptyProfilesView}>
-          {EmptyListView("No followers yet.")}
+          {EmptyListView("no followers yet.")}
         </View>
       );
     } else {
-      return EmptyListView("Not following anyone yet.");
+      return EmptyListView("not following anyone yet.");
     }
   };
 

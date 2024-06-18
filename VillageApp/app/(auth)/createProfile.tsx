@@ -33,7 +33,7 @@ const deviceType = getDeviceType();
 const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const CreateProfile = () => {
-  const { updateUser } = useUser();
+  const { updateUser, updateActiveNeighborhood } = useUser();
   const router = useRouter();
   const { updateUserAttributes, checkIfUserAccountWasDeleted } = useTweetsApi();
   const [username, setUsername] = useState("");
@@ -100,20 +100,16 @@ const CreateProfile = () => {
         buildingID: building?.id,
         neighborhoodID: building?.neighborhood_id,
       });
-
       updateUser(updatedUser);
       if (building) {
         // show popup stating this account was previously deleted
         Alert.alert(
           "This phone number was previously used. Welcome back! Please submit a building change request if you've moved."
         );
-        router.replace({
-          pathname: "/showNeighborhood",
-          params: {
-            neighborhoodName: building?.neighborhood?.name,
-            buildingID: building.id,
-            neighborhoodID: building.neighborhood_id,
-          },
+        console.log("building:", building);
+        updateActiveNeighborhood({
+          name: building.neighborhood?.name,
+          id: building.neighborhood_id,
         });
         return;
       }
@@ -142,7 +138,7 @@ const CreateProfile = () => {
         <Text
           style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
         >
-          Create your anonymous profile.
+          create your anonymous profile.
         </Text>
         <View
           style={{
@@ -151,18 +147,18 @@ const CreateProfile = () => {
           }}
         >
           <View>
-            <Text style={styles.inputLabel}>Username</Text>
+            <Text style={styles.inputLabel}>username</Text>
             <TextInput
               autoComplete="off"
               autoCorrect={false}
               autoCapitalize="none"
-              placeholder="Username"
+              placeholder="username"
               value={username}
               onChangeText={setUsername}
               style={styles.input}
               placeholderTextColor={"grey"}
             />
-            <Text style={styles.inputLabel}>Profile Picture</Text>
+            <Text style={styles.inputLabel}>profile picture</Text>
             <View style={styles.customProfilePictureParentContainer}>
               <View style={styles.customProfilePictureContainer}>
                 <Image
@@ -215,7 +211,7 @@ const CreateProfile = () => {
               onPress={handlePressButtonAsync}
             >
               <Text style={styles.optInText}>
-                By selecting Create, you agree to Village's
+                by selecting create, you agree to Village's
                 https://villagenyc.notion.site/Privacy-Policy-for-Village-845fb113171045c3bdd26c828e8ccf26,
                 https://villagenyc.notion.site/Terms-of-Service-for-Village-1da7d1897d1e485e8f80125a3a3be087,
                 and
@@ -231,7 +227,7 @@ const CreateProfile = () => {
               onPress={onSave}
               disabled={isButtonDisabled}
             >
-              <Text style={onboardingStyles.buttonText}>Create</Text>
+              <Text style={onboardingStyles.buttonText}>create</Text>
             </Pressable>
           </View>
         </View>

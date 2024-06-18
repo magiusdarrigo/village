@@ -200,7 +200,7 @@ const FeedScreen = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={() =>
-          EmptyListView("Post something that’s on your mind.")
+          EmptyListView("post something that’s on your mind.")
         }
         contentContainerStyle={{ flexGrow: 1 }}
       />
