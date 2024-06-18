@@ -106,7 +106,6 @@ const CreateProfile = () => {
         Alert.alert(
           "This phone number was previously used. Welcome back! Please submit a building change request if you've moved."
         );
-        console.log("building:", building);
         updateActiveNeighborhood({
           name: building.neighborhood?.name,
           id: building.neighborhood_id,
