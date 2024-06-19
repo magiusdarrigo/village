@@ -4,7 +4,7 @@ import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, SplashScreen } from "expo-router";
 import { useEffect } from "react";
-import { Alert, Text } from "react-native";
+import { Alert, Text, TextInput } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import AssetsContextProvider from "../context/AssetsContext";
@@ -43,6 +43,11 @@ export const unstable_settings = {
 
 // @ts-ignore
 Text.defaultProps = { ...(Text.defaultProps || {}), allowFontScaling: false };
+// @ts-ignore
+TextInput.defaultProps = {
+  ...(TextInput.defaultProps || {}),
+  allowFontScaling: false,
+};
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
