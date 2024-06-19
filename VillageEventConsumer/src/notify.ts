@@ -55,7 +55,7 @@ export const notifyUser = async (postEvent: NewPostWebhookEvent) => {
 export const emailSupportAcctDeletionReq = async (user_id: string) => {
   const { data: _, error } = await resend.emails.send({
     from: "Support <noreply@support.villageapp.nyc>",
-    to: ["magiusdarrigo@gmail.com"],
+    to: ["matteo@juiceapps.llc"],
     subject: "Account Deletion Request",
     html: `
       <h1>New Account Deletion Request</h1>

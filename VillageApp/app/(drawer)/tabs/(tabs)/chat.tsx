@@ -23,7 +23,10 @@ import {
 } from "stream-chat-expo";
 import { getDeviceType, DeviceType } from "../../../../lib/helpers";
 import CustomMessageList from "../../../../components/CustomMessageList";
-import CustomChatAvatar from "../../../../components/CustomChatAvatar";
+import {
+  CustomMessageAvatar,
+  CustomReplies,
+} from "../../../../components/CustomChatAvatar";
 
 let areNotificationsEnabled = false;
 
@@ -131,7 +134,7 @@ const ChatScreen = () => {
       }
 
       const token = await messaging().getToken();
-      console.log("FCM token: ", token);
+      // console.log("FCM token: ", token);
       const push_provider = "firebase";
       const push_provider_name = "firebaseStreamAPINotificationConfig"; // name an alias for your push provider (optional)
       streamChatClient.setLocalDevice({
@@ -234,7 +237,8 @@ const ChatScreen = () => {
         >
           <Chat client={streamChatClient}>
             <Channel
-              MessageAvatar={CustomChatAvatar}
+              MessageAvatar={CustomMessageAvatar}
+              Reply={CustomReplies}
               channel={channel}
               messageActions={(param) => {
                 const { isMyMessage, muteUser } = param;
