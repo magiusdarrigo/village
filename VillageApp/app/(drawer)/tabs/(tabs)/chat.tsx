@@ -134,7 +134,7 @@ const ChatScreen = () => {
       }
 
       const token = await messaging().getToken();
-      console.log("FCM token: ", token);
+      // console.log("FCM token: ", token);
       const push_provider = "firebase";
       const push_provider_name = "firebaseStreamAPINotificationConfig"; // name an alias for your push provider (optional)
       streamChatClient.setLocalDevice({

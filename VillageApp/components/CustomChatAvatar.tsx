@@ -1,5 +1,6 @@
 import { Pressable } from "react-native";
 import {
+  DefaultStreamChatGenerics,
   MessageAvatar,
   MessageAvatarProps,
   MessageType,
@@ -9,25 +10,26 @@ import {
 } from "stream-chat-expo";
 import { router } from "expo-router";
 
+const openProfile = (message: MessageType<DefaultStreamChatGenerics>) => {
+  if (!message?.user?.id || !message?.user?.name) {
+    return;
+  }
+  router.push({
+    pathname: `/profile/${message.user.id}`,
+    params: {
+      userID: message.user.id,
+      username: message.user.name,
+    },
+  });
+};
+
 export const CustomMessageAvatar = (props: MessageAvatarProps) => {
   const { message } = useMessageContext();
   if (!message) {
     return null;
   }
-  const openProfile = () => {
-    if (!message?.user?.id || !message?.user?.name) {
-      return;
-    }
-    router.push({
-      pathname: `/profile/${message.user.id}`,
-      params: {
-        userID: message.user.id,
-        username: message.user.name,
-      },
-    });
-  };
   return (
-    <Pressable onPress={openProfile}>
+    <Pressable onPress={() => openProfile(message)}>
       <MessageAvatar {...props} />
     </Pressable>
   );
@@ -39,7 +41,9 @@ const CustomMessageReplyAvatar = (props: MessageAvatarProps) => {
     return null;
   }
   return (
-    <Pressable onPress={() => console.log("Quoted Avatar")}>
+    <Pressable
+      onPress={() => openProfile(message.quoted_message as MessageType<any>)}
+    >
       <MessageAvatar
         {...props}
         size={50}
