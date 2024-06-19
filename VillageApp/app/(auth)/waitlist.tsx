@@ -5,7 +5,7 @@ import { SplashScreen } from "expo-router";
 
 const Waitlist = () => {
   const handleContactSupport = () => {
-    Linking.openURL("mailto:magiusdarrigo@gmail.com");
+    Linking.openURL("mailto:matteo@juiceapps.llc");
   };
 
   useEffect(() => {
