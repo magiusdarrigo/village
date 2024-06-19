@@ -76,7 +76,7 @@ app.post("/newbuildingchangerequest", async (req: Request, res: Response) => {
   // send email to support
   const { data: _, error } = await resend.emails.send({
     from: "Village <noreply@support.villageapp.nyc>",
-    to: ["magiusdarrigo@gmail.com"],
+    to: ["matteo@juiceapps.llc"],
     subject: "Building Change Request",
     html: `
         <h1>New Building Chage Request</h1>
@@ -100,7 +100,7 @@ app.post("/newreportedpost", async (req: Request, res: Response) => {
   // send email to support
   const { data: _, error } = await resend.emails.send({
     from: "Support <noreply@support.villageapp.nyc>",
-    to: ["magiusdarrigo@gmail.com"],
+    to: ["matteo@juiceapps.llc"],
     subject: "New Reported Post",
     html: `
         <h1>New Reported Post</h1>
@@ -124,7 +124,7 @@ app.post("/newreportedcomment", async (req: Request, res: Response) => {
   // send email to support
   const { data: _, error } = await resend.emails.send({
     from: "Support <noreply@support.villageapp.nyc>",
-    to: ["magiusdarrigo@gmail.com"],
+    to: ["matteo@juiceapps.llc"],
     subject: "New Reported Comment",
     html: `
         <h1>New Reported Comment</h1>

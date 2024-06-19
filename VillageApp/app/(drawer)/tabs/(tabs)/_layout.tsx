@@ -1,6 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Octicons, Ionicons } from "@expo/vector-icons";
-import { Tabs, useNavigation } from "expo-router";
+import { Tabs, router, useNavigation } from "expo-router";
 import { Pressable, AppState, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../../../context/UserContext";
@@ -168,6 +168,10 @@ export default function TabLayout() {
     }
   };
 
+  const onQuestionPress = () => {
+    router.push("/(drawer)/wheresEveryone");
+  };
+
   const onSettingsPress = () => {
     const options = [
       "request building change",
@@ -209,7 +213,7 @@ export default function TabLayout() {
             break;
           case requestNeighborhoodChangeIndex:
             Linking.openURL(
-              "mailto:magiusdarrigo@gmail.com?subject=Neighborhood%20Change%20Request&body=I'd%20like%20to%20change%20me%20and%20my%20building's%20neighborhood%20to%3A%0D%0A%0D%0A%3CEnter%20new%20neighborhood%20here%3E"
+              "mailto:matteo@juiceapps.llc?subject=Neighborhood%20Change%20Request&body=I'd%20like%20to%20change%20me%20and%20my%20building's%20neighborhood%20to%3A%0D%0A%0D%0A%3CEnter%20new%20neighborhood%20here%3E"
             );
           case termsOfServiceIndex:
             handlePressButtonAsync(TERMS_OF_SERVICE_URL);
@@ -221,7 +225,7 @@ export default function TabLayout() {
             handlePressButtonAsync(REPORT_A_BUG_URL);
             break;
           case contactUsIndex:
-            Linking.openURL("mailto:magiusdarrigo@gmail.com");
+            Linking.openURL("mailto:matteo@juiceapps.llc");
             break;
           case deleteAccountIndex:
             Alert.alert(
@@ -342,6 +346,18 @@ export default function TabLayout() {
           tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="comments" color={color} />
+          ),
+          headerRight: () => (
+            <Pressable onPress={onQuestionPress}>
+              {({ pressed }) => (
+                <FontAwesome
+                  name="question"
+                  size={25}
+                  color={Colors.light.text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
           ),
         }}
         listeners={{

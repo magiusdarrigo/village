@@ -10,6 +10,12 @@ import { View } from "../../components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import { DynaPuffText } from "../../components/StyledText";
+import { stripParentheses, getDeviceType, DeviceType } from "../../lib/helpers";
+
+const deviceType = getDeviceType();
+const smallDevice = deviceType === DeviceType.iPhoneSmall;
+
+const finalItemPaddingBottom = smallDevice ? 0 : 20;
 
 const DrawerNavigator = createDrawerNavigator().Navigator;
 const Drawer = withLayoutContext(DrawerNavigator);
@@ -23,7 +29,12 @@ function CustomDrawerContent(props: any) {
   return (
     <DrawerContentScrollView
       {...props}
-      style={{ backgroundColor: Colors.light.tertiary }}
+      style={{
+        backgroundColor: Colors.light.tertiary,
+      }}
+      contentContainerStyle={{
+        flex: 1,
+      }}
     >
       <View>
         <View
@@ -105,6 +116,38 @@ export default function DrawerLayout() {
           drawerInactiveBackgroundColor: "transparent",
           drawerLabelStyle: { color: "black", fontSize: 18 },
           drawerItemStyle: { marginTop: -10 },
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()}>
+              {({ pressed }) => (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={28}
+                  color={Colors.light.text}
+                  style={{ opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="wheresEveryone"
+        options={{
+          headerShown: true,
+          headerBackTitleVisible: false,
+          headerTintColor: "black",
+          title: "where's everyone?",
+          drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
+          drawerInactiveBackgroundColor: "transparent",
+          drawerLabelStyle: {
+            color: "black",
+            fontSize: 18,
+            fontWeight: "bold",
+          },
+          drawerItemStyle: {
+            marginTop: "auto",
+            paddingBottom: finalItemPaddingBottom,
+          },
           headerLeft: () => (
             <Pressable onPress={() => router.back()}>
               {({ pressed }) => (

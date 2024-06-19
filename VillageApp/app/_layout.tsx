@@ -4,7 +4,7 @@ import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, SplashScreen } from "expo-router";
 import { useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, Text, TextInput } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import AssetsContextProvider from "../context/AssetsContext";
@@ -35,13 +35,18 @@ Sentry.init({
   debug: false,
 });
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
+};
+
+// @ts-ignore
+Text.defaultProps = { ...(Text.defaultProps || {}), allowFontScaling: false };
+// @ts-ignore
+TextInput.defaultProps = {
+  ...(TextInput.defaultProps || {}),
+  allowFontScaling: false,
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
