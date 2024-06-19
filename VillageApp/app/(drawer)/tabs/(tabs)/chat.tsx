@@ -23,7 +23,10 @@ import {
 } from "stream-chat-expo";
 import { getDeviceType, DeviceType } from "../../../../lib/helpers";
 import CustomMessageList from "../../../../components/CustomMessageList";
-import CustomChatAvatar from "../../../../components/CustomChatAvatar";
+import {
+  CustomMessageAvatar,
+  CustomReplies,
+} from "../../../../components/CustomChatAvatar";
 
 let areNotificationsEnabled = false;
 
@@ -234,7 +237,8 @@ const ChatScreen = () => {
         >
           <Chat client={streamChatClient}>
             <Channel
-              MessageAvatar={CustomChatAvatar}
+              MessageAvatar={CustomMessageAvatar}
+              Reply={CustomReplies}
               channel={channel}
               messageActions={(param) => {
                 const { isMyMessage, muteUser } = param;

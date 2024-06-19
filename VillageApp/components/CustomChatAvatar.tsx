@@ -1,14 +1,19 @@
-import { Pressable, Image } from "react-native";
-import { MessageAvatar, useMessageContext } from "stream-chat-expo";
+import { Pressable } from "react-native";
+import {
+  MessageAvatar,
+  MessageAvatarProps,
+  MessageType,
+  Reply,
+  ReplyProps,
+  useMessageContext,
+} from "stream-chat-expo";
 import { router } from "expo-router";
 
-const CustomChatAvatar = () => {
+export const CustomMessageAvatar = (props: MessageAvatarProps) => {
   const { message } = useMessageContext();
-
-  const usedImage = message?.quoted_message
-    ? message.quoted_message?.user?.image
-    : message.user?.image;
-
+  if (!message) {
+    return null;
+  }
   const openProfile = () => {
     if (!message?.user?.id || !message?.user?.name) {
       return;
@@ -21,16 +26,29 @@ const CustomChatAvatar = () => {
       },
     });
   };
-
   return (
     <Pressable onPress={openProfile}>
+      <MessageAvatar {...props} />
+    </Pressable>
+  );
+};
+
+const CustomMessageReplyAvatar = (props: MessageAvatarProps) => {
+  const { message } = useMessageContext();
+  if (!message) {
+    return null;
+  }
+  return (
+    <Pressable onPress={() => console.log("Quoted Avatar")}>
       <MessageAvatar
-        ImageComponent={(props) => (
-          <Image {...props} source={{ uri: usedImage }} />
-        )}
+        {...props}
+        size={50}
+        message={message.quoted_message as MessageType<any>}
       />
     </Pressable>
   );
 };
 
-export default CustomChatAvatar;
+export const CustomReplies = (props: ReplyProps) => {
+  return <Reply {...props} MessageAvatar={CustomMessageReplyAvatar} />;
+};
