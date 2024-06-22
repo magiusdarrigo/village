@@ -21,6 +21,7 @@ import * as Sentry from "sentry-expo";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import { NeighborhoodType } from "../../types/index";
+import { router } from "expo-router";
 
 type NeighborhoodProps = {
   neighborhood: NeighborhoodType;
@@ -171,6 +172,7 @@ const Neighborhoods: React.FC = () => {
       );
     } finally {
       setIsLoading(false);
+      router.back();
     }
   };
 
