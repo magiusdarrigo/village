@@ -137,7 +137,7 @@ const CreateProfile = () => {
         <Text
           style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
         >
-          create your anonymous profile.
+          create your profile.
         </Text>
         <View
           style={{

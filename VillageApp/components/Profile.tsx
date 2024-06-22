@@ -27,9 +27,10 @@ import profileStyles from "../lib/styles/profile";
 
 type ProfileProps = {
   user: UserType;
+  refetchProfile: () => Promise<any>;
 };
 
-const Profile = ({ user }: ProfileProps) => {
+const Profile = ({ user, refetchProfile }: ProfileProps) => {
   const {
     updateUserAttributes,
     listTweetsForProfile,
@@ -48,6 +49,7 @@ const Profile = ({ user }: ProfileProps) => {
   const onRefresh = async () => {
     setRefreshing(true);
     await isRefetchingTweets();
+    await refetchProfile();
     setRefreshing(false);
   };
 

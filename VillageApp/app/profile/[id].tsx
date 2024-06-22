@@ -1,6 +1,6 @@
 import { ActivityIndicator, Alert, Pressable } from "react-native";
 import { useEffect } from "react";
-import { useLocalSearchParams, useNavigation, usePathname } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import Profile from "../../components/Profile";
 import { useTweetsApi } from "../../context/TweetContext";
 import { useQuery } from "@tanstack/react-query";
@@ -119,7 +119,12 @@ const OtherUserProfileScreen = () => {
   }, [username, navigation]);
 
   // Get user profile
-  const { data, isLoading, error } = useQuery({
+  const {
+    data,
+    isLoading,
+    error,
+    refetch: refetchProfile,
+  } = useQuery({
     queryKey: ["profiles", userID],
     queryFn: () => (userID ? getUserProfile(String(userID)) : null),
     enabled: !!userID, // This will prevent the query from running if userID is undefined
@@ -140,7 +145,7 @@ const OtherUserProfileScreen = () => {
     return null; // Or render some fallback UI
   }
 
-  return <Profile user={data} />;
+  return <Profile user={data} refetchProfile={refetchProfile} />;
 };
 
 export default OtherUserProfileScreen;

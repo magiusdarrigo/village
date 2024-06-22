@@ -347,18 +347,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="comments" color={color} />
           ),
-          headerRight: () => (
-            <Pressable onPress={onQuestionPress}>
-              {({ pressed }) => (
-                <FontAwesome
-                  name="question"
-                  size={25}
-                  color={Colors.light.text}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
-          ),
+          // headerRight: () => (
+          //   <Pressable onPress={onQuestionPress}>
+          //     {({ pressed }) => (
+          //       <FontAwesome
+          //         name="question"
+          //         size={25}
+          //         color={Colors.light.text}
+          //         style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          //       />
+          //     )}
+          //   </Pressable>
+          // ),
         }}
         listeners={{
           focus: (_) => {
