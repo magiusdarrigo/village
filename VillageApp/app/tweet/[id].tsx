@@ -64,7 +64,7 @@ const TweetScreen = () => {
 
   const isPostButtonDisabled = commentText.length < 1;
 
-  if (activeNeighborhood === null) {
+  if (!activeNeighborhood) {
     return <ActivityIndicator />;
   }
 
