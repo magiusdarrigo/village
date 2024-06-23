@@ -14,6 +14,7 @@ datasource db {
 model users {
   id                     String         @id @default(uuid())
   username               String         @unique
+  country_code           String         @default("+1")
   phone_number           String         @unique
   image                  String?
   is_verified            Boolean        @default(false)

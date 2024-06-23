@@ -119,6 +119,7 @@ const SignIn = () => {
                 style={{
                   color: "black",
                   fontSize: 22,
+                  fontWeight: "bold",
                 }}
               >
                 {countryCode}
