@@ -22,8 +22,6 @@ const YourProfileScreen = () => {
     return <ActivityIndicator />;
   }
 
-  console.log("hydrated user", user);
-
   return <Profile user={user} refetchProfile={handleRefetchUser} />;
 };
 

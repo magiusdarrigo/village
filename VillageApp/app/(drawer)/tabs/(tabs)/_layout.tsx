@@ -168,10 +168,6 @@ export default function TabLayout() {
     }
   };
 
-  const onQuestionPress = () => {
-    router.push("/(drawer)/wheresEveryone");
-  };
-
   const onSettingsPress = () => {
     const options = [
       "request building change",
@@ -242,6 +238,7 @@ export default function TabLayout() {
                     try {
                       // delete account request submitted
                       await accountDeletionRequest();
+                      router.replace("/(auth)/signIn");
                       streamChatClient.disconnectUser();
                       removeAuthToken();
                       removeUser();
@@ -267,6 +264,7 @@ export default function TabLayout() {
               {
                 text: "log out",
                 onPress: async () => {
+                  router.replace("/(auth)/signIn");
                   streamChatClient.disconnectUser();
                   removeAuthToken();
                   removeUser();

@@ -43,12 +43,7 @@ const Tweet = ({
   const segments = useSegments();
   const { user, isFeedHot, activeNeighborhood } = useUser();
 
-  if (!user) {
-    Alert.alert("Something went wrong. Try again.");
-    return null;
-  }
-
-  if (!activeNeighborhood) {
+  if (!user || !activeNeighborhood) {
     Alert.alert("Something went wrong. Try again.");
     return null;
   }
