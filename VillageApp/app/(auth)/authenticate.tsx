@@ -29,7 +29,7 @@ const smallDevice = deviceType === DeviceType.iPhoneSmall;
 const Authenticate = () => {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  let { phoneNumber } = useLocalSearchParams();
+  let { phoneNumber, countryCode } = useLocalSearchParams();
   // add back parantheses to the phone number. Have to do this because someone on the expo team is brain dead
   // TODO: remove once issue: https://github.com/expo/expo/issues/26664 resolved. Because these regex-based helpers will
   // break in the future if the phone number format changes
@@ -53,13 +53,16 @@ const Authenticate = () => {
   const continueOnboarding = () => !user?.neighborhood_id || !user.building_id;
 
   const onConfirm = async () => {
-    if (typeof phoneNumber !== "string") {
+    if (typeof phoneNumber !== "string" || typeof countryCode !== "string") {
       return;
     }
     try {
       setIsLoading(true);
       Keyboard.dismiss();
-      const res = await authenticate({ phoneNumber, phoneToken: code });
+      const res = await authenticate({
+        phoneNumber: `${countryCode} ${phoneNumber}`,
+        phoneToken: code,
+      });
       updateAuthToken(res.token);
       if (continueOnboarding()) {
         router.replace("/createProfile");

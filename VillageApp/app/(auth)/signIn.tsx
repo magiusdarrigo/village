@@ -60,11 +60,13 @@ const SignIn = () => {
     try {
       setIsLoading(true);
       Keyboard.dismiss();
-      const user = await login({ phoneNumber });
+      const user = await login({
+        phoneNumber: `${countryCode} ${phoneNumber}`,
+      });
       updateUser(user);
       router.replace({
         pathname: "/authenticate",
-        params: { phoneNumber: stripParentheses(phoneNumber) },
+        params: { phoneNumber: stripParentheses(phoneNumber), countryCode },
       });
     } catch (error) {
       Sentry.Native.captureException(error);

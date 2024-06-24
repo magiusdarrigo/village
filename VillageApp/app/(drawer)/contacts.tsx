@@ -28,8 +28,6 @@ import { router, useSegments } from "expo-router";
 const deviceType = getDeviceType();
 const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
-type ContactProps = {};
-
 const getPhoneNumbersFromContacts = (contacts: Contacts.Contact[]) => {
   const phoneNumbers: string[] = [];
   for (const contact of contacts) {
@@ -44,7 +42,7 @@ const getPhoneNumbersFromContacts = (contacts: Contacts.Contact[]) => {
   return phoneNumbers;
 };
 
-const ContactsScreen = (props: ContactProps) => {
+const ContactsScreen = () => {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
   const [numbers, setNumbers] = useState<string[]>([]);
   const [permissions, setPermissions] = useState(false);
@@ -116,15 +114,25 @@ const ContactsScreen = (props: ContactProps) => {
   const isButtonDisabled = loading || permissions;
 
   // we need to create a list of profiles from phone numbers first and then append the rest of the contacts
-  const formattedProfiles = profiles?.data ?? [];
+  let formattedProfiles = profiles?.data ?? [];
+  // remove myself from the list
+  formattedProfiles = formattedProfiles.filter(
+    (profile: any) => profile.username !== user.username
+  );
+
   const profilePhoneNumbersSet = new Set(
     formattedProfiles.map((profile: any) => profile.phone_number)
   );
   const formattedContacts = contacts.reduce(
     (accumulator: any, current: any) => {
+      if (!current.phoneNumbers?.[0]?.number || !current.name) {
+        return accumulator;
+      }
+      console.log("number: ", current.phoneNumbers?.[0]?.number);
       const formattedNumber = getDDBReadableNumber(
         current.phoneNumbers?.[0].number
       );
+      console.log("formattedNumber: ", formattedNumber);
       if (profilePhoneNumbersSet.has(formattedNumber)) {
         return accumulator;
       }

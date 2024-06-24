@@ -129,23 +129,26 @@ export const formatPhoneNumber = (text: string) => {
   return `(${text.slice(0, 3)}) ${text.slice(3, 6)}-${text.slice(6)}`;
 };
 
-// +1 (123) 456-7890 -> (123) 456-7890
-// +11234567890 -> (123) 456-7890
-// 1234567890 -> (123) 456-7890
+// +1 (123) 456-7890 -> +1 (123) 456-7890
+// +11234567890 -> +1 (123) 456-7890
+// 1234567890 -> +1 (123) 456-7890
+// +57 123 456 7890 -> +57 (123) 456-7890
 export const getDDBReadableNumber = (text: any) => {
   if (!text) {
-    return undefined;
+    return "";
   }
   // strip all non-numeric characters
-  const stripped = text.replace(/\D/g, "");
-  if (stripped.length === 11) {
-    return formatPhoneNumber(stripped.slice(1));
-  } else if (stripped.length === 10) {
-    return formatPhoneNumber(stripped);
-  } else {
-    // if the number is greater than 11 digits, it is an international number and we don't support that yet.
-    return text;
+  const numbers = text.replace(/\D/g, "");
+  // collect the last 10 digits
+  let lastTenDigits = numbers.slice(-10);
+  if (lastTenDigits.length !== 10) {
+    return "";
   }
+  // anything left over is the country code. If there are no digits left over, default to +1
+  const countryCode = numbers.slice(0, -10) || "1";
+  // format the last ten digits
+  lastTenDigits = formatPhoneNumber(lastTenDigits);
+  return `+${countryCode} ${lastTenDigits}`;
 };
 
 export const blurhash =

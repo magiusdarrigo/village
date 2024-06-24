@@ -10,8 +10,8 @@ const CURRENT_APP_VERSION = "1.0.0";
 
 // new phone number not seen before -> create new user
 router.post("/login", async (req, res) => {
-  console.log("login called");
   const { phoneNumber } = req.body;
+  console.log("login called, with number: ", phoneNumber);
 
   if (typeof phoneNumber !== "string") {
     return res.status(400).send("Phone number incorrect.");
@@ -19,7 +19,7 @@ router.post("/login", async (req, res) => {
 
   // Generate OTP (6-digit code)
   const phoneToken = Math.floor(100000 + Math.random() * 900000).toString();
-  console.log("phoneToken", phoneToken);
+  console.log("phone token: ", phoneToken);
   const expiration = new Date(
     new Date().getTime() + 1000 * 60 * PHONE_TOKEN_EXPIRY_MINUTES
   ); // 2 minutes
@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => {
               },
             },
           },
-        }, // This tells Prisma to include the user data in the result
+        },
       },
     });
 
@@ -91,7 +91,7 @@ router.post("/login", async (req, res) => {
     // await twilioClient.messages.create({
     //   body: `Your Village OTP is: ${phoneToken}`,
     //   from: process.env.TWILIO_PHONE_NUMBER,
-    //   to: phoneNumber,
+    //   to: `${countryCode} ${phoneNumber}`, // +1 (123) 456-7890
     // });
 
     res.send(user);
