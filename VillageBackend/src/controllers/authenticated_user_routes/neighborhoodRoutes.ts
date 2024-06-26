@@ -54,7 +54,6 @@ const getHotPosts = async (
   cursor: number,
   cacheKey: string | undefined
 ) => {
-  console.log("get hot posts called, cursor: ", cursor, "cacheKey: ", cacheKey);
   let key = cacheKey;
   if (!cacheKey || !cursor) {
     // if cursor is MAX_INT4_VALUE, then we need to get the latest key in the redis sorted set
