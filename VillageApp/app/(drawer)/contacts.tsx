@@ -132,7 +132,6 @@ const ContactsScreen = () => {
       const formattedNumber = getDDBReadableNumber(
         current.phoneNumbers?.[0].number
       );
-      console.log("formattedNumber: ", formattedNumber);
       if (profilePhoneNumbersSet.has(formattedNumber)) {
         return accumulator;
       }
