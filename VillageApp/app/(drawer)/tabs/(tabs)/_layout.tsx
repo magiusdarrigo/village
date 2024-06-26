@@ -1,5 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Octicons, Ionicons } from "@expo/vector-icons";
+import { Octicons, Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Tabs, router, useNavigation } from "expo-router";
 import { Pressable, AppState, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -77,6 +77,13 @@ notifee.onBackgroundEvent(async ({ type }) => {
     await Promise.resolve();
   }
 });
+
+const onMovingPress = () => {
+  Alert.alert(
+    "moving?",
+    "submit a building change request in the profile settings."
+  );
+};
 
 export default function TabLayout() {
   const navigation = useNavigation();
@@ -346,11 +353,11 @@ export default function TabLayout() {
             <TabBarIconFontAwesome name="comments" color={color} />
           ),
           // headerRight: () => (
-          //   <Pressable onPress={onQuestionPress}>
+          //   <Pressable onPress={onMovingPress}>
           //     {({ pressed }) => (
-          //       <FontAwesome
-          //         name="question"
-          //         size={25}
+          //       <FontAwesome5
+          //         name="box-open"
+          //         size={22}
           //         color={Colors.light.text}
           //         style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
           //       />
