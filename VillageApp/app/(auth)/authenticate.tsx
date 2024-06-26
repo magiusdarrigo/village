@@ -67,10 +67,12 @@ const Authenticate = () => {
       if (continueOnboarding()) {
         router.replace("/createProfile");
       }
-      if (user?.neighborhood_id && user?.neighborhood?.name) {
+      if (user?.neighborhood_id && user?.neighborhood) {
         updateActiveNeighborhood({
           name: user?.neighborhood?.name,
           id: user?.neighborhood_id,
+          is_locked: user?.neighborhood?.is_locked,
+          members_count: user?.neighborhood?.members_count,
         });
       }
     } catch (e) {

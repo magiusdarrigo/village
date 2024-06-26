@@ -1,48 +1,42 @@
-export const ManhattanNeighborhoods = [
-  { name: "battery park city", id: 24 },
-  // { name: "Carnegie Hill", id: 1 },
-  // { name: "Central Harlem", id: 12 },
-  { name: "chelsea", id: 11 },
-  { name: "chinatown", id: 4 },
-  // { name: "East Harlem", id: 17 },
-  { name: "east village", id: 8 },
-  { name: "fidi", id: 15 },
-  { name: "flatiron", id: 3 },
-  { name: "gramercy", id: 16 },
-  { name: "greenwich village", id: 23 },
-  { name: "hamilton heights", id: 46 },
-  { name: "harlem", id: 43 },
-  { name: "hell's kitchen", id: 10 },
-  { name: "hudson yards", id: 19 },
-  // { name: "Kips Bay", id: 18 },
-  // { name: "Lenox Hill", id: 28 },
-  { name: "little italy", id: 29 },
-  { name: "lower east side", id: 13 },
-  // { name: "Manhattanville", id: 5 },
-  { name: "meatpacking district", id: 9 },
-  { name: "midtown", id: 26 },
-  { name: "midtown east", id: 44 },
-  // { name: "Murray Hill", id: 7 },
-  // { name: "noHo", id: 6 },
-  { name: "nolita", id: 14 },
-  { name: "nomad", id: 22 },
-  { name: "roosevelt island", id: 42 },
-  { name: "soho", id: 2 },
-  { name: "stuytown", id: 45 },
-  { name: "tribeca", id: 21 },
-  // { name: "Turtle Bay", id: 20 },
-  // { name: "Two Bridges", id: 31 },
-  { name: "upper east side", id: 27 },
-  { name: "upper west side", id: 30 },
-  { name: "wash heights", id: 47 },
-  // { name: "West Harlem", id: 32 },
-  { name: "west village", id: 34 },
-  // { name: "Yorkville", id: 25 },
+import { NeighborhoodType } from "../types";
+
+type BoroughData = {
+  title: string;
+  neighborhoods: NeighborhoodType[];
+};
+
+const neighborhoodsData: BoroughData[] = [
+  {
+    title: "manhattan",
+    neighborhoods: [],
+  },
+  {
+    title: "brooklyn",
+    neighborhoods: [],
+  },
+  {
+    title: "queens",
+    neighborhoods: [],
+  },
+  {
+    title: "bronx",
+    neighborhoods: [],
+  },
+  {
+    title: "staten island",
+    neighborhoods: [],
+  },
 ];
 
-export const BrooklynNeighborhoods = [{ name: "all of brooklyn", id: 33 }];
-export const QueensNeighborhoods = [{ name: "all of queens", id: 37 }];
-export const BronxNeighborhoods = [{ name: "all of the bronx", id: 38 }];
-export const StatenIslandNeighborhoods = [
-  { name: "all of staten island", id: 40 },
-];
+export const getNeighborhoodsData = (neighborhoods: NeighborhoodType[]) => {
+  neighborhoodsData.forEach((category) => {
+    category.neighborhoods = neighborhoods.filter(
+      (neighborhood) => neighborhood.borough === category.title
+    );
+  });
+  return neighborhoodsData;
+};
+
+export const getSortedNeighborhoods = (neighborhoods: NeighborhoodType[]) => {
+  return neighborhoods.sort((a, b) => a.name.localeCompare(b.name));
+};

@@ -61,6 +61,8 @@ router.post("/login", async (req, res) => {
             neighborhood: {
               select: {
                 name: true,
+                is_locked: true,
+                members_count: true,
               },
             },
             building: {

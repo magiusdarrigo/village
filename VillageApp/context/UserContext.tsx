@@ -8,6 +8,8 @@ interface UserContextType {
   user: UserType | null;
   updateUser: (user: UserType) => void;
   removeUser: () => void;
+  neighborhoods: NeighborhoodType[];
+  updateNeighborhoods: (neighborhoods: NeighborhoodType[]) => void;
   getStreamChatClient: () => StreamChat<any>;
   chatTabBadgeCount: number;
   updateChatTabBadgeCount: (count: number) => void;
@@ -36,6 +38,7 @@ const UserContextProvider = ({
   streamChatClient,
 }: UserContextProviderProps) => {
   const [user, setUser] = useState<UserType | null>(null);
+  const [neighborhoods, setNeighborhoods] = useState<NeighborhoodType[]>([]);
   const [isFeedHot, setIsFeedHot] = useState(true);
   const [chatTabBadgeCount, setChatTabBadgeCount] = useState<number>(0);
   const flatListRef = useRef<FlatList>(null);
@@ -64,6 +67,10 @@ const UserContextProvider = ({
     setUser(null);
   };
 
+  const updateNeighborhoods = (newNeighborhoods: NeighborhoodType[]) => {
+    setNeighborhoods(newNeighborhoods);
+  };
+
   const getStreamChatClient = () => {
     return streamChatClient;
   };
@@ -88,6 +95,8 @@ const UserContextProvider = ({
         user,
         updateUser,
         removeUser,
+        neighborhoods,
+        updateNeighborhoods,
         getStreamChatClient,
         chatTabBadgeCount,
         updateChatTabBadgeCount,

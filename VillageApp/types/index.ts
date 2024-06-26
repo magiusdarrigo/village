@@ -1,11 +1,16 @@
 export type NeighborhoodType = {
   id: number;
   name: string;
+  is_locked: boolean;
+  members_count: number;
+  borough?: string;
 };
 export type UserType = {
   neighborhood_id?: number;
   neighborhood?: {
     name: string;
+    is_locked: boolean;
+    members_count: number;
   };
   building?: {
     address: string;

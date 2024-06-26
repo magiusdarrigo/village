@@ -11,6 +11,32 @@ import redisClient from "../../clients/redisClient";
 
 const router = Router();
 
+// get all neighborhoods
+router.get("/", async (req, res) => {
+  console.log("get all neighborhoods called");
+  try {
+    const neighborhoods = await prisma.neighborhoods.findMany({
+      where: {
+        is_hidden: false,
+      },
+      orderBy: {
+        name: "asc",
+      },
+      select: {
+        id: true,
+        name: true,
+        is_locked: true,
+        members_count: true,
+        borough: true,
+      },
+    });
+    res.json({ data: neighborhoods });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "error fetching neighborhoods" });
+  }
+});
+
 /**
  * get posts by neighborhood id
  * paginate by 20 for infinite scroll on the frontend

@@ -10,47 +10,18 @@ import {
 } from "react-native";
 import Colors from "../../constants/Colors";
 import neighborhoodStyles from "../../lib/styles/neighborhood";
-import {
-  ManhattanNeighborhoods,
-  BrooklynNeighborhoods,
-  QueensNeighborhoods,
-  BronxNeighborhoods,
-  StatenIslandNeighborhoods,
-} from "../../constants/Neighborhoods";
 import * as Sentry from "sentry-expo";
 import { useUser } from "../../context/UserContext";
 import { useTweetsApi } from "../../context/TweetContext";
 import { NeighborhoodType } from "../../types/index";
 import { router } from "expo-router";
+import { getNeighborhoodsData } from "../../constants/Neighborhoods";
 
 type NeighborhoodProps = {
   neighborhood: NeighborhoodType;
   isSelected: boolean;
   onPress: () => void;
 };
-
-const neighborhoodsData = [
-  {
-    title: "manhattan",
-    neighborhoods: ManhattanNeighborhoods,
-  },
-  {
-    title: "brooklyn",
-    neighborhoods: BrooklynNeighborhoods,
-  },
-  {
-    title: "queens",
-    neighborhoods: QueensNeighborhoods,
-  },
-  {
-    title: "bronx",
-    neighborhoods: BronxNeighborhoods,
-  },
-  {
-    title: "staten island",
-    neighborhoods: StatenIslandNeighborhoods,
-  },
-];
 
 const NeighborhoodButton = ({
   neighborhood,
@@ -116,15 +87,23 @@ const areArraysEqual = (arr1: any, arr2: any) => {
 
 const Neighborhoods: React.FC = () => {
   const { updateUserAttributes } = useTweetsApi();
-  const { user, updateUser } = useUser();
+  const { user, updateUser, neighborhoods } = useUser();
   if (
     user?.neighborhood?.name === undefined ||
     user?.neighborhood_id === undefined
   ) {
     throw new Error("User neighborhood is undefined");
   }
+
+  const neighborhoodsData = getNeighborhoodsData(neighborhoods);
+
   const currentNeighborhoods = [
-    { name: user?.neighborhood?.name, id: user?.neighborhood_id },
+    {
+      name: user?.neighborhood?.name,
+      id: user?.neighborhood_id,
+      is_locked: user?.neighborhood?.is_locked,
+      members_count: user?.neighborhood?.members_count,
+    },
   ];
   if (user?.selected_neighborhoods) {
     user.selected_neighborhoods.forEach((neighborhood) => {
