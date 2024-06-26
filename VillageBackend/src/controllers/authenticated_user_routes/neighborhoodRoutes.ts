@@ -34,6 +34,11 @@ router.get("/:id/posts", async (req, res) => {
       ? await getHotPosts(currentUser.id, neighborhoodID, cursor, cacheKey)
       : await getNewPosts(currentUser.id, neighborhoodID, cursor);
 
+    // const postTexts = posts?.map((post: any) => post.id) || [];
+    // console.log("post ids: ", postTexts);
+    // console.log("total posts returned: ", posts?.length);
+    // console.log("nextCursor: ", nextCursor);
+
     res.json({ data: posts, nextCursor });
   } catch (error) {
     console.error(error);
@@ -49,6 +54,7 @@ const getHotPosts = async (
   cursor: number,
   cacheKey: string | undefined
 ) => {
+  console.log("get hot posts called, cursor: ", cursor, "cacheKey: ", cacheKey);
   let key = cacheKey;
   if (!cacheKey || !cursor) {
     // if cursor is MAX_INT4_VALUE, then we need to get the latest key in the redis sorted set
@@ -79,13 +85,15 @@ const getHotPosts = async (
     .filter((postID) => postID < cursor)
     .slice(0, 20);
 
+  const nextCursor = postIDsToGet.length < 20 ? undefined : postIDsToGet[19];
+
   if (postIDsToGet.length === 0) {
-    return { posts: [], nextCursor: undefined };
+    return { posts: [], nextCursor };
   }
+
   const sqlQuery = getPostsByUserAndPostIdsQuery(userID, postIDsToGet);
   const posts = (await prisma.$queryRaw(sqlQuery)) as any;
 
-  const nextCursor = posts.length < 20 ? undefined : posts[19].id;
   const sortedPosts = postIDsToGet
     .map((id) => posts.find((post: any) => post.id === id))
     .filter((post) => post !== undefined);

@@ -121,7 +121,7 @@ const FeedScreen = () => {
   };
 
   const handleLoadMore = () => {
-    if (hasNextPage) fetchNextPage();
+    if (!isFetchingNextPage && hasNextPage) fetchNextPage();
   };
 
   if (isFetched) {

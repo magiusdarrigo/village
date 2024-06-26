@@ -385,4 +385,31 @@ router.delete("/:id/likes", async (req, res) => {
   }
 });
 
+// // create 100 fake posts
+// router.post("/fake", async (req, res) => {
+//   console.log("create 100 fake posts called");
+//   const currentUser = (req as unknown as AuthenticatedRequest).user;
+
+//   try {
+//     const fakePosts = Array.from({ length: 100 }, (_, index) => {
+//       return createPostQuery(
+//         currentUser.id,
+//         24,
+//         `fake post ${index + 1}`,
+//         "",
+//         0,
+//         0
+//       );
+//     });
+
+//     const promises = fakePosts.map((query) => prisma.$queryRaw(query));
+//     await Promise.all(promises);
+
+//     res.status(200);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Error creating fake posts." });
+//   }
+// });
+
 export default router;
