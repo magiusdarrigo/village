@@ -208,8 +208,8 @@ export default function TabLayout() {
         switch (selectedIndex) {
           case requestBuildingChangeIndex:
             Alert.prompt(
-              "building change request",
-              "what's the address of the building?",
+              "moving?",
+              "what's the address of the new building?",
               (text) => handleBuildingChangeRequest(text),
               "plain-text"
             );

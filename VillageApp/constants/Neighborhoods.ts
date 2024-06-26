@@ -28,7 +28,7 @@ export const ManhattanNeighborhoods = [
   { name: "nomad", id: 22 },
   { name: "roosevelt island", id: 42 },
   { name: "soho", id: 2 },
-  { name: "stuy town", id: 45 },
+  { name: "stuytown", id: 45 },
   { name: "tribeca", id: 21 },
   // { name: "Turtle Bay", id: 20 },
   // { name: "Two Bridges", id: 31 },
