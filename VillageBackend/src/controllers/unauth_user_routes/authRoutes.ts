@@ -92,7 +92,7 @@ router.post("/login", async (req, res) => {
     await twilioClient.messages.create({
       body: `Your Village OTP is: ${phoneToken}`,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: `${countryCode} ${phoneNumber}`, // +1 (123) 456-7890
+      to: `${phoneNumber}`, // +1 (123) 456-7890
     });
 
     res.send(user);
