@@ -34,7 +34,7 @@ const Comment = ({
 
   const isReply = comment.parent_comment_id !== null;
 
-  if (activeNeighborhood === null) {
+  if (!activeNeighborhood) {
     return null;
   }
 

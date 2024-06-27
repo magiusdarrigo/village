@@ -38,6 +38,7 @@ router.get("/", async (req, res) => {
         neighborhood: {
           select: {
             name: true,
+            is_locked: true,
           },
         },
       },

@@ -97,6 +97,7 @@ router.put("/", upload.single("image"), async (req, res) => {
         neighborhood: {
           select: {
             name: true,
+            is_locked: true,
           },
         },
         building: {
@@ -179,6 +180,7 @@ router.post("/:id/follow", async (req, res) => {
         neighborhood: {
           select: {
             name: true,
+            is_locked: true,
           },
         },
       },
@@ -263,6 +265,7 @@ router.delete("/:id/follow", async (req, res) => {
         neighborhood: {
           select: {
             name: true,
+            is_locked: true,
           },
         },
       },
@@ -335,6 +338,7 @@ router.get("/", async (req, res) => {
         neighborhood: {
           select: {
             name: true,
+            is_locked: true,
           },
         },
         building: {

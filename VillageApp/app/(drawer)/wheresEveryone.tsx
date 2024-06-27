@@ -22,8 +22,8 @@ const wheresEveryone = () => {
   return (
     <View style={styles.container}>
       <Text style={[onboardingStyles.label, { marginTop: 12 }]}>
-        not enough neighbors? shoot us an email and we'll swing by and post
-        flyers.
+        not enough neighbors? it's a new app. shoot us an email and we'll swing
+        by and post flyers.
       </Text>
       <Pressable
         style={[

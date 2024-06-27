@@ -27,9 +27,10 @@ import profileStyles from "../lib/styles/profile";
 
 type ProfileProps = {
   user: UserType;
+  refetchProfile: () => Promise<any>;
 };
 
-const Profile = ({ user }: ProfileProps) => {
+const Profile = ({ user, refetchProfile }: ProfileProps) => {
   const {
     updateUserAttributes,
     listTweetsForProfile,
@@ -48,6 +49,7 @@ const Profile = ({ user }: ProfileProps) => {
   const onRefresh = async () => {
     setRefreshing(true);
     await isRefetchingTweets();
+    await refetchProfile();
     setRefreshing(false);
   };
 
@@ -155,23 +157,20 @@ const Profile = ({ user }: ProfileProps) => {
   });
 
   const handleLoadMoreTweets = () => {
-    if (hasNextTweetsPage) fetchNextTweetsPage();
+    if (!isFetchingTweets && hasNextTweetsPage) fetchNextTweetsPage();
   };
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     const contentHeight = event.nativeEvent.contentSize.height;
     const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
-
     // Check if the user has scrolled to the bottom
     if (
       offsetY + scrollViewHeight >=
       contentHeight - PIXELS_FROM_BOTTOM_TO_TRIGGER_PAGE_LOAD
     ) {
       // 50 is a threshold
-      if (!isFetchingTweets) {
-        handleLoadMoreTweets();
-      }
+      handleLoadMoreTweets();
     }
   };
 
@@ -347,8 +346,6 @@ const Profile = ({ user }: ProfileProps) => {
               allowPush={true}
             />
           )}
-          onEndReached={handleLoadMoreTweets}
-          onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetchingNextTweetsPage
               ? () => <ActivityIndicator size="small" />

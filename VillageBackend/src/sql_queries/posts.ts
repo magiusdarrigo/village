@@ -22,8 +22,6 @@ export const getPostsByUserAndPostIdsQuery = (
                   post_likes ON posts.id = post_likes.post_id AND post_likes.user_id = ${userID}
               WHERE 
                   posts.id IN (${Prisma.raw(postIdsString)})
-              AND
-                  posts.is_banned = FALSE
               LIMIT 20;
           `;
 };

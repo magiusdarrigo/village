@@ -109,6 +109,7 @@ const CreateProfile = () => {
         updateActiveNeighborhood({
           name: building.neighborhood?.name,
           id: building.neighborhood_id,
+          is_locked: building.neighborhood?.is_locked,
         });
         return;
       }
@@ -137,7 +138,7 @@ const CreateProfile = () => {
         <Text
           style={[onboardingStyles.label, smallDevice ? { marginTop: 12 } : {}]}
         >
-          create your anonymous profile.
+          create your profile.
         </Text>
         <View
           style={{

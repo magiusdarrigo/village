@@ -12,8 +12,8 @@ export const notifyUser = async (postEvent: NewPostWebhookEvent) => {
     const { error: inserError } = await supabaseClient
       .from("notifications")
       .insert({
-        title: "Your recent post has been auto-banned.",
-        message: "If you think this was a mistake, contact us.",
+        title: "your recent post has been banned.",
+        message: "if you think this was a mistake, contact us.",
         for_user_id: postEvent.record.user_id,
         from_user_id: villageAppUserID,
         for_post_id: postEvent.record.id,

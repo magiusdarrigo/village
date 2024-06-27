@@ -7,13 +7,7 @@ import { useTweetsApi } from "../../context/TweetContext";
 import Colors from "../../constants/Colors";
 import onboardingStyles from "../../lib/styles/onboarding";
 import * as Sentry from "sentry-expo";
-import {
-  ManhattanNeighborhoods,
-  BrooklynNeighborhoods,
-  QueensNeighborhoods,
-  BronxNeighborhoods,
-  StatenIslandNeighborhoods,
-} from "../../constants/Neighborhoods";
+import { getSortedNeighborhoods } from "../../constants/Neighborhoods";
 import { getDeviceType, DeviceType } from "../../lib/helpers";
 
 const deviceType = getDeviceType();
@@ -24,15 +18,9 @@ const PickNeighborhood = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { buildingAddress } = useLocalSearchParams();
   const { createBuilding } = useTweetsApi();
-  const { user } = useUser();
+  const { user, neighborhoods } = useUser();
 
-  const neighborhoods = [
-    ...BrooklynNeighborhoods,
-    ...BronxNeighborhoods,
-    ...QueensNeighborhoods,
-    ...StatenIslandNeighborhoods,
-    ...ManhattanNeighborhoods,
-  ];
+  const sortedNeighborhoods = getSortedNeighborhoods(neighborhoods);
 
   const onSubmit = async () => {
     try {
@@ -76,7 +64,7 @@ const PickNeighborhood = () => {
             setSelectedNeighborhood(itemValue)
           }
         >
-          {neighborhoods.map((neighborhood) => (
+          {sortedNeighborhoods.map((neighborhood) => (
             <Picker.Item
               key={neighborhood.id}
               label={neighborhood.name}

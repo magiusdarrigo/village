@@ -1,4 +1,4 @@
-import { SplashScreen, useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import {
   PropsWithChildren,
   createContext,
@@ -21,8 +21,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: PropsWithChildren) => {
-  const { user, updateUser, updateActiveNeighborhood, activeNeighborhood } =
-    useUser();
+  const {
+    user,
+    updateUser,
+    updateActiveNeighborhood,
+    activeNeighborhood,
+    updateNeighborhoods,
+  } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const segments = useSegments();
@@ -54,10 +59,34 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const getNeighborhoods = async (token: string) => {
+    if (!token) {
+      console.log("no authToken");
+      return [];
+    }
+    const url = `${API_URL}/v1/neighborhoods`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching neighborhoods");
+    }
+
+    const body = await res.json();
+    return body.data;
+  };
+
   useEffect(() => {
     if (!isLoaded) {
       return;
     }
+
+    // router.replace("/pickNeighborhood");
+    // return;
 
     if (
       (!authToken || !user?.neighborhood?.name) &&
@@ -96,12 +125,17 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
         setAuthToken(token);
         if (!user) {
           try {
-            const currentUser = await getUser(token);
+            const [currentUser, neighborhoods] = await Promise.all([
+              getUser(token),
+              getNeighborhoods(token),
+            ]);
             updateUser(currentUser);
+            updateNeighborhoods(neighborhoods);
             if (!activeNeighborhood) {
               updateActiveNeighborhood({
                 name: currentUser.neighborhood.name,
                 id: currentUser.neighborhood_id,
+                is_locked: currentUser.neighborhood.is_locked,
               });
             }
           } catch (error) {
