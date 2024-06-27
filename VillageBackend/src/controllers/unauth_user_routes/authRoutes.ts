@@ -62,7 +62,6 @@ router.post("/login", async (req, res) => {
               select: {
                 name: true,
                 is_locked: true,
-                members_count: true,
               },
             },
             building: {

@@ -16,7 +16,11 @@ const NeighborhoodScrollPicker = () => {
     return null;
   }
   const currentNeighborhoods = [
-    { name: user?.neighborhood?.name, id: user?.neighborhood_id },
+    {
+      name: user?.neighborhood?.name,
+      id: user?.neighborhood_id,
+      is_locked: user?.neighborhood?.is_locked,
+    },
   ];
   if (user?.selected_neighborhoods) {
     user.selected_neighborhoods.forEach((neighborhood) => {

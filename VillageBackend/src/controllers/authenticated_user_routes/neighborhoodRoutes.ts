@@ -26,7 +26,6 @@ router.get("/", async (req, res) => {
         id: true,
         name: true,
         is_locked: true,
-        members_count: true,
         borough: true,
       },
     });
@@ -140,5 +139,36 @@ const getNewPosts = async (
   const nextCursor = posts.length < 20 ? undefined : posts[19].id;
   return { posts, nextCursor };
 };
+
+/**
+ * get the "members_count" for a neighborhood
+ */
+router.get("/:id/members/count", async (req, res) => {
+  console.log("get members count called, id: ", req.params.id);
+  const { id } = req.params;
+  const neighborhoodID = getNumberFromQuery(id);
+
+  if (!neighborhoodID) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
+  try {
+    const neighborhood = await prisma.neighborhoods.findUnique({
+      where: {
+        id: neighborhoodID,
+      },
+      select: {
+        members_count: true,
+      },
+    });
+
+    res.json(neighborhood);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "error fetching members count for neighborhood",
+    });
+  }
+});
 
 export default router;

@@ -43,6 +43,7 @@ const NeighborhoodButton = ({
         ]}
       >
         {neighborhood.name}
+        {neighborhood.is_locked && " 🔒"}
       </Text>
     </TouchableOpacity>
   );
@@ -87,7 +88,13 @@ const areArraysEqual = (arr1: any, arr2: any) => {
 
 const Neighborhoods: React.FC = () => {
   const { updateUserAttributes } = useTweetsApi();
-  const { user, updateUser, neighborhoods } = useUser();
+  const {
+    user,
+    updateUser,
+    neighborhoods,
+    updateActiveNeighborhood,
+    activeNeighborhood,
+  } = useUser();
   if (
     user?.neighborhood?.name === undefined ||
     user?.neighborhood_id === undefined
@@ -102,7 +109,6 @@ const Neighborhoods: React.FC = () => {
       name: user?.neighborhood?.name,
       id: user?.neighborhood_id,
       is_locked: user?.neighborhood?.is_locked,
-      members_count: user?.neighborhood?.members_count,
     },
   ];
   if (user?.selected_neighborhoods) {
@@ -143,6 +149,13 @@ const Neighborhoods: React.FC = () => {
         selectedNeighborhoods: filteredNeighborhoods,
       });
       updateUser(updatedUser);
+      // if active neighborhood is not in selected neighborhoods, set the first selected neighborhood as active
+      if (
+        selectedNeighborhoods.length > 0 &&
+        !selectedNeighborhoods.some((n) => n.name === activeNeighborhood?.name)
+      ) {
+        updateActiveNeighborhood(selectedNeighborhoods[0]);
+      }
     } catch (error) {
       console.error(error);
       Sentry.Native.captureException(error);

@@ -110,7 +110,6 @@ const CreateProfile = () => {
           name: building.neighborhood?.name,
           id: building.neighborhood_id,
           is_locked: building.neighborhood?.is_locked,
-          members_count: building.neighborhood?.members_count,
         });
         return;
       }

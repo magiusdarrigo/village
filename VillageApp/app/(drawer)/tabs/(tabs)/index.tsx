@@ -15,13 +15,14 @@ import { useTweetsApi } from "../../../../context/TweetContext";
 import { useUser } from "../../../../context/UserContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import EmptyListView from "../../../../components/EmptyListView";
+import LockedNeighborhoodListView from "../../../../components/LockedNeighborhoodListView";
 import pageStyles from "../../../../lib/styles/page";
 import { useEffect, useRef, useState } from "react";
 import FeedSwitch from "../../../../components/FeedSwitch";
 import NeighborhoodScrollPicker from "../../../../components/NeighborhoodScrollPicker";
 
 const FeedScreen = () => {
-  const { listTweets } = useTweetsApi();
+  const { listTweets, getUsersCountForNeighborhood } = useTweetsApi();
   const [refreshing, setRefreshing] = useState(false);
   const [lastScrollPos, setLastScrollPos] = useState(0);
   const {
@@ -34,12 +35,15 @@ const FeedScreen = () => {
   const fadeSwitchAnim = useRef(new Animated.Value(1)).current;
   const fadeNewTweetButtonAnim = useRef(new Animated.Value(1)).current;
   const [switchIsVisible, setSwitchIsVisible] = useState(true);
+  const [membersCount, setMembersCount] = useState(0);
   const selectedNeighborhoodsCount =
     currentUser?.selected_neighborhoods?.length ?? 0;
 
   if (!activeNeighborhood) {
     return <Text>Loading...</Text>;
   }
+
+  const isNeighborhoodLocked = activeNeighborhood.is_locked;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +52,16 @@ const FeedScreen = () => {
 
     fetchData();
   }, [isFeedHot]);
+
+  useEffect(() => {
+    const getUsersCount = async () => {
+      const res = await getUsersCountForNeighborhood(activeNeighborhood.id);
+      setMembersCount(res?.members_count ?? 0);
+    };
+    if (isNeighborhoodLocked) {
+      getUsersCount();
+    }
+  }, [activeNeighborhood]);
 
   const fadeIn = () => {
     setSwitchIsVisible(true);
@@ -173,37 +187,51 @@ const FeedScreen = () => {
       >
         <NeighborhoodScrollPicker />
       </Animated.View>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        onScroll={handleScroll}
-        keyExtractor={(item) => item.id}
-        ref={flatListRef}
-        data={uniqueItems}
-        renderItem={({ item }) => (
-          <Tweet
-            tweet={item}
-            allowPush={true}
-            handleCommentIconClicked={() => console.log("comment clicked")}
-          />
-        )}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
-        }
-        ListHeaderComponent={
-          selectedNeighborhoodsCount
-            ? () => <View style={{ height: 45, backgroundColor: "white" }} />
-            : null
-        }
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        ListEmptyComponent={() =>
-          EmptyListView("post something that’s on your mind.")
-        }
-        contentContainerStyle={{ flexGrow: 1 }}
-      />
+      {isNeighborhoodLocked ? (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={[]}
+          renderItem={() => null}
+          ListEmptyComponent={() =>
+            LockedNeighborhoodListView({
+              membersCount,
+            })
+          }
+          contentContainerStyle={{ flexGrow: 1 }}
+        />
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          keyExtractor={(item) => item.id}
+          ref={flatListRef}
+          data={uniqueItems}
+          renderItem={({ item }) => (
+            <Tweet
+              tweet={item}
+              allowPush={true}
+              handleCommentIconClicked={() => console.log("comment clicked")}
+            />
+          )}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isFetchingNextPage ? () => <ActivityIndicator size="small" /> : null
+          }
+          ListHeaderComponent={
+            selectedNeighborhoodsCount
+              ? () => <View style={{ height: 45, backgroundColor: "white" }} />
+              : null
+          }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={() =>
+            EmptyListView("post something that’s on your mind.")
+          }
+          contentContainerStyle={{ flexGrow: 1 }}
+        />
+      )}
       <Animated.View
         pointerEvents={switchIsVisible ? "auto" : "none"}
         style={[

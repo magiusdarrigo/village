@@ -39,7 +39,6 @@ router.get("/", async (req, res) => {
           select: {
             name: true,
             is_locked: true,
-            members_count: true,
           },
         },
       },

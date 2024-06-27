@@ -136,7 +136,6 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
                 name: currentUser.neighborhood.name,
                 id: currentUser.neighborhood_id,
                 is_locked: currentUser.neighborhood.is_locked,
-                members_count: currentUser.neighborhood.members_count,
               });
             }
           } catch (error) {

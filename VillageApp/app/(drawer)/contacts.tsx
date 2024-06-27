@@ -128,7 +128,6 @@ const ContactsScreen = () => {
       if (!current.phoneNumbers?.[0]?.number || !current.name) {
         return accumulator;
       }
-      console.log("number: ", current.phoneNumbers?.[0]?.number);
       const formattedNumber = getDDBReadableNumber(
         current.phoneNumbers?.[0].number
       );

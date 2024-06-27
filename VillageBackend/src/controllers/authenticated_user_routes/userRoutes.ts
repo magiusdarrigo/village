@@ -98,7 +98,6 @@ router.put("/", upload.single("image"), async (req, res) => {
           select: {
             name: true,
             is_locked: true,
-            members_count: true,
           },
         },
         building: {
@@ -182,7 +181,6 @@ router.post("/:id/follow", async (req, res) => {
           select: {
             name: true,
             is_locked: true,
-            members_count: true,
           },
         },
       },
@@ -268,7 +266,6 @@ router.delete("/:id/follow", async (req, res) => {
           select: {
             name: true,
             is_locked: true,
-            members_count: true,
           },
         },
       },
@@ -342,7 +339,6 @@ router.get("/", async (req, res) => {
           select: {
             name: true,
             is_locked: true,
-            members_count: true,
           },
         },
         building: {
