@@ -9,7 +9,9 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from "react-native";
+import { CountryPicker } from "react-native-country-codes-picker";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter, SplashScreen } from "expo-router";
 import { login } from "../../lib/api/auth";
@@ -23,6 +25,8 @@ const deviceType = getDeviceType();
 const smallDevice = deviceType === DeviceType.iPhoneSmall;
 
 const SignIn = () => {
+  const [show, setShow] = useState(false);
+  const [countryCode, setCountryCode] = useState("+1");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [_, setLastKeyPressed] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -56,11 +60,13 @@ const SignIn = () => {
     try {
       setIsLoading(true);
       Keyboard.dismiss();
-      const user = await login({ phoneNumber });
+      const user = await login({
+        phoneNumber: `${countryCode} ${phoneNumber}`,
+      });
       updateUser(user);
       router.replace({
         pathname: "/authenticate",
-        params: { phoneNumber: stripParentheses(phoneNumber) },
+        params: { phoneNumber: stripParentheses(phoneNumber), countryCode },
       });
     } catch (error) {
       Sentry.Native.captureException(error);
@@ -101,19 +107,52 @@ const SignIn = () => {
           enter your phone number.
         </Text>
         <View style={{ flex: 1, justifyContent: "space-between" }}>
-          <TextInput
-            ref={phoneNumberInputRef}
-            placeholder=""
-            value={phoneNumber}
-            onChangeText={handlePhoneChange}
-            onKeyPress={onKeyPress}
-            style={styles.input}
-            keyboardType="phone-pad"
-            autoFocus={false}
-            multiline={true}
-            numberOfLines={1}
-          />
-
+          <View style={styles.inputContainer}>
+            <TouchableOpacity
+              onPress={() => setShow(true)}
+              style={{
+                maxHeight: 50,
+                backgroundColor: Colors.light.tertiary,
+                paddingTop: 10,
+                paddingRight: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: "black",
+                  fontSize: 22,
+                  fontWeight: "bold",
+                }}
+              >
+                {countryCode}
+              </Text>
+            </TouchableOpacity>
+            <CountryPicker
+              lang="en"
+              show={show}
+              pickerButtonOnPress={(item) => {
+                setCountryCode(item.dial_code);
+                setShow(false);
+              }}
+              style={{
+                modal: {
+                  height: 500,
+                },
+              }}
+            />
+            <TextInput
+              ref={phoneNumberInputRef}
+              placeholder=""
+              value={phoneNumber}
+              onChangeText={handlePhoneChange}
+              onKeyPress={onKeyPress}
+              style={styles.input}
+              keyboardType="phone-pad"
+              autoFocus={false}
+              multiline={true}
+              numberOfLines={1}
+            />
+          </View>
           <View>
             <Text style={styles.optInText}>
               by selecting get code, you agree to receiving sms verification
@@ -140,6 +179,10 @@ const SignIn = () => {
 };
 
 const styles = StyleSheet.create({
+  inputContainer: {
+    flex: 1,
+    flexDirection: "row",
+  },
   optInText: {
     fontSize: 12,
     textAlign: "center",
@@ -156,7 +199,7 @@ const styles = StyleSheet.create({
     borderColor: "transparent", // no border
     borderWidth: 0,
     paddingTop: 10,
-    fontSize: 20,
+    fontSize: 22,
     color: "black",
     flex: 1,
   },

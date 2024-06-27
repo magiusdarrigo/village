@@ -77,6 +77,8 @@ interface TweetsApiContextType {
   accountDeletionRequest: () => Promise<any>;
   blockUser: (userID: string) => Promise<any>;
   getUsersFromPhoneNumbers: (phoneNumbers: string[]) => Promise<any>;
+  getCurrentUser: () => Promise<any>;
+  getUsersCountForNeighborhood: (neighborhoodID: number) => Promise<any>;
 }
 
 const TweetsApiContext = createContext<TweetsApiContextType>({
@@ -111,6 +113,8 @@ const TweetsApiContext = createContext<TweetsApiContextType>({
   accountDeletionRequest: async () => {},
   blockUser: async () => {},
   getUsersFromPhoneNumbers: async () => {},
+  getCurrentUser: async () => {},
+  getUsersCountForNeighborhood: async () => {},
 });
 
 const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
@@ -1069,6 +1073,58 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
     return body;
   };
 
+  const getCurrentUser = async () => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/users`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      return {};
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
+  const getUsersCountForNeighborhood = async (neighborhoodID: number) => {
+    if (!authToken) {
+      return {};
+    }
+
+    const url = `${API_URL}/v1/neighborhoods/${neighborhoodID}/members/count`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (res.status === 403) {
+      removeAuthToken();
+      return {};
+    }
+
+    if (res.status !== 200) {
+      return {};
+    }
+
+    const body = await res.json();
+    return body;
+  };
+
   return (
     <TweetsApiContext.Provider
       value={{
@@ -1103,6 +1159,8 @@ const TweetsApiContextProvider = ({ children }: PropsWithChildren) => {
         accountDeletionRequest,
         blockUser,
         getUsersFromPhoneNumbers,
+        getCurrentUser,
+        getUsersCountForNeighborhood,
       }}
     >
       {children}

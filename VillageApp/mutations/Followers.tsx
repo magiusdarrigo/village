@@ -1,10 +1,12 @@
 import { Alert } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTweetsApi } from "../context/TweetContext";
+import { useUser } from "../context/UserContext";
 
 // createMutateFollowUser can be destructured to:  { mutate: mutateFollowUser, isLoading: isLoadingFollow }
 export const useFollowUser = () => {
-  const { followUser } = useTweetsApi();
+  const { followUser, getCurrentUser } = useTweetsApi();
+  const { user, updateUser } = useUser();
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -17,18 +19,27 @@ export const useFollowUser = () => {
     }) => followUser(userIDToFollow),
     {
       onSuccess: (_, variables) => {
-        // Update the profiles cache
+        // Update the profile's cache
         queryClient.setQueryData(
           ["profiles", variables.userIDToFollow],
           (oldData: any) => {
+            if (!oldData) {
+              return;
+            }
             return {
               ...oldData,
               followed_by_user: true,
+              followers_count: oldData.followers_count + 1,
             };
           }
         );
 
-        // Update the profile following cache
+        // update this user's following count
+        if (user && user.following_count !== undefined) {
+          updateUser({ ...user, following_count: user.following_count + 1 });
+        }
+
+        // Update the profile followers cache
         queryClient.setQueryData(
           ["profilefollowers", variables.userIDOfProfile],
           (oldData: any) => {
@@ -76,6 +87,7 @@ export const useFollowUser = () => {
             };
           }
         );
+        // Update the contacts cache
         queryClient.setQueriesData(["contacts"], (oldData: any) => {
           if (!oldData) {
             return;
@@ -100,6 +112,7 @@ export const useFollowUser = () => {
 // createMutateUnfollowUser can be destructured to:  { mutate: mutateUnfollowUser, isLoading: isLoadingUnfollow }
 export const useUnfollowUser = () => {
   const { unFollowUser } = useTweetsApi();
+  const { updateUser, user } = useUser();
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -116,14 +129,23 @@ export const useUnfollowUser = () => {
         queryClient.setQueryData(
           ["profiles", variables.userIDToUnfollow],
           (oldData: any) => {
+            if (!oldData) {
+              return;
+            }
             return {
               ...oldData,
               followed_by_user: false,
+              followers_count: oldData.followers_count - 1,
             };
           }
         );
 
-        // Update the profile followers cache
+        // update this user's following count
+        if (user && user.following_count !== undefined) {
+          updateUser({ ...user, following_count: user.following_count - 1 });
+        }
+
+        // Update the profile's followers cache
         queryClient.setQueryData(
           ["profilefollowers", variables.userIDOfProfile],
           (oldData: any) => {
@@ -147,6 +169,8 @@ export const useUnfollowUser = () => {
             };
           }
         );
+
+        // Update the profile's following cache
         queryClient.setQueryData(
           ["profilefollowing", variables.userIDOfProfile],
           (oldData: any) => {
@@ -170,6 +194,8 @@ export const useUnfollowUser = () => {
             };
           }
         );
+
+        // Update the contacts cache
         queryClient.setQueriesData(["contacts"], (oldData: any) => {
           if (!oldData) {
             return;

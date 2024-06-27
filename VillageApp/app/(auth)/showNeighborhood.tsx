@@ -39,6 +39,7 @@ const ShowNeighborhood = () => {
       updateActiveNeighborhood({
         name: updatedUser.neighborhood.name,
         id: updatedUser.neighborhood_id,
+        is_locked: updatedUser.neighborhood.is_locked,
       });
       router.replace("/(auth)/notifications");
     } catch (error) {
