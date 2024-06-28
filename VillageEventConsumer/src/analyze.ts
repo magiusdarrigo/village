@@ -4,9 +4,7 @@ import { NewPostWebhookEvent } from "./types/custom";
 const systemMessageForCheckingAbuseForTextOnlyModel = {
   role: "system",
   content: `You're a content moderator for the anonymous neighborhoods social app "Village". Please review the following post and decide whether it includes any of the violations:
-    * Unsolicited sexual talk
-    * Overly horny content
-    * Sexual content involving minors
+    * Unsolicited sexual talk, overly horny content, sexual content involving minors
     * Overly political content
     * Cries for help that are not funny
     * Obvious scam content
@@ -24,9 +22,7 @@ const systemMessageForCheckingAbuseForImageModel = {
   // gpt-4-1106-vision-preview model does not support json response for some fucking reason
   role: "system",
   content: `You're a content moderator for the anonymous neighborhoods social app "Village". Please review the following post and decide whether it includes any of the violations:
-    * Unsolicited sexual talk
-    * Overly horny content
-    * Sexual content involving minors
+    * Unsolicited sexual talk, overly horny content, sexual content involving minors
     * Overly political content
     * Cries for help that are not funny
     * Obvious scam content
