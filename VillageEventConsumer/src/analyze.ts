@@ -15,7 +15,7 @@ const systemMessageForCheckingAbuseForTextOnlyModel = {
     * Real terroristic, suicidal, or criminal threats
     * Revealing people's names that are not public figures.
     
-    Remember you should almost always allow funny or entertaining content. The next message will be the post. ONLY answer in JSON format with the SINGLE key "ban" and the value either being true or false.`,
+    Remember you should almost always allow funny or entertaining or joke content. The next message will be the post. ONLY answer in JSON format with the SINGLE key "ban" and the value either being true or false.`,
 } as any;
 
 const systemMessageForCheckingAbuseForImageModel = {
@@ -33,7 +33,7 @@ const systemMessageForCheckingAbuseForImageModel = {
     * Real terroristic, suicidal, or criminal threats
     * Revealing people's names that are not public figures.
     
-    Remember you should almost always allow funny or entertaining content. The next message will be the post. ONLY answer with the single word- YES or NO`,
+    Remember you should almost always allow funny or entertaining or joke content. The next message will be the post. ONLY answer with the single word- YES or NO`,
 } as any;
 
 type AbuseAnswer = {
