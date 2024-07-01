@@ -27,6 +27,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
     updateActiveNeighborhood,
     activeNeighborhood,
     updateNeighborhoods,
+    neighborhoods,
   } = useUser();
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -133,9 +134,9 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
             updateNeighborhoods(neighborhoods);
             if (!activeNeighborhood) {
               updateActiveNeighborhood({
-                name: currentUser.neighborhood.name,
-                id: currentUser.neighborhood_id,
-                is_locked: currentUser.neighborhood.is_locked,
+                name: currentUser?.neighborhood?.name,
+                id: currentUser?.neighborhood_id,
+                is_locked: currentUser?.neighborhood?.is_locked,
               });
             }
           } catch (error) {
@@ -149,6 +150,24 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
     loadAuthToken();
   }, []);
+
+  // if auth token changes...
+  useEffect(() => {
+    const fillNeighborhoods = async () => {
+      try {
+        if (!authToken) {
+          return;
+        }
+        const neighborhoods = await getNeighborhoods(authToken);
+        updateNeighborhoods(neighborhoods);
+      } catch (error) {
+        Sentry.Native.captureException(error);
+      }
+    };
+    if (neighborhoods.length === 0) {
+      fillNeighborhoods();
+    }
+  }, [authToken]);
 
   const updateAuthToken = async (newToken: string) => {
     await SecureStore.setItemAsync("authToken", newToken);
