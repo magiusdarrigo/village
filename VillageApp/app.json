@@ -2,7 +2,7 @@
   "expo": {
     "name": "Village - NYC",
     "slug": "village",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.magius18.village",
-      "buildNumber": "21",
+      "buildNumber": "22",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false
