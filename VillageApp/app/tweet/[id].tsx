@@ -17,10 +17,10 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Entypo } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { useTweetsApi } from "../../context/TweetContext";
 import Tweet from "../../components/Tweet";
-import { SplashScreen, useLocalSearchParams, usePathname } from "expo-router";
+import { SplashScreen, useLocalSearchParams } from "expo-router";
 import Comment from "../../components/Comment";
 import { CommentType } from "../../types";
 import * as Sentry from "sentry-expo";
@@ -394,7 +394,12 @@ const TweetScreen = () => {
             onPress={handleAddComment}
             disabled={isPostButtonDisabled}
           >
-            <Entypo name="plus" size={18} color="white" />
+            <FontAwesome
+              name="send"
+              size={16}
+              color="white"
+              style={{ paddingRight: 2 }}
+            />
           </Pressable>
         </View>
       </View>
