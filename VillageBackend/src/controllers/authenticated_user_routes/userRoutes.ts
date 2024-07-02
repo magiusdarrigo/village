@@ -48,13 +48,16 @@ router.put("/", upload.single("image"), async (req, res) => {
         req.file,
         String(currentUser.id),
         "profile_pictures",
-        "uploads"
+        "uploads",
+        300
       );
-      // delete the file from the local filesystem
       await deleteFileFromFS(req.file.path);
     }
   } catch (error) {
     console.error(error);
+    if (req.file) {
+      await deleteFileFromFS(req.file.path);
+    }
     return res.status(500).json({
       error: `error uploading image for user`,
     });

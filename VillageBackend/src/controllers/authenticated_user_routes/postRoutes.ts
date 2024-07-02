@@ -117,7 +117,8 @@ router.post("/", upload.single("image"), async (req, res) => {
         req.file,
         String(currentUser.id),
         "post_images",
-        "uploads"
+        "uploads",
+        500
       );
       // delete the file from the local filesystem
       await deleteFileFromFS(req.file.path);

@@ -2,6 +2,7 @@ import supabaseClient from "../clients/supabaseClient";
 import * as fs from "fs";
 import convert from "heic-convert";
 import { promisify } from "util";
+import sharp from "sharp";
 
 const getBucketURL = (bucketName: string) => {
   return `${process.env.SUPABASE_URL}/storage/v1/object/public/${bucketName}/`;
@@ -11,28 +12,31 @@ export const uploadImageToSupabase = async (
   file: Express.Multer.File,
   userID: string,
   bucketName: string,
-  folderName: string
+  folderName: string,
+  resizeWidthSize: number
 ) => {
   const filePath = file.path;
   const fileMimeType = file.mimetype;
-  const fileContents = await promisify(fs.readFile)(filePath);
+
+  // Resize the image - for example, to a width of 800 pixels and proportional height
+  const resizedImage = await sharp(filePath).resize(resizeWidthSize).toBuffer();
 
   // create file name based on user id and current time, also attach file extension
   const fileName = `${userID}_${Date.now()}.${fileMimeType.split("/")[1]}`;
 
-  // Upload the image to the bucket 'post_images'
+  // Upload the image to the bucket
   const { data, error } = await supabaseClient.storage
     .from(bucketName)
-    .upload(`${folderName}/${fileName}`, fileContents, {
-      // cache set to 48 hours
-      cacheControl: "172800",
-      upsert: false,
+    .upload(`${folderName}/${fileName}`, resizedImage, {
+      cacheControl: "172800", // cache set to 48 hours
+      upsert: true,
       contentType: fileMimeType,
     });
 
   if (error) {
     throw error;
   }
+
   return getBucketURL(bucketName) + data.path;
 };
 
@@ -75,6 +79,5 @@ export const deleteFileFromFS = async (filePath: string) => {
     await promisify(fs.unlink)(filePath);
   } catch (error) {
     console.error("Error deleting file:", error);
-    throw error;
   }
 };
