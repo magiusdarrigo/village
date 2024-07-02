@@ -19,7 +19,10 @@ export const uploadImageToSupabase = async (
   const fileMimeType = file.mimetype;
 
   // Resize the image - for example, to a width of 800 pixels and proportional height
-  const resizedImage = await sharp(filePath).resize(resizeWidthSize).toBuffer();
+  const resizedImage = await sharp(filePath)
+    .rotate()
+    .resize(resizeWidthSize)
+    .toBuffer();
 
   // create file name based on user id and current time, also attach file extension
   const fileName = `${userID}_${Date.now()}.${fileMimeType.split("/")[1]}`;
