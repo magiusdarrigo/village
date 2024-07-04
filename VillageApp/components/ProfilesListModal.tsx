@@ -42,7 +42,11 @@ const ProfilesListModal = ({
         </View>
       );
     } else {
-      return EmptyListView("not following anyone yet.");
+      return (
+        <View style={styles.emptyProfilesView}>
+          {EmptyListView("not following anyone yet.")}
+        </View>
+      );
     }
   };
 
