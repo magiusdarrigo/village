@@ -44,30 +44,44 @@ export type Database = {
       }
       account_deletion_requests: {
         Row: {
+          building_id: number
           created_at: string
           id: number
-          reason: string | null
+          phone_number: string
+          reason: string
           tags: Json | null
           user_id: string
-          username: string | null
+          username: string
         }
         Insert: {
+          building_id: number
           created_at?: string
           id?: number
-          reason?: string | null
+          phone_number: string
+          reason?: string
           tags?: Json | null
           user_id: string
-          username?: string | null
+          username: string
         }
         Update: {
+          building_id?: number
           created_at?: string
           id?: number
-          reason?: string | null
+          phone_number?: string
+          reason?: string
           tags?: Json | null
           user_id?: string
-          username?: string | null
+          username?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "account_deletion_requests_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       building_change_requests: {
         Row: {
@@ -289,20 +303,32 @@ export type Database = {
       }
       neighborhoods: {
         Row: {
+          borough: string | null
           created_at: string
           id: number
+          is_hidden: boolean
+          is_locked: boolean
+          members_count: number
           name: string
           tags: Json | null
         }
         Insert: {
+          borough?: string | null
           created_at?: string
           id?: number
+          is_hidden?: boolean
+          is_locked?: boolean
+          members_count?: number
           name: string
           tags?: Json | null
         }
         Update: {
+          borough?: string | null
           created_at?: string
           id?: number
+          is_hidden?: boolean
+          is_locked?: boolean
+          members_count?: number
           name?: string
           tags?: Json | null
         }
@@ -653,9 +679,12 @@ export type Database = {
           following_count: number
           id: string
           image: string | null
+          is_hidden: boolean
           is_verified: boolean
           neighborhood_id: number | null
+          outside_nyc: boolean
           phone_number: string
+          selected_neighborhoods: Json[] | null
           tags: Json | null
           username: string
         }
@@ -669,9 +698,12 @@ export type Database = {
           following_count?: number
           id: string
           image?: string | null
+          is_hidden?: boolean
           is_verified?: boolean
           neighborhood_id?: number | null
+          outside_nyc?: boolean
           phone_number: string
+          selected_neighborhoods?: Json[] | null
           tags?: Json | null
           username: string
         }
@@ -685,9 +717,12 @@ export type Database = {
           following_count?: number
           id?: string
           image?: string | null
+          is_hidden?: boolean
           is_verified?: boolean
           neighborhood_id?: number | null
+          outside_nyc?: boolean
           phone_number?: string
+          selected_neighborhoods?: Json[] | null
           tags?: Json | null
           username?: string
         }
