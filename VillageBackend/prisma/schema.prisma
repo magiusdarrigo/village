@@ -31,6 +31,7 @@ model users {
   blocked_users          String[]       @default([])
   outside_nyc            Boolean        @default(false)
   is_hidden              Boolean        @default(false)
+  is_bot_account         Boolean        @default(false)
 
   posts                    posts[]
   comments                 comments[]
