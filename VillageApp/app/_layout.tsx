@@ -79,11 +79,7 @@ export default function RootLayout() {
       }
     };
     checkVersion();
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+  }, []);
 
   return <RootLayoutNav />;
 }
