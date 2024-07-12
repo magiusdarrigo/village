@@ -10,7 +10,7 @@ import { View } from "../../components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import { DynaPuffText } from "../../components/StyledText";
-import { stripParentheses, getDeviceType, DeviceType } from "../../lib/helpers";
+import { getDeviceType, DeviceType } from "../../lib/helpers";
 
 const deviceType = getDeviceType();
 const smallDevice = deviceType === DeviceType.iPhoneSmall;

@@ -99,6 +99,34 @@ export const createPostQuery = (
             `;
 };
 
+// return the post as well as the user's username and profile image. ADMIN VERSION
+export const createPostAdminQuery = (
+  userID: string,
+  neighborhoodID: number,
+  textContent: string,
+  imageURL: string,
+  imageWidth: number,
+  imageHeight: number,
+  createdAt: string,
+  likesCount: number
+) => {
+  return Prisma.sql`
+                  WITH new_post AS (
+                      INSERT INTO posts (user_id, neighborhood_id, text_content, image_url, image_width, image_height, created_at, likes_count)
+                      VALUES (${userID}, ${neighborhoodID}, ${textContent}, ${imageURL}, ${imageWidth}, ${imageHeight}, ${createdAt}::timestamp without time zone, ${likesCount})
+                      RETURNING *
+                  )
+                  SELECT 
+                      new_post.*,
+                      u.username,
+                      u.image AS profile_image
+                  FROM 
+                      new_post
+                  JOIN 
+                      users u ON new_post.user_id = u.id;
+              `;
+};
+
 export const getPostsByUserQuery = (
   userID: string,
   currentUserID: string,

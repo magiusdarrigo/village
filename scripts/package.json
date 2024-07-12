@@ -1,0 +1,27 @@
+{
+  "name": "scripts",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "scripts for village",
+  "main": "index.js",
+  "scripts": {
+    "create-fake-users": "node fakeUsers.js",
+    "create-fake-posts": "node fakePosts.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magiusdarrigo/village.git"
+  },
+  "author": "magiusdarrigo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/magiusdarrigo/village/issues"
+  },
+  "homepage": "https://github.com/magiusdarrigo/village#readme",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "google-auth-library": "^9.11.0",
+    "google-spreadsheet": "^4.1.2"
+  }
+}
