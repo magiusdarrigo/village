@@ -1,5 +1,6 @@
 {
   "name": "scripts",
+  "type": "module",
   "version": "1.0.0",
   "description": "scripts for village",
   "main": "index.js",
@@ -20,6 +21,7 @@
   "dependencies": {
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
+    "google-auth-library": "^9.11.0",
     "google-spreadsheet": "^4.1.2"
   }
 }

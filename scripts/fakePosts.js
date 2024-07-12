@@ -1,31 +1,39 @@
-const { GoogleSpreadsheet } = require("google-spreadsheet");
-const axios = require("axios");
-require("dotenv").config();
+import { GoogleSpreadsheet } from "google-spreadsheet";
+import { JWT } from "google-auth-library";
+import axios from "axios";
+import "dotenv/config";
 
 // ID of your Google Sheet (can be found in the sheet URL)
 const SPREADSHEET_ID = "1rahnRPlPUtV8_F0bjSAIsiZD8VG4HIoOomoc5EisiDw";
-const DOC = new GoogleSpreadsheet(SPREADSHEET_ID);
+let doc;
 
 // API endpoint and token
-const API_ENDPOINT = "https://yourapi.com/admin/post";
-const AUTH_TOKEN = "YOUR_ADMIN_TOKEN";
+const API_ENDPOINT = "http://localhost:3000/v1/admin/posts";
+const AUTH_TOKEN = process.env.ADMIN_AUTH_TOKEN;
+const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 
-async function authenticateGoogleSheets() {
-  // Assuming you've saved your service account credentials in a .json file
-  // Ensure this JSON file path is correctly referenced in your project environment
-  await DOC.useServiceAccountAuth(
-    require("./path-to-your-service-account-credentials.json")
-  );
-  await DOC.loadInfo(); // Loads document properties and worksheets
-}
+const authenticateGoogleSheets = async () => {
+  const creds = await import("./secrets/village-404104-79076a5fb68f.json", {
+    assert: { type: "json" },
+  }).then((module) => module.default);
 
-async function fetchSheetData() {
-  const sheet = DOC.sheetsByIndex[0]; // Assuming we want the first sheet
-  const rows = await sheet.getRows();
-  return rows;
-}
+  const serviceAccountAuth = new JWT({
+    email: creds.client_email,
+    key: creds.private_key.replace(/\\n/g, "\n"), // Ensure newline characters are handled correctly
+    scopes: SCOPES,
+  });
 
-async function postToApi(data) {
+  doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
+  await doc.loadInfo();
+  console.log("Authenticated and loaded document:", doc.title);
+};
+
+const fetchSheetData = async () => {
+  const sheet = doc.sheetsByIndex[0];
+  return await sheet.getRows();
+};
+
+const postToApi = async (data) => {
   const config = {
     headers: {
       Authorization: `Bearer ${AUTH_TOKEN}`,
@@ -47,13 +55,13 @@ async function postToApi(data) {
   } catch (error) {
     console.error("Failed to create post:", error.response.data);
   }
-}
+};
 
 async function main() {
   await authenticateGoogleSheets();
   const rows = await fetchSheetData();
   for (const row of rows) {
-    await postToApi(row);
+    console.log("row", row);
   }
 }
 

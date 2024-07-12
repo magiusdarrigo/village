@@ -2,6 +2,7 @@ import express from "express";
 import prisma from "../../clients/prismaClient";
 import { createPostAdminQuery } from "../../sql_queries/posts";
 import { upload } from "../../middleware/upload";
+import sharp from "sharp";
 import {
   uploadImageToSupabase,
   convertFileIfNecessary,
@@ -56,16 +57,19 @@ router.delete("/:id", async (req, res) => {
 // create post for any user
 router.post("/", upload.single("image"), async (req, res) => {
   console.log("create admin post called");
-  const {
-    neighborhoodID,
-    textContent,
-    imageWidth,
-    imageHeight,
-    username,
-    createdAt,
-    likesCount,
-  } = req.body;
-  console.log("image dimensions: ", imageWidth, imageHeight);
+  const { neighborhoodID, textContent, username, createdAt, likesCount } =
+    req.body;
+
+  let imageWidth;
+  let imageHeight;
+  if (req.file) {
+    console.log("req.file", req.file);
+    const image = sharp(req.file.path);
+    const metadata = await image.metadata();
+    imageWidth = metadata.width;
+    imageHeight = metadata.height;
+  }
+  console.log("imageWidth", imageWidth);
 
   // get the user ID from the username
   const user = await prisma.users.findFirst({
