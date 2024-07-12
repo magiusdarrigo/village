@@ -261,7 +261,7 @@ const FeedScreen = () => {
 
 const styles = StyleSheet.create({
   floatingButton: {
-    backgroundColor: "red",
+    backgroundColor: "black",
     position: "absolute",
     bottom: 20,
     right: 20,

@@ -2,15 +2,13 @@ import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useUser } from "../context/UserContext";
 import * as Linking from "expo-linking";
-import { useRouter, useRootNavigationState } from "expo-router";
+import { useRouter } from "expo-router";
 
 function DeepLinkHandler() {
   const router = useRouter();
   const { authToken } = useAuth();
   const { user } = useUser();
-  const navigationState = useRootNavigationState();
   useEffect(() => {
-    // if (!navigationState?.key) return;
     const handleDeepLink = (event: Linking.EventType) => {
       if (event.url && authToken && user) {
         const { hostname, path, queryParams } = Linking.parse(event.url);
@@ -44,7 +42,7 @@ function DeepLinkHandler() {
       // Clean up the event listener
       sub.remove();
     };
-  }, [authToken, user, navigationState]);
+  }, [authToken, user]);
   return null;
 }
 
