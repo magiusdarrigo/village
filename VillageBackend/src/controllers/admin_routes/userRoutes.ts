@@ -1,26 +1,13 @@
 import { Router } from "express";
 import prisma from "../../clients/prismaClient";
+import { upload } from "../../middleware/upload";
+import {
+  convertFileIfNecessary,
+  deleteFileFromFS,
+  uploadImageToSupabase,
+} from "../../utils/uploads";
 
 const router = Router();
-
-// create user
-router.post("/", async (req, res) => {
-  const { username, phoneNumber } = req.body;
-  try {
-    const newUser = await prisma.users.create({
-      data: {
-        username,
-        phone_number: phoneNumber,
-      },
-    });
-    res.json(newUser);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: `error creating user with username ${username} and phone number ${phoneNumber}`,
-    });
-  }
-});
 
 // list users
 router.get("/", async (_, res) => {
@@ -54,22 +41,65 @@ router.delete("/:id", async (req, res) => {
 });
 
 // create user
-router.post("/", async (req, res) => {
-  const { username, phoneNumber } = req.body;
-  try {
-    const newUser = await prisma.users.create({
-      data: {
-        username,
-        phone_number: phoneNumber,
-      },
-    });
-    res.json(newUser);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
+router.post("/", upload.single("image"), async (req, res) => {
+  console.log("create admin user called");
+  const { username, phoneNumber, neighborhoodID, buildingID, defaultImage } =
+    req.body;
+
+  // create user
+  const newUser = await prisma.users.create({
+    data: {
+      username,
+      phone_number: phoneNumber,
+      neighborhood_id: Number(neighborhoodID),
+      building_id: Number(buildingID),
+      is_bot_account: true,
+    },
+  });
+
+  if (!newUser) {
+    return res.status(500).json({
       error: `error creating user with username ${username} and phone number ${phoneNumber}`,
     });
   }
+
+  // first try-catch is for image upload handling
+  let uploadedFilePath = "";
+  try {
+    if (req.file) {
+      await convertFileIfNecessary(req.file);
+      // upload file to supabase
+      uploadedFilePath = await uploadImageToSupabase(
+        req.file,
+        newUser.id,
+        "profile_pictures",
+        "uploads",
+        300
+      );
+      await deleteFileFromFS(req.file.path);
+    }
+  } catch (error) {
+    console.error(error);
+    if (req.file) {
+      await deleteFileFromFS(req.file.path);
+    }
+    return res.status(500).json({
+      error: `error uploading image for user`,
+    });
+  }
+  uploadedFilePath = uploadedFilePath || defaultImage;
+
+  // update user with image
+  const updatedUser = await prisma.users.update({
+    where: {
+      id: newUser.id,
+    },
+    data: {
+      image: uploadedFilePath,
+    },
+  });
+
+  res.json(updatedUser);
 });
 
 // update user

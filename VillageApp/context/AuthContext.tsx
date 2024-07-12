@@ -86,9 +86,6 @@ const AuthContextProvider = ({ children }: PropsWithChildren) => {
       return;
     }
 
-    // router.replace("/pickNeighborhood");
-    // return;
-
     if (
       (!authToken || !user?.neighborhood?.name) &&
       (segments[0] !== "(auth)" ||

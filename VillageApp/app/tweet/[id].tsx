@@ -64,10 +64,6 @@ const TweetScreen = () => {
 
   const isPostButtonDisabled = commentText.length < 1;
 
-  if (!activeNeighborhood) {
-    return <ActivityIndicator />;
-  }
-
   useEffect(() => {
     const keyboardHideListener = Keyboard.addListener(
       "keyboardDidHide",
@@ -148,7 +144,7 @@ const TweetScreen = () => {
       });
       // update the tweet list cache with a +1 total comments count for the tweet
       queryClient.setQueryData(
-        ["infinitetweets", activeNeighborhood.id, isFeedHot],
+        ["infinitetweets", activeNeighborhood?.id, isFeedHot],
         (old: any) => {
           if (!old) return;
           return {
