@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 8,
     color: "black",
-    fontWeight: "bold",
+    fontWeight: "800",
     alignSelf: "flex-start",
   },
   inputLabel: {

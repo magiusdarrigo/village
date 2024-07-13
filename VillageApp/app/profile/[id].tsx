@@ -92,13 +92,19 @@ const OtherUserProfileScreen = () => {
     if (username) {
       if (username === currentUser?.username) {
         navigation.setOptions({
-          title: "You",
+          title: "you",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
         });
         return;
       }
       let headerTitle = `@${username}`;
       navigation.setOptions({
         title: headerTitle,
+        headerTitleStyle: {
+          fontWeight: "800",
+        },
         headerRight: () => (
           <Pressable onPress={onOtherUserSettingsPress}>
             {({ pressed }) => (

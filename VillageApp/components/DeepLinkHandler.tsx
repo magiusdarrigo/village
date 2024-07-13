@@ -11,12 +11,7 @@ function DeepLinkHandler() {
   useEffect(() => {
     const handleDeepLink = (event: Linking.EventType) => {
       if (event.url && authToken && user) {
-        const { hostname, path, queryParams } = Linking.parse(event.url);
-        console.log(
-          `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
-            queryParams
-          )}`
-        );
+        const { path, queryParams } = Linking.parse(event.url);
         // Use a dynamic route parameter based on the actual URL
         if (path) {
           // first take user to the home screen

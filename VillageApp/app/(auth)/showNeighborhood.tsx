@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     fontSize: 60,
     marginBottom: 8, // space below the label
     color: "black",
-    fontWeight: "bold",
+    fontWeight: "800",
     alignSelf: "flex-start", // align to top-left
   },
   container: {

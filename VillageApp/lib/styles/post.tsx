@@ -24,13 +24,13 @@ const postStyles = StyleSheet.create({
     lineHeight: 24,
     marginTop: 5,
     fontSize: 18,
-    fontWeight: "500",
+    fontWeight: "700",
     marginRight: 10,
   },
   timeContent: {
     fontSize: 16,
     color: "grey",
-    fontWeight: "500",
+    fontWeight: "600",
     marginLeft: 5,
   },
   postFooter: {

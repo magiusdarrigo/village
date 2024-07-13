@@ -36,7 +36,7 @@ const getVerticalOffset = () => {
           marginBottom: -3,
           marginTop: 2,
         },
-        tabBarLabelStyle: { marginBottom: 5 },
+        tabBarLabelStyle: { marginBottom: 5, fontWeight: 800 },
       };
     default:
       return {
@@ -48,7 +48,7 @@ const getVerticalOffset = () => {
           marginBottom: -5,
           marginTop: 2,
         },
-        tabBarLabelStyle: {},
+        tabBarLabelStyle: { fontWeight: 800 },
       };
   }
 };
@@ -299,6 +299,9 @@ export default function TabLayout() {
         options={{
           title: "home",
           headerTitle: activeNeighborhood?.name || "home",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="home" color={color} />
@@ -347,6 +350,9 @@ export default function TabLayout() {
         options={{
           title: "building",
           headerTitle: user?.building?.address || "Building",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarBadge: chatTabBadgeCount > 0 ? chatTabBadgeCount : undefined,
           tabBarIcon: ({ color }) => (
@@ -383,6 +389,9 @@ export default function TabLayout() {
         name="notifications"
         options={{
           title: "activity",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconOcticons name="bell-fill" color={color} />
@@ -398,6 +407,9 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "you",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           tabBarLabelStyle: tabVerticalOffset.tabBarLabelStyle,
           tabBarIcon: ({ color }) => (
             <TabBarIconFontAwesome name="user" color={color} />

@@ -205,7 +205,7 @@ const NewTweet = () => {
     >
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
-          <Link href="../" style={{ fontSize: 16 }}>
+          <Link href="../" style={{ fontSize: 16, fontWeight: "800" }}>
             cancel
           </Link>
           {isLoading && <ActivityIndicator />}
@@ -238,7 +238,7 @@ const NewTweet = () => {
               marginTop: 8,
               lineHeight: 24,
               fontSize: 20,
-              fontWeight: "500",
+              fontWeight: "600",
               textAlignVertical: "top",
               backgroundColor: "white",
               flex: 1,
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   buttonText: {
-    fontWeight: "600",
+    fontWeight: "800",
     color: "white",
     fontSize: 16,
     paddingVertical: 2,
@@ -384,12 +384,12 @@ const styles = StyleSheet.create({
   charCounterPositive: {
     fontSize: 16,
     color: "black",
-    fontWeight: "bold",
+    fontWeight: "800",
   },
   charCounterNegative: {
     fontSize: 16,
     color: "red",
-    fontWeight: "bold",
+    fontWeight: "800",
   },
 });
 
