@@ -59,7 +59,6 @@ const NeighborhoodScrollPicker = () => {
                 <Text
                   style={[
                     neighborhoodStyles.neighborhoodButtonText,
-                    // { color: !isSelected ? "black" : "white" },
                     isSelected &&
                       neighborhoodStyles.neighborhoodButtonTextSelected,
                   ]}

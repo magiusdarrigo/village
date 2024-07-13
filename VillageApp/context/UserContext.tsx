@@ -11,6 +11,7 @@ interface UserContextType {
   neighborhoods: NeighborhoodType[];
   updateNeighborhoods: (neighborhoods: NeighborhoodType[]) => void;
   getStreamChatClient: () => StreamChat<any>;
+  getIsTextBoldEnabled: () => boolean;
   chatTabBadgeCount: number;
   updateChatTabBadgeCount: (count: number) => void;
   flatListRef?: React.RefObject<any>;
@@ -28,6 +29,7 @@ interface UserContextType {
 interface UserContextProviderProps {
   children: React.ReactNode;
   streamChatClient: StreamChat<any>;
+  isTextBoldEnabled: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -36,6 +38,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const UserContextProvider = ({
   children,
   streamChatClient,
+  isTextBoldEnabled,
 }: UserContextProviderProps) => {
   const [user, setUser] = useState<UserType | null>(null);
   const [neighborhoods, setNeighborhoods] = useState<NeighborhoodType[]>([]);
@@ -75,6 +78,10 @@ const UserContextProvider = ({
     return streamChatClient;
   };
 
+  const getIsTextBoldEnabled = () => {
+    return isTextBoldEnabled;
+  };
+
   const updateChatTabBadgeCount = async (count: number) => {
     await notifee.setBadgeCount(count);
     setChatTabBadgeCount(count);
@@ -98,6 +105,7 @@ const UserContextProvider = ({
         neighborhoods,
         updateNeighborhoods,
         getStreamChatClient,
+        getIsTextBoldEnabled,
         chatTabBadgeCount,
         updateChatTabBadgeCount,
         flatListRef,

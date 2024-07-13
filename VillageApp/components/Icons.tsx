@@ -82,7 +82,7 @@ export const MaterialCommunityIcon = ({
       <Text
         style={{
           fontSize: 16,
-          fontWeight: "bold",
+          fontWeight: "800",
           color: Colors.light.counterFontColor,
           marginLeft: 5,
           paddingBottom: 2,

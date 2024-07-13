@@ -24,7 +24,7 @@ const neighborhoodStyles = StyleSheet.create({
   neighborhoodButtonText: {
     fontSize: 14,
     color: Colors.light.switchFontColor,
-    fontWeight: "bold",
+    fontWeight: "800",
   },
   neighborhoodButtonTextSelected: {
     color: "white",
