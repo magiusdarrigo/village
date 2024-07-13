@@ -14,7 +14,7 @@ const profileStyles = StyleSheet.create({
     justifyContent: "center",
   },
   followButtonText: {
-    fontWeight: "600",
+    fontWeight: "800",
     color: "white",
     fontSize: 14,
   },
@@ -32,7 +32,7 @@ const profileStyles = StyleSheet.create({
     justifyContent: "center",
   },
   unfollowButtonText: {
-    fontWeight: "600",
+    fontWeight: "800",
     color: "black",
     fontSize: 14,
   },
@@ -99,7 +99,7 @@ const profileStyles = StyleSheet.create({
   },
   username: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "800",
     marginTop: 12,
     marginBottom: 8,
   },

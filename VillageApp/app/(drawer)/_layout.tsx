@@ -74,9 +74,16 @@ export default function DrawerLayout() {
           headerBackTitleVisible: false,
           headerTintColor: "black",
           title: "home",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
-          drawerLabelStyle: { color: "black", fontSize: 18 },
+          drawerLabelStyle: {
+            color: "black",
+            fontSize: 18,
+            fontWeight: "bold",
+          },
           drawerItemStyle: { marginTop: -10 },
         }}
       />
@@ -87,9 +94,16 @@ export default function DrawerLayout() {
           headerBackTitleVisible: false,
           headerTintColor: "black",
           title: "neighborhoods",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
-          drawerLabelStyle: { color: "black", fontSize: 18 },
+          drawerLabelStyle: {
+            color: "black",
+            fontSize: 18,
+            fontWeight: "bold",
+          },
           drawerItemStyle: { marginTop: -10 },
           headerLeft: () => (
             <Pressable onPress={() => router.back()}>
@@ -112,9 +126,16 @@ export default function DrawerLayout() {
           headerBackTitleVisible: false,
           headerTintColor: "black",
           title: "contacts",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
-          drawerLabelStyle: { color: "black", fontSize: 18 },
+          drawerLabelStyle: {
+            color: "black",
+            fontSize: 18,
+            fontWeight: "bold",
+          },
           drawerItemStyle: { marginTop: -10 },
           headerLeft: () => (
             <Pressable onPress={() => router.back()}>
@@ -137,6 +158,9 @@ export default function DrawerLayout() {
           headerBackTitleVisible: false,
           headerTintColor: "black",
           title: "where's everyone?",
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
           drawerActiveBackgroundColor: "rgba(0, 0, 0, 0.04)",
           drawerInactiveBackgroundColor: "transparent",
           drawerLabelStyle: {

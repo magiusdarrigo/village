@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   textOption: {
-    fontWeight: "bold",
+    fontWeight: "800",
     width: "50%",
     textAlign: "center",
     color: Colors.light.switchFontColor,

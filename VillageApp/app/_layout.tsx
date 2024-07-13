@@ -115,6 +115,7 @@ function RootLayoutNav() {
                           name="tweet/[id]"
                           options={{
                             title: "post",
+                            headerTitleStyle: { fontWeight: "800" },
                             headerBackTitleVisible: false,
                             headerTintColor: "black",
                           }}
@@ -123,6 +124,9 @@ function RootLayoutNav() {
                           name="new-tweet"
                           options={{
                             title: "new post",
+                            headerTitleStyle: {
+                              fontWeight: "800",
+                            },
                             headerShown: true,
                             headerBackTitleVisible: false,
                             headerTintColor: "black",
