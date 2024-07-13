@@ -41,7 +41,10 @@ const Tweet = ({
   const queryClient = useQueryClient();
   const navigation = useNavigation();
   const segments = useSegments();
-  const { user, isFeedHot, activeNeighborhood } = useUser();
+  const { user, isFeedHot, activeNeighborhood, getIsTextBoldEnabled } =
+    useUser();
+
+  const isTextBoldEnabled = getIsTextBoldEnabled();
 
   if (!user || !activeNeighborhood) {
     Alert.alert("Something went wrong. Try again.");
@@ -586,7 +589,16 @@ const Tweet = ({
                 linkStyle={{ color: "#2980b9" }}
                 onPress={handlePressButtonAsync}
               >
-                <Text style={postStyles.textContent}>{tweet.text_content}</Text>
+                <Text
+                  style={[
+                    postStyles.textContent,
+                    isTextBoldEnabled
+                      ? { fontWeight: "500" }
+                      : { fontWeight: "700" },
+                  ]}
+                >
+                  {tweet.text_content}
+                </Text>
               </Hyperlink>
             </View>
           </Pressable>
@@ -651,7 +663,7 @@ const Tweet = ({
               <Text
                 style={{
                   fontSize: 16,
-                  fontWeight: "bold",
+                  fontWeight: "800",
                   color: Colors.light.counterFontColor,
                   marginLeft: 5,
                   marginRight: 6,

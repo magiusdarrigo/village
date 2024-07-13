@@ -3,8 +3,8 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, SplashScreen } from "expo-router";
-import { useEffect } from "react";
-import { Alert, Text, TextInput } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, Text, TextInput, AccessibilityInfo } from "react-native";
 import AuthContextProvider from "../context/AuthContext";
 import UserContextProvider from "../context/UserContext";
 import AssetsContextProvider from "../context/AssetsContext";
@@ -61,11 +61,21 @@ export default function RootLayout() {
     ...FontAwesome.font,
     DynaPuff: require("../assets/fonts/DynaPuff_SemiCondensed-Bold.ttf"),
   });
+  const [isTextBoldEnabled, setIsTextBoldEnabled] = useState(false);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
+
+  // get if user has enabled bold text in accessibility settings
+  useEffect(() => {
+    const getAccessibilityInfo = async () => {
+      const isBoldTextEnabled = await AccessibilityInfo.isBoldTextEnabled();
+      setIsTextBoldEnabled(isBoldTextEnabled);
+    };
+    getAccessibilityInfo();
+  }, []);
 
   useEffect(() => {
     // call version check here
@@ -81,14 +91,17 @@ export default function RootLayout() {
     checkVersion();
   }, []);
 
-  return <RootLayoutNav />;
+  return <RootLayoutNav isTextBoldEnabled={isTextBoldEnabled} />;
 }
 
-function RootLayoutNav() {
+function RootLayoutNav({ isTextBoldEnabled }: any) {
   return (
     <>
       <AssetsContextProvider>
-        <UserContextProvider streamChatClient={streamChatClient}>
+        <UserContextProvider
+          streamChatClient={streamChatClient}
+          isTextBoldEnabled={isTextBoldEnabled}
+        >
           <AuthContextProvider>
             <TweetsApiContextProvider>
               <QueryClientProvider client={queryClient}>

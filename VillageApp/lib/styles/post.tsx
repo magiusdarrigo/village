@@ -24,7 +24,7 @@ const postStyles = StyleSheet.create({
     lineHeight: 24,
     marginTop: 5,
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     marginRight: 10,
   },
   timeContent: {

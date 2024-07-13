@@ -12,12 +12,15 @@ import postStyles from "../lib/styles/post";
 import { Link } from "expo-router";
 import Colors from "../constants/Colors";
 import { useAssetContext } from "../context/AssetsContext";
+import { useUser } from "../context/UserContext";
 
 type NotificationProps = {
   notification: NotificationType;
 };
 
 const Notification = ({ notification }: NotificationProps) => {
+  const { getIsTextBoldEnabled } = useUser();
+  const isTextBoldEnabled = getIsTextBoldEnabled();
   const assets = useAssetContext();
   const warning = assets?.[1];
   const disablePostPressable = notification.for_post_id === null;
@@ -82,9 +85,27 @@ const Notification = ({ notification }: NotificationProps) => {
           >
             <View style={[styles.mainContainer]}>
               <View style={{ flexDirection: "row" }}>
-                <Text style={styles.titleContent}>{notification.title}</Text>
+                <Text
+                  style={[
+                    styles.titleContent,
+                    isTextBoldEnabled
+                      ? { fontWeight: "600" }
+                      : { fontWeight: "700" },
+                  ]}
+                >
+                  {notification.title}
+                </Text>
               </View>
-              <Text style={styles.messageContent}>{notification.message}</Text>
+              <Text
+                style={[
+                  styles.messageContent,
+                  isTextBoldEnabled
+                    ? { fontWeight: "500" }
+                    : { fontWeight: "700" },
+                ]}
+              >
+                {notification.message}
+              </Text>
             </View>
           </Pressable>
         </Link>
@@ -96,13 +117,13 @@ const Notification = ({ notification }: NotificationProps) => {
 const styles = StyleSheet.create({
   titleContent: {
     fontSize: 17,
-    fontWeight: "bold",
+    fontWeight: "800",
   },
   messageContent: {
     lineHeight: 20,
     marginTop: 5,
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "700",
     marginRight: 10,
     color: Colors.light.switchFontColor,
   },

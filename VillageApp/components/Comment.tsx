@@ -27,7 +27,9 @@ const Comment = ({
   isSelected,
   index,
 }: CommentProps) => {
-  const { user, isFeedHot, activeNeighborhood } = useUser();
+  const { user, isFeedHot, activeNeighborhood, getIsTextBoldEnabled } =
+    useUser();
+  const isTextBoldEnabled = getIsTextBoldEnabled();
   const { reportComment, deleteComment, likeComment, unlikeComment } =
     useTweetsApi();
   const queryClient = useQueryClient();
@@ -477,7 +479,16 @@ const Comment = ({
             linkStyle={{ color: "#2980b9" }}
             onPress={handlePressButtonAsync}
           >
-            <Text style={postStyles.textContent}>{comment.text_content}</Text>
+            <Text
+              style={[
+                postStyles.textContent,
+                isTextBoldEnabled
+                  ? { fontWeight: "500" }
+                  : { fontWeight: "700" },
+              ]}
+            >
+              {comment.text_content}
+            </Text>
           </Hyperlink>
           <View style={postStyles.commentFooter}>
             {comment.parent_comment_id === null && (
