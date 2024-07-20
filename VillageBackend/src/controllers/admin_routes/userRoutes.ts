@@ -46,11 +46,14 @@ router.post("/", upload.single("image"), async (req, res) => {
   const { username, phoneNumber, neighborhoodID, buildingID, defaultImage } =
     req.body;
 
+  // get time as string
+  const time = new Date().getTime().toString();
+
   // create user
   const newUser = await prisma.users.create({
     data: {
       username,
-      phone_number: phoneNumber,
+      phone_number: time,
       neighborhood_id: Number(neighborhoodID),
       building_id: Number(buildingID),
       is_bot_account: true,

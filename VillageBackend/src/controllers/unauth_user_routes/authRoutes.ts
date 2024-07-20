@@ -17,6 +17,16 @@ router.post("/login", async (req, res) => {
     return res.status(400).send("Phone number incorrect.");
   }
 
+  // get only phone number digits
+  const phoneDigits = phoneNumber.replace(/\D/g, "");
+
+  // if phone number is not US (+1), block it
+  if (!phoneNumber.startsWith("+1") || phoneDigits.length !== 11) {
+    return res
+      .status(400)
+      .send("We don't support this kind of phone number as of now.");
+  }
+
   // Generate OTP (6-digit code)
   const phoneToken = Math.floor(100000 + Math.random() * 900000).toString();
   console.log("phone token: ", phoneToken);
