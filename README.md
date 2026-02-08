@@ -2,7 +2,7 @@
 
 A neighborhood-based social media app built for NYC residents to connect with their neighbors, share posts, and chat within their buildings.
 
-**Note:** This project is no longer actively maintained. The startup has been shut down and this repo has been made public for portfolio/reference purposes.
+**Note:** This project is no longer actively maintained. This repo has been made public for reference purposes.
 
 ## What is Village?
 
