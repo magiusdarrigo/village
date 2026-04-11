@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/magiusdarrigo/village#readme",
   "dependencies": {
-    "axios": "^1.7.2",
+    "axios": "^1.15.0",
     "dotenv": "^16.4.5",
     "google-auth-library": "^9.11.0",
     "google-spreadsheet": "^4.1.2"
