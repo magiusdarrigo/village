@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@supabase/supabase-js": "^2.42.0",
+    "@supabase/supabase-js": "^2.105.0",
     "amqplib": "^0.10.3",
     "dotenv": "^16.4.5",
     "firebase-admin": "^12.0.0",
